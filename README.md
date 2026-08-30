@@ -18,6 +18,10 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
   <sub>Open <a href="demo.mp4">demo.mp4</a> in this repository.</sub>
 </p>
 
+Another demo:
+
+https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
+
 ## Prerequisites
 
 Python 3.10+. After cloning, create a virtualenv and install dependencies; the `m2mr` command is then available:
