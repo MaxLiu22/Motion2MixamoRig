@@ -1,0 +1,32 @@
+# ── User-supplied assets: never committed ───────────────────
+# Ignore every file under assets/; re-include directories (so git
+# can descend) plus the docs and .gitkeep placeholders. This keeps
+# SMPLX_NEUTRAL.npz / *.fbx / videos out of git no matter what.
+assets/**
+!assets/**/
+!assets/README.md
+!assets/**/.gitkeep
+
+# ── Auto-downloaded inference weights (GVHMR / 2D pose, etc.) ─
+weights/**
+!weights/.gitkeep
+
+# ── Run outputs ──────────────────────────────────────────────
+outputs/**
+!outputs/.gitkeep
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# ── Local secrets / environment variables ────────────────────
+.env
+.env.*
+
+# ── OS junk ──────────────────────────────────────────────────
+.DS_Store

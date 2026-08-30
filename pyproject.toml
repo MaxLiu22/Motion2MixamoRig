@@ -1,0 +1,23 @@
+[project]
+name = "motion2mixamorig"
+version = "0.1.0"
+description = "Retarget human motion from video to an Adobe Mixamo-rigged 3D character."
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "opencv-python",
+    "einops",
+    # Video -> 3D human skeleton. `preproc` = person detection/tracking,
+    # `rtmpose` = the ungated 2D-pose backend the pipeline uses.
+    "gvhmr[preproc,rtmpose]>=1.6",
+]
+
+[project.scripts]
+m2mr = "motion2mixamorig.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["motion2mixamorig*"]
