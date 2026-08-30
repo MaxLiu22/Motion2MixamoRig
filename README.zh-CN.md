@@ -1,6 +1,10 @@
 # Motion2MixamoRig
 
-中文 · [English](README.md)
+![Motion2MixamoRig](repo_poster.png)
+
+<p align="center">
+  中文 · <a href="README.md">English</a>
+</p>
 
 把视频里人物的动作，转到 Adobe Mixamo rig 的 3D 角色上。
 
