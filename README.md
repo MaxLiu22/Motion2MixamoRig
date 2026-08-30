@@ -12,6 +12,12 @@ For game developers: give it a **single-person** action video and a Mixamo chara
 
 Agents should start with [`AGENTS.md`](AGENTS.md).
 
+https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
+
+<p align="center">
+  <sub>Open <a href="demo.mp4">demo.mp4</a> in this repository.</sub>
+</p>
+
 ## Prerequisites
 
 Python 3.10+. After cloning, create a virtualenv and install dependencies; the `m2mr` command is then available:

@@ -12,6 +12,12 @@
 
 Agent 请先读 [`AGENTS.md`](AGENTS.md)。
 
+https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
+
+<p align="center">
+  <sub>打开本仓库中的 <a href="demo.mp4">demo.mp4</a>。</sub>
+</p>
+
 ## 前置条件
 
 需要 Python 3.10+。克隆后建虚拟环境并安装依赖，`m2mr` 命令随之可用：
