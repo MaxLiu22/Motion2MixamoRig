@@ -3,7 +3,7 @@
 ![Motion2MixamoRig](repo_poster.png)
 
 <p align="center">
-  中文 · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a>
+  中文 · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
 把视频里人物的动作，转到 Adobe Mixamo rig 的 3D 角色上。

@@ -3,7 +3,7 @@
 ![Motion2MixamoRig](repo_poster.png)
 
 <p align="center">
-  <a href="README.zh-CN.md">中文</a> · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · 日本語 · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a>
+  <a href="README.zh-CN.md">中文</a> · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · 日本語 · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
 動画の人物の動きを、Adobe Mixamo rig の 3D キャラクターに移します。
