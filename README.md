@@ -54,13 +54,13 @@ This repository does not ship these files; you have to fetch them. The SMPL-X fi
 |---|---|---|
 | SMPL-X body model | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | Register at [SMPL-X](https://smpl-x.is.tue.mpg.de/) and download it |
 | Mixamo character FBX | `assets/mixamo/Y_Bot.fbx` | With an Adobe account, download Y Bot (or any other Mixamo-rigged character) from [Mixamo](https://www.mixamo.com) |
-| Action video | `assets/video/<your_clip>.mp4` | A clip with **exactly one** clearly visible person (you may keep several files; each run uses one) |
+| Action video | `assets/video/<your_clip>.mp4` | A clip with **exactly one** clearly visible person, **head to toe in frame the whole time** (you may keep several files; each run uses the most recently added) |
 
 Note: Mixamo's download is named `Y Bot.fbx` (**space**), one character off from `Y_Bot.fbx` (**underscore**) in the table.
 Rename it to the underscore form and it becomes the default rig (`m2mr run` without `--rig`). Leaving the space is fine too — if `Y_Bot.fbx` is missing, the first `.fbx` in `assets/mixamo/` is used.
 
 `assets/video/` can hold several videos. Without `--video`, the run uses the file **most recently added** to that folder.
-Each clip must show only one person: `m2mr doctor` / `m2mr run` sample the frames and stop before extraction if two people are in view.
+Each clip must show only one person, **head to toe in frame for the whole clip** — nothing cropped at the edges. `m2mr doctor` / `m2mr run` sample the frames and stop before extraction if two people are in view.
 
 ## Quick Start
 

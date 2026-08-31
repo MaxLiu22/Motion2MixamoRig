@@ -53,14 +53,14 @@ pip install --upgrade pip setuptools wheel \
 |---|---|---|
 | SMPL-X 人体模型 | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | 注册 [SMPL-X](https://smpl-x.is.tue.mpg.de/) 后下载 |
 | Mixamo 角色 FBX | `assets/mixamo/Y_Bot.fbx` | 用 Adobe 账号从 [Mixamo](https://www.mixamo.com) 下载 Y Bot（或其他 Mixamo rig 角色） |
-| 动作视频 | `assets/video/<your_clip>.mp4` | **只有一个人**、人清晰可见的动作视频（可放多个文件，每次跑用其中一个） |
+| 动作视频 | `assets/video/<your_clip>.mp4` | **只有一个人**、人清晰可见、**从头到脚全程都在画框内**（可放多个文件，每次跑用最新的那一个） |
 
 注意：Mixamo 下载下来的文件叫 `Y Bot.fbx`（中间是**空格**），和上表的 `Y_Bot.fbx`（**下划线**）差一个字符。
 改成下划线它就是默认 rig，`m2mr run` 不带 `--rig` 时自动用它；不想改名也行——找不到 `Y_Bot.fbx` 时
 会自动用 `assets/mixamo/` 里的第一个 `.fbx`。
 
 `assets/video/` 可以放多个视频文件。不指定 `--video` 时，会用**最后放进这个文件夹**的那一个。
-每个视频画面里只能有一个人：`m2mr doctor` / `m2mr run` 会抽样检测，看到两个人就直接停，不会进入提取。
+每个视频画面里只能有一个人，而且人物必须**从头到脚全程都在画框内**，不能出画。`m2mr doctor` / `m2mr run` 会抽样检测人数，看到两个人就直接停，不会进入提取。
 
 ## Quick Start
 
