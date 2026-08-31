@@ -3,7 +3,7 @@
 ![Motion2MixamoRig](repo_poster.png)
 
 <p align="center">
-  中文 · <a href="README.md">English</a>
+  中文 · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a>
 </p>
 
 把视频里人物的动作，转到 Adobe Mixamo rig 的 3D 角色上。
@@ -111,7 +111,7 @@ m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 outputs/20260829_193205_dance/
 ├── run.json                    # 启动时间、用的视频 / rig、完整命令
 ├── skeleton_motion.npz         # 人体 3D 骨架（换 rig 可复用，不必重跑提取）
-├── mixamo_rotations.npz        # Mixamo 骨逐帧旋转
+├── mixamo_rotations.npz        # Mixamo 骨骼逐帧旋转
 ├── mixamo_character.glb        # 带皮角色 + 动画，Blender / Unity 可直接导入
 └── videos/                     # 比例跟输入视频一致
     ├── human_skeleton.mp4      # 人体骨架

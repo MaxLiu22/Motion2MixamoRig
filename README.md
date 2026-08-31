@@ -3,7 +3,7 @@
 ![Motion2MixamoRig](repo_poster.png)
 
 <p align="center">
-  <a href="README.zh-CN.md">中文</a> · English
+  <a href="README.zh-CN.md">中文</a> · English · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a>
 </p>
 
 Transfer the motion of a person in a video onto an Adobe Mixamo-rigged 3D character.
