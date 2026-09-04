@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## 输出
 
-每次 `m2mr run` 按**命令启动时间**新建一个目录：
+每次 `m2mr run` 按**命令启动时间**新建一个目录。根目录那四个文件视频和照片都一样，只有预览文件夹会变。
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # 启动时间、用的视频 / rig、完整命令
-├── skeleton_motion.npz         # 人体 3D 骨架（换 rig 可复用，不必重跑提取）
-├── mixamo_rotations.npz        # Mixamo 骨骼逐帧旋转
-├── mixamo_character.glb        # 带皮角色 + 动画，Blender / Unity 可直接导入
-└── videos/                     # 视频输入：比例跟输入视频一致
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 四宫格：左上原片 / 右上 Mixamo 骨架 / 左下人体骨架 / 右下 Mixamo 角色
-
-# 照片输入则写 images/，四种图和上面一一对应：
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   另外还有 before_after_360_compare.mp4（左原图 / 右 10° 俯视绕角色转一圈）
+outputs/20260829_193205_dance/          # 照片 run 则是 …_pose/
+├── run.json                            # 启动时间、输入、完整命令
+├── skeleton_motion.npz                 # 人体 3D 骨架（可用 --skeleton 复用）
+├── mixamo_rotations.npz                # Mixamo 骨骼逐帧旋转
+├── mixamo_character.glb                # 带皮角色，Blender / Unity 可导入
+└── videos/   或   images/              # 预览 — 取决于这次输入是视频还是照片
 ```
 
-`mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，先选中角色，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：选中骨架，在 Armature → Viewport Display 里去掉 Shapes。时间轴结束帧改成和视频一样长，再点播放；对照同一次运行的 `videos/mixamo_character.mp4`。
+**视频输入**写 `videos/`（比例跟片段一致）：
+
+```
+videos/
+├── human_skeleton.mp4                  # 提取出的人体 3D 骨架
+├── mixamo_skeleton.mp4                 # Mixamo rig 骨架
+├── mixamo_character.mp4                # 带皮 Mixamo 角色
+└── compare.mp4                         # 四宫格：左上原片 / 右上 Mixamo 骨架
+                                        #         左下人体骨架 / 右下角色
+```
+
+**照片输入**则写 `images/`（四种图和上面一一对应，外加一条绕转）：
+
+```
+images/
+├── human_skeleton.png                  # 提取出的人体 3D 骨架
+├── mixamo_skeleton.png                 # Mixamo rig 骨架
+├── mixamo_character.png                # 带皮 Mixamo 角色
+├── compare.png                         # 四宫格：左上原图 / 右上 Mixamo 骨架
+│                                       #         左下人体骨架 / 右下角色
+└── before_after_360_compare.mp4        # 左：原图
+                                        # 右：10° 俯视绕角色转一圈
+```
+
+`mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，先选中角色，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：选中骨架，在 Armature → Viewport Display 里去掉 Shapes。视频 run 把时间轴结束帧改成和片段一样长，对照 `videos/mixamo_character.mp4`。照片 run 对照 `images/mixamo_character.png` 或那条绕转视频。
 
 ## 许可证
 

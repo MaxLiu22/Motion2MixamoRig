@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## Outputs
 
-Each `m2mr run` creates a directory named by **the time the command started**:
+Each `m2mr run` creates a directory named by **the time the command started**. The four files at the root are the same for video and still; only the preview folder changes.
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # start time, video / rig used, full command
-├── skeleton_motion.npz         # 3D human skeleton (reuse when swapping rigs; no re-extract)
-├── mixamo_rotations.npz        # per-bone Mixamo rotations
-├── mixamo_character.glb        # skinned character + animation, import into Blender / Unity
-└── videos/                     # video input: same aspect ratio as the clip
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2: original (TL) / Mixamo skeleton (TR) / human skeleton (BL) / character (BR)
-
-# still input writes images/ instead, same four views:
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   plus before_after_360_compare.mp4 (left original / right 10° orbit of the rig)
+outputs/20260829_193205_dance/          # or …_pose/ for a still
+├── run.json                            # start time, inputs, full command
+├── skeleton_motion.npz                 # 3D human skeleton (reuse with --skeleton)
+├── mixamo_rotations.npz                # per-bone Mixamo rotations
+├── mixamo_character.glb                # skinned character, import into Blender / Unity
+└── videos/   or   images/              # previews — which one depends on the input
 ```
 
-Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character and use View → Frame Selected. The cluster of spheres on the head and hands is the bone display, not the mesh: select the armature and turn off Shapes under Armature → Viewport Display. Set the timeline end frame to the clip length, then play. Compare against `videos/mixamo_character.mp4` from the same run.
+**Video input** writes `videos/` (same aspect ratio as the clip):
+
+```
+videos/
+├── human_skeleton.mp4                  # recovered 3D human skeleton
+├── mixamo_skeleton.mp4                 # Mixamo rig skeleton
+├── mixamo_character.mp4                # skinned Mixamo character
+└── compare.mp4                         # 2×2: original (TL) / Mixamo skeleton (TR)
+                                        #      human skeleton (BL) / character (BR)
+```
+
+**Still input** writes `images/` instead (same four views, plus a turntable):
+
+```
+images/
+├── human_skeleton.png                  # recovered 3D human skeleton
+├── mixamo_skeleton.png                 # Mixamo rig skeleton
+├── mixamo_character.png                # skinned Mixamo character
+├── compare.png                         # 2×2: original (TL) / Mixamo skeleton (TR)
+│                                       #      human skeleton (BL) / character (BR)
+└── before_after_360_compare.mp4        # left: original photo
+                                        # right: 10° orbit of the rig (one full turn)
+```
+
+Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character and use View → Frame Selected. The cluster of spheres on the head and hands is the bone display, not the mesh: select the armature and turn off Shapes under Armature → Viewport Display. For a video run, set the timeline end frame to the clip length and compare against `videos/mixamo_character.mp4`. For a still run, compare against `images/mixamo_character.png` or the orbit clip.
 
 ## License
 

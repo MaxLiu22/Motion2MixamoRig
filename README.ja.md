@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## 出力
 
-各 `m2mr run` は**コマンド開始時刻**でディレクトリを作ります：
+各 `m2mr run` は**コマンド開始時刻**でディレクトリを作ります。ルートの 4 ファイルは動画も写真も同じで、プレビューフォルダだけが変わります。
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # 開始時刻、使った動画 / rig、完全なコマンド
-├── skeleton_motion.npz         # 人体 3D スケルトン（rig 差し替え時に再利用、再抽出不要）
-├── mixamo_rotations.npz        # Mixamo ボーンごとの回転
-├── mixamo_character.glb        # スキン付きキャラクター + アニメーション、Blender / Unity に直接インポート
-└── videos/                     # 動画入力：クリップと同じアスペクト比
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2：元映像（左上）/ Mixamo スケルトン（右上）/ 人体スケルトン（左下）/ キャラクター（右下）
-
-# 写真入力は images/ に同じ 4 ビューを書き出します：
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   加えて before_after_360_compare.mp4（左が原画 / 右が 10° 周回）
+outputs/20260829_193205_dance/          # 写真実行は …_pose/
+├── run.json                            # 開始時刻、入力、完全なコマンド
+├── skeleton_motion.npz                 # 人体 3D スケルトン（--skeleton で再利用）
+├── mixamo_rotations.npz                # Mixamo ボーンごとの回転
+├── mixamo_character.glb                # スキン付きキャラクター、Blender / Unity にインポート
+└── videos/   または   images/          # プレビュー — 入力によって決まる
 ```
 
-`mixamo_character.glb` は Blender で File → Import → glTF 2.0 (.glb/.gltf) で開きます。カメラが空を向いているときはキャラクターを選び、View → Frame Selected。頭と手の球の塊はメッシュではなくボーン表示です：アーマチュアを選び、Armature → Viewport Display で Shapes をオフにします。タイムラインの終了フレームをクリップ長に合わせて再生。同じ実行の `videos/mixamo_character.mp4` と見比べてください。
+**動画入力**は `videos/` に書き出します（クリップと同じアスペクト比）：
+
+```
+videos/
+├── human_skeleton.mp4                  # 復元した人体 3D スケルトン
+├── mixamo_skeleton.mp4                 # Mixamo rig スケルトン
+├── mixamo_character.mp4                # スキン付き Mixamo キャラクター
+└── compare.mp4                         # 2×2：元映像（左上）/ Mixamo スケルトン（右上）
+                                        #      人体スケルトン（左下）/ キャラクター（右下）
+```
+
+**写真入力**は代わりに `images/` に書き出します（同じ 4 ビュー + 周回）：
+
+```
+images/
+├── human_skeleton.png                  # 復元した人体 3D スケルトン
+├── mixamo_skeleton.png                 # Mixamo rig スケルトン
+├── mixamo_character.png                # スキン付き Mixamo キャラクター
+├── compare.png                         # 2×2：原画（左上）/ Mixamo スケルトン（右上）
+│                                       #      人体スケルトン（左下）/ キャラクター（右下）
+└── before_after_360_compare.mp4        # 左：原画
+                                        # 右：10° で一周する周回
+```
+
+`mixamo_character.glb` は Blender で File → Import → glTF 2.0 (.glb/.gltf) で開きます。カメラが空を向いているときはキャラクターを選び、View → Frame Selected。頭と手の球の塊はメッシュではなくボーン表示です：アーマチュアを選び、Armature → Viewport Display で Shapes をオフにします。動画実行はタイムラインの終了フレームをクリップ長に合わせ、`videos/mixamo_character.mp4` と見比べてください。写真実行は `images/mixamo_character.png` または周回クリップと見比べてください。
 
 ## ライセンス
 

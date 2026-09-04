@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## المخرجات
 
-كل `m2mr run` ينشئ مجلدًا باسم **وقت بدء الأمر**:
+كل `m2mr run` ينشئ مجلدًا باسم **وقت بدء الأمر**. الملفات الأربعة في الجذر واحدة للفيديو والصورة؛ يتغيّر مجلد المعاينة فقط.
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # وقت البدء، الفيديو / الهيكل المستخدم، الأمر الكامل
-├── skeleton_motion.npz         # هيكل إنسان ثلاثي الأبعاد (يُعاد استخدامه عند تبديل الهيكل؛ بلا إعادة استخراج)
-├── mixamo_rotations.npz        # دورانات عظام Mixamo لكل عظم
-├── mixamo_character.glb        # شخصية مكسوّة + تحريك، استيراد إلى Blender / Unity
-└── videos/                     # إدخال فيديو: نسبة العرض إلى الارتفاع نفسها كالمقطع
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2: الأصل (أعلى اليسار) / هيكل Mixamo (أعلى اليمين) / هيكل الإنسان (أسفل اليسار) / الشخصية (أسفل اليمين)
-
-# إدخال الصورة يكتب images/ بنفس المناظر الأربعة:
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   إضافة إلى before_after_360_compare.mp4 (اليسار الأصل / اليمين مدار 10°)
+outputs/20260829_193205_dance/          # تشغيل الصورة: …_pose/
+├── run.json                            # وقت البدء، المدخلات، الأمر الكامل
+├── skeleton_motion.npz                 # هيكل إنسان ثلاثي الأبعاد (إعادة استخدام بـ --skeleton)
+├── mixamo_rotations.npz                # دورانات عظام Mixamo لكل عظم
+├── mixamo_character.glb                # شخصية مكسوّة، استيراد إلى Blender / Unity
+└── videos/   أو   images/              # المعاينات — حسب المدخل
 ```
 
-افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: حدّد الهيكل (Armature) وأوقف Shapes تحت Armature → Viewport Display. اضبط إطار نهاية الخط الزمني على طول المقطع ثم شغّل. قارن مع `videos/mixamo_character.mp4` من التشغيل نفسه.
+**إدخال الفيديو** يكتب `videos/` (نسبة العرض إلى الارتفاع نفسها كالمقطع):
+
+```
+videos/
+├── human_skeleton.mp4                  # هيكل الإنسان الثلاثي المستعاد
+├── mixamo_skeleton.mp4                 # هيكل Mixamo
+├── mixamo_character.mp4                # شخصية Mixamo المكسوّة
+└── compare.mp4                         # 2×2: الأصل (أعلى اليسار) / هيكل Mixamo (أعلى اليمين)
+                                        #      هيكل الإنسان (أسفل اليسار) / الشخصية (أسفل اليمين)
+```
+
+**إدخال الصورة** يكتب `images/` بدلًا من ذلك (نفس المناظر الأربعة مع مدار):
+
+```
+images/
+├── human_skeleton.png                  # هيكل الإنسان الثلاثي المستعاد
+├── mixamo_skeleton.png                 # هيكل Mixamo
+├── mixamo_character.png                # شخصية Mixamo المكسوّة
+├── compare.png                         # 2×2: الأصل (أعلى اليسار) / هيكل Mixamo (أعلى اليمين)
+│                                       #      هيكل الإنسان (أسفل اليسار) / الشخصية (أسفل اليمين)
+└── before_after_360_compare.mp4        # اليسار: الصورة الأصلية
+                                        # اليمين: مدار 10° حول الهيكل (دورة كاملة)
+```
+
+افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: حدّد الهيكل (Armature) وأوقف Shapes تحت Armature → Viewport Display. في تشغيل الفيديو اضبط إطار نهاية الخط الزمني على طول المقطع وقارن مع `videos/mixamo_character.mp4`. في تشغيل الصورة قارن مع `images/mixamo_character.png` أو مقطع المدار.
 
 ## الرخصة
 

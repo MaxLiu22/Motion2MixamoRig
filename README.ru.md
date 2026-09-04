@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## Результаты
 
-Каждый `m2mr run` создаёт каталог по **времени старта команды**:
+Каждый `m2mr run` создаёт каталог по **времени старта команды**. Четыре файла в корне одинаковы для видео и фото; меняется только папка превью.
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # время старта, видео / риг, полная команда
-├── skeleton_motion.npz         # 3D-скелет человека (переиспользовать при смене рига; без повторного извлечения)
-├── mixamo_rotations.npz        # вращения костей Mixamo
-├── mixamo_character.glb        # персонаж со скином + анимация, импорт в Blender / Unity
-└── videos/                     # видео-вход: то же соотношение сторон, что у клипа
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2: оригинал (верхний левый) / скелет Mixamo (верхний правый) / скелет человека (нижний левый) / персонаж (нижний правый)
-
-# фото-вход пишет images/ с теми же четырьмя видами:
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   плюс before_after_360_compare.mp4 (слева оригинал / справа орбита 10°)
+outputs/20260829_193205_dance/          # для фото: …_pose/
+├── run.json                            # время старта, входы, полная команда
+├── skeleton_motion.npz                 # 3D-скелет человека (повторно с --skeleton)
+├── mixamo_rotations.npz                # вращения костей Mixamo
+├── mixamo_character.glb                # персонаж со скином, импорт в Blender / Unity
+└── videos/   или   images/             # превью — зависит от входа
 ```
 
-`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: выберите арматуру и отключите Shapes в Armature → Viewport Display. Конечный кадр таймлайна поставьте по длине клипа, затем воспроизведите. Сверяйте с `videos/mixamo_character.mp4` того же запуска.
+**Видео-вход** пишет в `videos/` (то же соотношение сторон, что у клипа):
+
+```
+videos/
+├── human_skeleton.mp4                  # восстановленный 3D-скелет человека
+├── mixamo_skeleton.mp4                 # скелет рига Mixamo
+├── mixamo_character.mp4                # персонаж Mixamo со скином
+└── compare.mp4                         # 2×2: оригинал (верхний левый) / скелет Mixamo (верхний правый)
+                                        #      скелет человека (нижний левый) / персонаж (нижний правый)
+```
+
+**Фото-вход** пишет в `images/` (те же четыре вида плюс орбита):
+
+```
+images/
+├── human_skeleton.png                  # восстановленный 3D-скелет человека
+├── mixamo_skeleton.png                 # скелет рига Mixamo
+├── mixamo_character.png                # персонаж Mixamo со скином
+├── compare.png                         # 2×2: оригинал (верхний левый) / скелет Mixamo (верхний правый)
+│                                       #      скелет человека (нижний левый) / персонаж (нижний правый)
+└── before_after_360_compare.mp4        # слева: исходное фото
+                                        # справа: орбита 10° вокруг рига (полный оборот)
+```
+
+`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: выберите арматуру и отключите Shapes в Armature → Viewport Display. Для видео-запуска поставьте конечный кадр таймлайна по длине клипа и сверяйте с `videos/mixamo_character.mp4`. Для фото-запуска сверяйте с `images/mixamo_character.png` или клипом орбиты.
 
 ## Лицензия
 

@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## 출력
 
-각 `m2mr run`은 **명령이 시작된 시각**으로 디렉터리를 만듭니다:
+각 `m2mr run`은 **명령이 시작된 시각**으로 디렉터리를 만듭니다. 루트의 네 파일은 영상과 사진이 같고, 미리보기 폴더만 달라집니다.
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # 시작 시각, 사용한 영상 / rig, 전체 명령
-├── skeleton_motion.npz         # 인체 3D 스켈레톤 (rig 교체 시 재사용, 추출 생략)
-├── mixamo_rotations.npz        # Mixamo 본별 회전
-├── mixamo_character.glb        # 스키닝된 캐릭터 + 애니메이션, Blender / Unity에 바로 임포트
-└── videos/                     # 영상 입력: 클립과 같은 화면비
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2: 원본(좌상) / Mixamo 스켈레톤(우상) / 인체 스켈레톤(좌하) / 캐릭터(우하)
-
-# 사진 입력은 images/에 같은 네 뷰를 씁니다:
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   그리고 before_after_360_compare.mp4 (왼쪽 원본 / 오른쪽 10° 궤도)
+outputs/20260829_193205_dance/          # 사진 실행은 …_pose/
+├── run.json                            # 시작 시각, 입력, 전체 명령
+├── skeleton_motion.npz                 # 인체 3D 스켈레톤 (--skeleton으로 재사용)
+├── mixamo_rotations.npz                # Mixamo 본별 회전
+├── mixamo_character.glb                # 스키닝된 캐릭터, Blender / Unity에 임포트
+└── videos/   또는   images/            # 미리보기 — 입력에 따라 결정
 ```
 
-`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Armature를 선택하고 Armature → Viewport Display에서 Shapes를 끄세요. 타임라인 끝 프레임을 클립 길이에 맞춘 뒤 재생하세요. 같은 실행의 `videos/mixamo_character.mp4`와 비교하면 됩니다.
+**영상 입력**은 `videos/`에 씁니다(클립과 같은 화면비):
+
+```
+videos/
+├── human_skeleton.mp4                  # 복원한 인체 3D 스켈레톤
+├── mixamo_skeleton.mp4                 # Mixamo rig 스켈레톤
+├── mixamo_character.mp4                # 스키닝된 Mixamo 캐릭터
+└── compare.mp4                         # 2×2: 원본(좌상) / Mixamo 스켈레톤(우상)
+                                        #      인체 스켈레톤(좌하) / 캐릭터(우하)
+```
+
+**사진 입력**은 대신 `images/`에 씁니다(같은 네 뷰 + 궤도):
+
+```
+images/
+├── human_skeleton.png                  # 복원한 인체 3D 스켈레톤
+├── mixamo_skeleton.png                 # Mixamo rig 스켈레톤
+├── mixamo_character.png                # 스키닝된 Mixamo 캐릭터
+├── compare.png                         # 2×2: 원본(좌상) / Mixamo 스켈레톤(우상)
+│                                       #      인체 스켈레톤(좌하) / 캐릭터(우하)
+└── before_after_360_compare.mp4        # 왼쪽: 원본 사진
+                                        # 오른쪽: 10° 궤도(한 바퀴)
+```
+
+`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Armature를 선택하고 Armature → Viewport Display에서 Shapes를 끄세요. 영상 실행은 타임라인 끝 프레임을 클립 길이에 맞추고 `videos/mixamo_character.mp4`와 비교하세요. 사진 실행은 `images/mixamo_character.png` 또는 궤도 클립과 비교하세요.
 
 ## 라이선스
 

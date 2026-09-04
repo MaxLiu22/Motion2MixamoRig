@@ -117,26 +117,42 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ## Ausgaben
 
-Jeder `m2mr run` legt ein Verzeichnis an, benannt nach **Startzeit des Befehls**:
+Jeder `m2mr run` legt ein Verzeichnis an, benannt nach **Startzeit des Befehls**. Die vier Dateien im Wurzelverzeichnis sind für Video und Foto gleich; nur der Vorschauordner ändert sich.
 
 ```
-outputs/20260829_193205_dance/
-├── run.json                    # Startzeit, verwendetes Video / Rig, vollständiger Befehl
-├── skeleton_motion.npz         # 3D-Körperskelett (beim Rig-Wechsel wiederverwenden; keine Neu-Extraktion)
-├── mixamo_rotations.npz        # Mixamo-Rotationen pro Bone
-├── mixamo_character.glb        # Charakterdatei mit Skinning + Animation, Import in Blender / Unity
-└── videos/                     # Videoeingabe: gleiches Seitenverhältnis wie der Clip
-    ├── human_skeleton.mp4
-    ├── mixamo_skeleton.mp4
-    ├── mixamo_character.mp4
-    └── compare.mp4             # 2×2: Original (oben links) / Mixamo-Skelett (oben rechts) / Körperskelett (unten links) / Charakter (unten rechts)
-
-# Fotoeingabe schreibt images/ mit denselben vier Ansichten:
-#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
-#   plus before_after_360_compare.mp4 (links Original / rechts 10°-Orbit)
+outputs/20260829_193205_dance/          # Foto-Lauf: …_pose/
+├── run.json                            # Startzeit, Eingaben, vollständiger Befehl
+├── skeleton_motion.npz                 # 3D-Körperskelett (mit --skeleton wiederverwenden)
+├── mixamo_rotations.npz                # Mixamo-Rotationen pro Bone
+├── mixamo_character.glb                # Charakter mit Skinning, Import in Blender / Unity
+└── videos/   oder   images/            # Vorschauen — je nach Eingabe
 ```
 
-`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, den Charakter wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: Armature wählen und unter Armature → Viewport Display die Shapes ausschalten. Das letzte Timeline-Frame auf die Cliplänge setzen, dann abspielen. Mit `videos/mixamo_character.mp4` desselben Laufs vergleichen.
+**Videoeingabe** schreibt `videos/` (gleiches Seitenverhältnis wie der Clip):
+
+```
+videos/
+├── human_skeleton.mp4                  # rekonstruiertes 3D-Körperskelett
+├── mixamo_skeleton.mp4                 # Mixamo-Rig-Skelett
+├── mixamo_character.mp4                # Mixamo-Charakter mit Skinning
+└── compare.mp4                         # 2×2: Original (oben links) / Mixamo-Skelett (oben rechts)
+                                        #      Körperskelett (unten links) / Charakter (unten rechts)
+```
+
+**Fotoeingabe** schreibt stattdessen `images/` (dieselben vier Ansichten plus Turntable):
+
+```
+images/
+├── human_skeleton.png                  # rekonstruiertes 3D-Körperskelett
+├── mixamo_skeleton.png                 # Mixamo-Rig-Skelett
+├── mixamo_character.png                # Mixamo-Charakter mit Skinning
+├── compare.png                         # 2×2: Original (oben links) / Mixamo-Skelett (oben rechts)
+│                                       #      Körperskelett (unten links) / Charakter (unten rechts)
+└── before_after_360_compare.mp4        # links: Originalfoto
+                                        # rechts: 10°-Orbit um den Rig (eine volle Umdrehung)
+```
+
+`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, den Charakter wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: Armature wählen und unter Armature → Viewport Display die Shapes ausschalten. Beim Videolauf das letzte Timeline-Frame auf die Cliplänge setzen und mit `videos/mixamo_character.mp4` vergleichen. Beim Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip vergleichen.
 
 ## Lizenz
 
