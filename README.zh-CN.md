@@ -10,6 +10,8 @@
 
 面向游戏开发者：输入一段**单人**动作视频（或一张人物照片）和一个 Mixamo 角色，输出预览视频，以及可直接丢进 Blender / Unity 的带皮角色文件（`.glb`）。
 
+> Motion2MixamoRig 目前仍处于实验阶段。v0.1.0 提供命令行工作流；Blender Extension 计划在 v0.2.0 中加入。
+
 Agent 请先读 [`AGENTS.md`](AGENTS.md)。
 
 https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
