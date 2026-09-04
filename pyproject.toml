@@ -1,7 +1,7 @@
 [project]
 name = "motion2mixamorig"
 version = "0.1.0"
-description = "Retarget human motion from video to an Adobe Mixamo-rigged 3D character."
+description = "Retarget human motion from video or a still pose to an Adobe Mixamo-rigged 3D character."
 requires-python = ">=3.10"
 dependencies = [
     "numpy",

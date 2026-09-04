@@ -3,6 +3,7 @@
     m2mr doctor                 check assets, weights and dependencies
     m2mr run                    latest video in assets/video/ + default Y Bot
     m2mr run --video V --rig R  pick the inputs explicitly (flags combine freely)
+    m2mr run --image I --rig R  still photo -> 3D pose on the same Mixamo path
 
 `m2mr run` performs the same asset checks as `m2mr doctor` before doing any
 work, and reports everything that is missing in one pass.
@@ -32,6 +33,11 @@ VIDEO_HINT = (
     "put a *single-person* motion video (.mp4/.mov/...) into assets/video/ "
     "— group shots are rejected before extraction"
 )
+IMAGE_HINT = (
+    "put a *single-person* still (.jpg/.png/...) into assets/image/ "
+    "— group photos are rejected before extraction"
+)
+SOURCE_HINT = VIDEO_HINT + "; or " + IMAGE_HINT
 
 
 def _check(label: str, present: bool, hint: str) -> bool:
@@ -80,14 +86,21 @@ def doctor() -> int:
     for rig in rigs:
         ok &= _check_content(f"  - {rig.name}", rig, checks.check_rig)
     videos = paths.list_videos()
+    images = paths.list_images()
     ok &= _check(
-        f"input video        assets/video/  ({len(videos)} found"
-        + (f", latest: {videos[0].name})" if videos else ")"),
-        bool(videos),
-        VIDEO_HINT,
+        "input source       assets/video/ + assets/image/  "
+        f"({len(videos)} videos"
+        + (f", latest {videos[0].name}" if videos else "")
+        + f"; {len(images)} images"
+        + (f", latest {images[0].name}" if images else "")
+        + ")",
+        bool(videos) or bool(images),
+        SOURCE_HINT,
     )
     for video in videos:
         ok &= _check_content(f"  - {video.name}", video, checks.check_video)
+    for image in images:
+        ok &= _check_content(f"  - {image.name}", image, checks.check_image)
 
     print()
     deps_ok = True
@@ -118,12 +131,12 @@ def doctor() -> int:
     return 1
 
 
-def preflight(args: argparse.Namespace) -> tuple[Path, Path, Path | None]:
+def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None, Path | None]:
     """Resolve run inputs, checking everything doctor checks for this run.
 
     All problems are collected and reported together (same format as doctor)
     instead of failing on the first one. Exits with code 1 if anything is
-    missing.
+    missing. Returns (video, rig, skeleton, image).
     """
     problems = 0
 
@@ -139,19 +152,67 @@ def preflight(args: argparse.Namespace) -> tuple[Path, Path, Path | None]:
         if path is not None and path.exists() and not _check_content(label, path, checker):
             problems += 1
 
-    # Input video: --video wins, else the most recently added file in assets/video/.
-    if args.video:
+    video: Path | None = None
+    image: Path | None = None
+    want_image = getattr(args, "image", None) is not None
+    want_video = bool(getattr(args, "video", None))
+
+    if want_image and want_video:
+        check(
+            "input source       --video / --image",
+            False,
+            "pass only one of --video or --image",
+        )
+    elif want_image:
+        if args.image:
+            image = Path(args.image)
+            check(f"input image        {image}", image.exists(), "check the --image path")
+        else:
+            image = paths.latest_image()
+            check(
+                "input image        assets/image/"
+                + (f"  (latest: {image.name})" if image else "  (0 found)"),
+                image is not None,
+                IMAGE_HINT + ", or pass --image PATH",
+            )
+        if image is not None and image.exists() and not paths.is_image(image):
+            check(
+                f"image suffix       {image.name}",
+                False,
+                "use a still (.jpg/.png/webp/bmp), or pass a clip with --video",
+            )
+        check_content(f"image is usable    {image.name if image else ''}", image, checks.check_image)
+    elif want_video:
         video = Path(args.video)
-        check(f"input video        {video}", video.exists(), "check the --video path")
+        if video.exists() and paths.is_image(video):
+            image = video
+            video = None
+            print(f"{OK} input image        {image}  (detected from --video path)")
+            check_content(f"image is usable    {image.name}", image, checks.check_image)
+        else:
+            check(f"input video        {video}", video.exists(), "check the --video path")
+            check_content(f"video is usable    {video.name}", video, checks.check_video)
     else:
         video = paths.latest_video()
-        check(
-            "input video        assets/video/"
-            + (f"  (latest: {video.name})" if video else "  (0 found)"),
-            video is not None,
-            VIDEO_HINT + ", or pass --video",
-        )
-    check_content(f"video is usable    {video.name if video else ''}", video, checks.check_video)
+        if video is None:
+            image = paths.latest_image()
+            check(
+                "input image        assets/image/"
+                + (f"  (latest: {image.name})" if image else "  (0 found)"),
+                image is not None,
+                SOURCE_HINT + ", or pass --video / --image",
+            )
+            check_content(
+                f"image is usable    {image.name if image else ''}", image, checks.check_image
+            )
+        else:
+            check(
+                "input video        assets/video/"
+                + f"  (latest: {video.name})",
+                True,
+                VIDEO_HINT + ", or pass --video",
+            )
+            check_content(f"video is usable    {video.name}", video, checks.check_video)
 
     # Rig: --rig wins, else Y_Bot.fbx, else the first .fbx in assets/mixamo/.
     if args.rig:
@@ -191,33 +252,49 @@ def preflight(args: argparse.Namespace) -> tuple[Path, Path, Path | None]:
     if problems:
         print(f"\n{problems} problem(s) — nothing was run. `m2mr doctor` checks everything.")
         sys.exit(1)
-    return video, rig, skeleton
+    return video, rig, skeleton, image
 
 
 def run(args: argparse.Namespace) -> int:
-    video, rig, skeleton = preflight(args)
+    video, rig, skeleton, image = preflight(args)
     print()
 
     from .pipeline import run_pipeline
 
-    run_dir = run_pipeline(video, rig, device=args.device, skeleton_npz=skeleton)
-    print(f"\nresults: {run_dir / 'videos'}")
+    run_dir = run_pipeline(
+        video, rig, image=image, device=args.device, skeleton_npz=skeleton
+    )
+    preview = "images" if image is not None else "videos"
+    print(f"\nresults: {run_dir / preview}")
     return 0
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="m2mr",
-        description="Drive a Mixamo-rigged character with human motion from a video.",
+        description=(
+            "Drive a Mixamo-rigged character with human motion from a video, "
+            "or a static 3D pose from a still photo."
+        ),
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="check assets, weights and dependencies")
 
-    p_run = sub.add_parser("run", help="video -> Mixamo rig, results in outputs/")
+    p_run = sub.add_parser("run", help="video or still -> Mixamo rig, results in outputs/")
     p_run.add_argument(
         "--video",
         help="input video (default: the file most recently added to assets/video/)",
+    )
+    p_run.add_argument(
+        "--image",
+        nargs="?",
+        const="",
+        default=None,
+        help=(
+            "still photo of one person (default: the file most recently added "
+            "to assets/image/). Recovers a static 3D pose; do not combine with --video"
+        ),
     )
     p_run.add_argument(
         "--rig",
@@ -225,7 +302,7 @@ def main() -> None:
     )
     p_run.add_argument(
         "--skeleton",
-        help="reuse a previous run's skeleton_motion.npz and skip video extraction",
+        help="reuse a previous run's skeleton_motion.npz and skip extraction",
     )
     p_run.add_argument(
         "--device",

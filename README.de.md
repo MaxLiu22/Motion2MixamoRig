@@ -6,9 +6,9 @@
   <a href="README.zh-CN.md">中文</a> · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · Deutsch · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
-Überträgt die Bewegung einer Person aus einem Video auf einen Adobe-Mixamo-geriggten 3D-Charakter.
+Überträgt die Bewegung einer Person aus einem Video — oder die Pose aus einem Foto — auf einen Adobe-Mixamo-geriggten 3D-Charakter.
 
-Für Spieleentwickler: ein Video mit **genau einer Person** und ein Mixamo-Charakter; Ausgabe sind Vorschauvideos plus eine Charakterdatei mit Skinning (`.glb`) für Blender oder Unity.
+Für Spieleentwickler: ein Video mit **genau einer Person** (oder ein Still) und ein Mixamo-Charakter; Ausgabe sind Vorschauen plus eine Charakterdatei mit Skinning (`.glb`) für Blender oder Unity.
 
 Agents beginnen mit [`AGENTS.md`](AGENTS.md).
 
@@ -46,25 +46,26 @@ Inferenzgewichte (GVHMR usw.) werden hier nicht geladen. Der erste `m2mr run` zi
 ffmpeg wird empfohlen (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 Ohne ffmpeg läuft die Pipeline, aber die Ausgabevideos sind **stumm** und spielen im Browser nicht.
 
-## Vor dem Lauf: drei Dinge nach `assets/`
+## Vor dem Lauf: dies nach `assets/` legen
 
-Dieses Repository enthält diese Dateien nicht; sie müssen selbst besorgt werden. Der SMPL-X-Dateiname muss exakt zur Tabelle passen; FBX- und Videonamen sind frei.
+Dieses Repository enthält diese Dateien nicht; sie müssen selbst besorgt werden. Der SMPL-X-Dateiname muss exakt zur Tabelle passen; FBX-, Video- und Bildnamen sind frei. Ein Lauf braucht SMPL-X, einen Mixamo-Charakter und **entweder** ein Video **oder** ein Still.
 
 | Was | Wohin | Woher |
 |---|---|---|
 | SMPL-X-Körpermodell | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | Bei [SMPL-X](https://smpl-x.is.tue.mpg.de/) registrieren und herunterladen |
 | Mixamo-Charakter-FBX | `assets/mixamo/Y_Bot.fbx` | Mit Adobe-Konto Y Bot (oder einen anderen Mixamo-geriggten Charakter) von [Mixamo](https://www.mixamo.com) laden |
 | Bewegungsvideo | `assets/video/<your_clip>.mp4` | Clip mit **genau einer** klar sichtbaren Person, **Kopf bis Fuß die ganze Zeit im Bild** (mehrere Dateien möglich; jeder Lauf nimmt die zuletzt hinzugefügte) |
+| Pose-Foto (optional) | `assets/image/<your_photo>.jpg` | Foto mit **genau einer** klar sichtbaren Person, **Kopf bis Fuß im Bild**. Mit `--image` |
 
 Hinweis: Der Download von Mixamo heißt `Y Bot.fbx` (**Leerzeichen**) und weicht um ein Zeichen von `Y_Bot.fbx` (**Unterstrich**) in der Tabelle ab.
 Umbenennen zum Unterstrich macht es zum Standard-Rig (`m2mr run` ohne `--rig`). Der Name mit Leerzeichen ist ebenfalls in Ordnung — fehlt `Y_Bot.fbx`, wird die erste `.fbx` in `assets/mixamo/` verwendet.
 
-In `assets/video/` können mehrere Videos liegen. Ohne `--video` nimmt der Lauf die **zuletzt in diesen Ordner gelegte** Datei.
-Jeder Clip darf nur eine Person zeigen, **Kopf bis Fuß die ganze Zeit im Bild** — nichts am Rand abgeschnitten. `m2mr doctor` / `m2mr run` prüfen Frames stichprobenartig und stoppen vor der Extraktion, wenn zwei Personen zu sehen sind.
+In `assets/video/` können mehrere Videos liegen. Ohne `--video` oder `--image` nimmt der Lauf die **zuletzt in `assets/video/` gelegte** Datei; ist der Ordner leer, das neueste Still in `assets/image/`.
+Jeder Clip oder jedes Foto darf nur eine Person zeigen, **Kopf bis Fuß im Bild** — nichts am Rand abgeschnitten. `m2mr doctor` / `m2mr run` stoppen vor der Extraktion, wenn zwei Personen zu sehen sind.
 
 ## Schnellstart
 
-Ergebnisse liegen in `outputs/<Laufzeit>_<Video>/`. Videos im Unterordner `videos/` ansehen.
+Ergebnisse liegen in `outputs/<Laufzeit>_<Quelle>/`. Videoläufe schreiben `videos/`; Fotoläufe schreiben `images/`.
 
 ### 1. Assets und Umgebung prüfen
 
@@ -103,6 +104,17 @@ m2mr run --skeleton outputs/<previous-run-dir>/skeleton_motion.npz --rig assets/
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 ```
 
+### 5. Ein Still (statische Pose)
+
+`--image` rekonstruiert eine **statische 3D-Pose** aus einem Foto mit einer Person und überträgt sie wie ein Videolauf auf den Mixamo-Charakter. Vorschauen sind vier Stills in `images/` (gleiche Ansichten wie der Videolauf) plus der Links/Rechts-Orbit-Clip `before_after_360_compare.mp4`. Nicht zusammen mit `--video` verwenden.
+
+```bash
+m2mr run --image assets/image/pose.jpg
+m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
+```
+
+`--image` ohne Pfad nimmt die zuletzt nach `assets/image/` gelegte Datei.
+
 ## Ausgaben
 
 Jeder `m2mr run` legt ein Verzeichnis an, benannt nach **Startzeit des Befehls**:
@@ -113,11 +125,15 @@ outputs/20260829_193205_dance/
 ├── skeleton_motion.npz         # 3D-Körperskelett (beim Rig-Wechsel wiederverwenden; keine Neu-Extraktion)
 ├── mixamo_rotations.npz        # Mixamo-Rotationen pro Bone
 ├── mixamo_character.glb        # Charakterdatei mit Skinning + Animation, Import in Blender / Unity
-└── videos/                     # gleiches Seitenverhältnis wie das Eingangsvideo
-    ├── human_skeleton.mp4      # Körperskelett
-    ├── mixamo_skeleton.mp4     # Mixamo-Rig-Skelett
-    ├── mixamo_character.mp4    # Mixamo-Rig-Charakter
+└── videos/                     # Videoeingabe: gleiches Seitenverhältnis wie der Clip
+    ├── human_skeleton.mp4
+    ├── mixamo_skeleton.mp4
+    ├── mixamo_character.mp4
     └── compare.mp4             # 2×2: Original (oben links) / Mixamo-Skelett (oben rechts) / Körperskelett (unten links) / Charakter (unten rechts)
+
+# Fotoeingabe schreibt images/ mit denselben vier Ansichten:
+#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
+#   plus before_after_360_compare.mp4 (links Original / rechts 10°-Orbit)
 ```
 
 `mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, den Charakter wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: Armature wählen und unter Armature → Viewport Display die Shapes ausschalten. Das letzte Timeline-Frame auf die Cliplänge setzen, dann abspielen. Mit `videos/mixamo_character.mp4` desselben Laufs vergleichen.

@@ -6,9 +6,9 @@
   中文 · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
-把视频里人物的动作，转到 Adobe Mixamo rig 的 3D 角色上。
+把视频里人物的动作，或一张照片里的姿态，转到 Adobe Mixamo rig 的 3D 角色上。
 
-面向游戏开发者：输入一段**单人**动作视频和一个 Mixamo 角色，输出预览视频，以及可直接丢进 Blender / Unity 的带皮角色文件（`.glb`）。
+面向游戏开发者：输入一段**单人**动作视频（或一张人物照片）和一个 Mixamo 角色，输出预览视频，以及可直接丢进 Blender / Unity 的带皮角色文件（`.glb`）。
 
 Agent 请先读 [`AGENTS.md`](AGENTS.md)。
 
@@ -45,26 +45,27 @@ pip install --upgrade pip setuptools wheel \
 建议再装上 ffmpeg（macOS：`brew install ffmpeg`，Ubuntu：`apt install ffmpeg`）。
 没有它也能跑，但输出的视频会**没有声音**，编码格式也没法在浏览器里直接播放。
 
-## 使用前：把三样东西放到 `assets/`
+## 使用前：把这些东西放到 `assets/`
 
-本仓库不附带这些文件，需要你自己准备。SMPL-X 的文件名必须和下表一字不差；FBX 和视频叫什么都行。
+本仓库不附带这些文件，需要你自己准备。SMPL-X 的文件名必须和下表一字不差；FBX、视频和照片叫什么都行。一次运行需要 SMPL-X、一个 Mixamo 角色，以及**视频或照片二选一**。
 
 | 放什么 | 放到哪 | 去哪拿 |
 |---|---|---|
 | SMPL-X 人体模型 | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | 注册 [SMPL-X](https://smpl-x.is.tue.mpg.de/) 后下载 |
 | Mixamo 角色 FBX | `assets/mixamo/Y_Bot.fbx` | 用 Adobe 账号从 [Mixamo](https://www.mixamo.com) 下载 Y Bot（或其他 Mixamo rig 角色） |
 | 动作视频 | `assets/video/<your_clip>.mp4` | **只有一个人**、人清晰可见、**从头到脚全程都在画框内**（可放多个文件，每次跑用最新的那一个） |
+| 姿态照片（可选） | `assets/image/<your_photo>.jpg` | **只有一个人**、人清晰可见、**从头到脚都在画框内**。配合 `--image` 使用 |
 
 注意：Mixamo 下载下来的文件叫 `Y Bot.fbx`（中间是**空格**），和上表的 `Y_Bot.fbx`（**下划线**）差一个字符。
 改成下划线它就是默认 rig，`m2mr run` 不带 `--rig` 时自动用它；不想改名也行——找不到 `Y_Bot.fbx` 时
 会自动用 `assets/mixamo/` 里的第一个 `.fbx`。
 
-`assets/video/` 可以放多个视频文件。不指定 `--video` 时，会用**最后放进这个文件夹**的那一个。
-每个视频画面里只能有一个人，而且人物必须**从头到脚全程都在画框内**，不能出画。`m2mr doctor` / `m2mr run` 会抽样检测人数，看到两个人就直接停，不会进入提取。
+`assets/video/` 可以放多个视频文件。不指定 `--video` 或 `--image` 时，会用**最后放进 `assets/video/` 的视频**；这个文件夹是空的，就退回到 `assets/image/` 里最新的一张照片。
+每个视频或照片画面里只能有一个人，而且人物必须**从头到脚都在画框内**，不能出画。`m2mr doctor` / `m2mr run` 检测到两个人就直接停，不会进入提取。
 
 ## Quick Start
 
-结果都在 `outputs/<运行时间>_<视频名>/`，看视频打开该目录下的 `videos/`。
+结果都在 `outputs/<运行时间>_<输入名>/`。视频输入写 `videos/`，照片输入写 `images/`。
 
 ### 1. 检查资产和环境
 
@@ -103,6 +104,17 @@ m2mr run --skeleton outputs/<上次的运行目录>/skeleton_motion.npz --rig as
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 ```
 
+### 5. 用一张照片（静态姿态）
+
+`--image` 从**单人照片**恢复一个静态 3D 姿态，再按和视频相同的路径转到 Mixamo 角色上。预览是 `images/` 里的四张静帧（种类和视频 run 一样），外加左右对比绕转视频 `before_after_360_compare.mp4`。不要和 `--video` 一起用。
+
+```bash
+m2mr run --image assets/image/pose.jpg
+m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
+```
+
+`--image` 不带路径时，用 `assets/image/` 里最后放进去的那一张。
+
 ## 输出
 
 每次 `m2mr run` 按**命令启动时间**新建一个目录：
@@ -113,11 +125,15 @@ outputs/20260829_193205_dance/
 ├── skeleton_motion.npz         # 人体 3D 骨架（换 rig 可复用，不必重跑提取）
 ├── mixamo_rotations.npz        # Mixamo 骨骼逐帧旋转
 ├── mixamo_character.glb        # 带皮角色 + 动画，Blender / Unity 可直接导入
-└── videos/                     # 比例跟输入视频一致
-    ├── human_skeleton.mp4      # 人体骨架
-    ├── mixamo_skeleton.mp4     # Mixamo rig 骨架
-    ├── mixamo_character.mp4    # Mixamo rig 角色
+└── videos/                     # 视频输入：比例跟输入视频一致
+    ├── human_skeleton.mp4
+    ├── mixamo_skeleton.mp4
+    ├── mixamo_character.mp4
     └── compare.mp4             # 四宫格：左上原片 / 右上 Mixamo 骨架 / 左下人体骨架 / 右下 Mixamo 角色
+
+# 照片输入则写 images/，四种图和上面一一对应：
+#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
+#   另外还有 before_after_360_compare.mp4（左原图 / 右 10° 俯视绕角色转一圈）
 ```
 
 `mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，先选中角色，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：选中骨架，在 Armature → Viewport Display 里去掉 Shapes。时间轴结束帧改成和视频一样长，再点播放；对照同一次运行的 `videos/mixamo_character.mp4`。

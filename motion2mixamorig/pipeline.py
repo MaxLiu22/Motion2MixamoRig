@@ -1,14 +1,14 @@
-"""One `m2mr run`: video -> human skeleton -> Mixamo rig -> result videos.
+"""One `m2mr run`: video or still -> human skeleton -> Mixamo rig -> result videos.
 
 Everything a run produces lands in its own timestamped folder:
 
-    outputs/<YYYYMMDD_HHMMSS>_<video>/
+    outputs/<YYYYMMDD_HHMMSS>_<source>/
     ├── run.json                what ran, with what inputs, producing what
     ├── skeleton_motion.npz     3D human skeleton (24 SMPL joints per frame)
     ├── mixamo_rotations.npz    per-bone animation rotations for the rig
     ├── mixamo_character.glb    skinned character + animation (Blender / Unity)
     ├── cache/                  GVHMR intermediates (2D pose, 3D lift)
-    └── videos/                 the four result videos
+    └── videos/ or images/      four result clips (video in) or four stills (photo in)
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ from .mixamo.retarget import verify_rest_fk
 from .mixamo.skinned_mesh import load_character_asset, rest_skin_error
 from .mixamo.tpose_calibration import load_calibration
 from .mixamo.ybot_retarget import build_mapping
-from .videos import render_run_videos
+from .videos import render_run_images, render_run_videos
 
 ROTATION_CONVENTION = (
     "Animation-channel rotations: M_local = T * Rpre * R_anim, world = parent @ local. "
@@ -67,37 +67,61 @@ def save_mixamo_rotations(anim, mapping, rig_path: Path, out_npz: Path) -> Path:
 
 
 def run_pipeline(
-    video: Path,
+    video: Path | None,
     rig: Path,
     *,
+    image: Path | None = None,
     device: str = "cpu",
     skeleton_npz: Path | None = None,
     verbose: bool = True,
 ) -> Path:
-    """Full pipeline for one video + one rig. Returns the run directory.
+    """Full pipeline for one video or still + one rig. Returns the run directory.
 
     `skeleton_npz` reuses a previous run's skeleton_motion.npz and skips the
-    (slow) video extraction entirely.
+    (slow) extraction entirely. A still is turned into a short hold clip so
+    the same GVHMR path can recover a static 3D pose.
     """
-    video = Path(video).resolve()
+    if image is None and video is None:
+        raise ValueError("run_pipeline needs a video or an image")
+    if image is not None:
+        image = Path(image).resolve()
+    if video is not None:
+        video = Path(video).resolve()
     rig = Path(rig).resolve()
     started = datetime.now()
     t0 = time.time()
-    run_dir = paths.new_run_dir(video, started)
+    source = image if image is not None else video
+    assert source is not None
+    run_dir = paths.new_run_dir(source, started)
     print(f"run directory  {run_dir}")
 
+    extract_video = video
     motion_npz = run_dir / "skeleton_motion.npz"
     if skeleton_npz is not None:
         import shutil
 
         shutil.copy2(skeleton_npz, motion_npz)
         print(f"reusing skeleton from {skeleton_npz}")
+    elif image is not None:
+        from .extract import extract_motion, temp_hold_video
+
+        print(f"extracting human pose from {image.name}")
+        with temp_hold_video(image) as hold:
+            extract_motion(
+                hold,
+                motion_npz,
+                work_dir=run_dir / "cache",
+                device=device,
+                verbose=verbose,
+                source_image=image,
+            )
     else:
         from .extract import extract_motion
 
-        print(f"extracting human motion from {video.name}")
+        assert extract_video is not None
+        print(f"extracting human motion from {extract_video.name}")
         extract_motion(
-            video,
+            extract_video,
             motion_npz,
             work_dir=run_dir / "cache",
             device=device,
@@ -127,16 +151,34 @@ def run_pipeline(
     write_glb(glb_path, asset, anim.r_anim_rig, anim.hips_cm_rig, anim.fps)
     print(f"saved {glb_path}")
 
-    print("rendering result videos")
-    videos = render_run_videos(
-        anim, asset, calibration, video, run_dir / "videos", verbose=verbose
-    )
+    if image is not None:
+        print("rendering result images")
+        previews = render_run_images(
+            anim, asset, calibration, image, run_dir / "images", verbose=verbose
+        )
+        preview_key = "images"
+        preview_dir = "images"
+    else:
+        print("rendering result videos")
+        assert extract_video is not None
+        previews = render_run_videos(
+            anim,
+            asset,
+            calibration,
+            extract_video,
+            run_dir / "videos",
+            original_label="Original Video",
+            verbose=verbose,
+        )
+        preview_key = "videos"
+        preview_dir = "videos"
 
     report = {
         "started": started.isoformat(timespec="seconds"),
         "elapsed_s": round(time.time() - t0, 1),
         "command": sys.argv,
-        "video": str(video),
+        "video": None if image is not None else str(video),
+        "image": str(image) if image is not None else None,
         "rig": str(rig),
         "device": device,
         "fps": float(motion.fps),
@@ -150,7 +192,7 @@ def run_pipeline(
             "skeleton_motion": motion_npz.name,
             "mixamo_rotations": rotations_npz.name,
             "mixamo_character_glb": glb_path.name,
-            "videos": {k: f"videos/{v.name}" for k, v in videos.items()},
+            preview_key: {k: f"{preview_dir}/{v.name}" for k, v in previews.items()},
         },
     }
     (run_dir / "run.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

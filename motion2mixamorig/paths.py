@@ -14,23 +14,33 @@ SMPLX_NEUTRAL = BODY_MODELS / "smplx" / "SMPLX_NEUTRAL.npz"
 MIXAMO_DIR = ASSETS / "mixamo"
 DEFAULT_RIG = MIXAMO_DIR / "Y_Bot.fbx"
 VIDEO_DIR = ASSETS / "video"
+IMAGE_DIR = ASSETS / "image"
 
 WEIGHTS = PROJECT_ROOT / "weights"
 OUTPUTS = PROJECT_ROOT / "outputs"
 
 VIDEO_SUFFIXES = (".mp4", ".mov", ".avi", ".mkv", ".webm")
+IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp", ".bmp")
+
+
+def _list_media(folder: Path, suffixes: tuple[str, ...]) -> list[Path]:
+    if not folder.is_dir():
+        return []
+    files = [
+        p
+        for p in folder.iterdir()
+        if p.suffix.lower() in suffixes and not p.name.startswith(".")
+    ]
+    return sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)
+
+
+def is_image(path: Path) -> bool:
+    return Path(path).suffix.lower() in IMAGE_SUFFIXES
 
 
 def list_videos() -> list[Path]:
     """User-supplied videos in assets/video/, most recently added first."""
-    if not VIDEO_DIR.is_dir():
-        return []
-    videos = [
-        p
-        for p in VIDEO_DIR.iterdir()
-        if p.suffix.lower() in VIDEO_SUFFIXES and not p.name.startswith(".")
-    ]
-    return sorted(videos, key=lambda p: p.stat().st_mtime, reverse=True)
+    return _list_media(VIDEO_DIR, VIDEO_SUFFIXES)
 
 
 def latest_video() -> Path | None:
@@ -39,12 +49,22 @@ def latest_video() -> Path | None:
     return videos[0] if videos else None
 
 
-def new_run_dir(video: Path, now: datetime | None = None) -> Path:
-    """Create outputs/<YYYYMMDD_HHMMSS>_<video-stem>/ for one `m2mr run`."""
+def list_images() -> list[Path]:
+    """User-supplied stills in assets/image/, most recently added first."""
+    return _list_media(IMAGE_DIR, IMAGE_SUFFIXES)
+
+
+def latest_image() -> Path | None:
+    """The still most recently placed into assets/image/ (by file mtime)."""
+    images = list_images()
+    return images[0] if images else None
+
+
+def new_run_dir(source: Path, now: datetime | None = None) -> Path:
+    """Create outputs/<YYYYMMDD_HHMMSS>_<source-stem>/ for one `m2mr run`."""
     stamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
-    run_dir = OUTPUTS / f"{stamp}_{video.stem}"
+    run_dir = OUTPUTS / f"{stamp}_{source.stem}"
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "videos").mkdir(exist_ok=True)
     return run_dir
 
 

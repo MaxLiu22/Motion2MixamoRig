@@ -6,9 +6,9 @@
   <a href="README.zh-CN.md">中文</a> · English · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
-Transfer the motion of a person in a video onto an Adobe Mixamo-rigged 3D character.
+Transfer the motion of a person in a video — or the pose in a still photo — onto an Adobe Mixamo-rigged 3D character.
 
-For game developers: give it a **single-person** action video and a Mixamo character; it writes preview videos plus a skinned character file (`.glb`) you can drop into Blender or Unity.
+For game developers: give it a **single-person** action video (or a still) and a Mixamo character; it writes preview videos plus a skinned character file (`.glb`) you can drop into Blender or Unity.
 
 Agents should start with [`AGENTS.md`](AGENTS.md).
 
@@ -46,25 +46,26 @@ Inference weights (GVHMR and so on) are not downloaded here. The first `m2mr run
 ffmpeg is recommended (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 The pipeline runs without it, but the output videos will be **silent** and will not play in a browser.
 
-## Before you run: put three things in `assets/`
+## Before you run: put these in `assets/`
 
-This repository does not ship these files; you have to fetch them. The SMPL-X filename must match the table exactly; FBX and video names can be anything.
+This repository does not ship these files; you have to fetch them. The SMPL-X filename must match the table exactly; FBX, video, and image names can be anything. A run needs SMPL-X, a Mixamo character, and **either** a video **or** a still.
 
 | What | Where | Where to get it |
 |---|---|---|
 | SMPL-X body model | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | Register at [SMPL-X](https://smpl-x.is.tue.mpg.de/) and download it |
 | Mixamo character FBX | `assets/mixamo/Y_Bot.fbx` | With an Adobe account, download Y Bot (or any other Mixamo-rigged character) from [Mixamo](https://www.mixamo.com) |
 | Action video | `assets/video/<your_clip>.mp4` | A clip with **exactly one** clearly visible person, **head to toe in frame the whole time** (you may keep several files; each run uses the most recently added) |
+| Pose still (optional) | `assets/image/<your_photo>.jpg` | A photo with **exactly one** clearly visible person, **head to toe in frame**. Use with `--image` |
 
 Note: Mixamo's download is named `Y Bot.fbx` (**space**), one character off from `Y_Bot.fbx` (**underscore**) in the table.
 Rename it to the underscore form and it becomes the default rig (`m2mr run` without `--rig`). Leaving the space is fine too — if `Y_Bot.fbx` is missing, the first `.fbx` in `assets/mixamo/` is used.
 
-`assets/video/` can hold several videos. Without `--video`, the run uses the file **most recently added** to that folder.
-Each clip must show only one person, **head to toe in frame for the whole clip** — nothing cropped at the edges. `m2mr doctor` / `m2mr run` sample the frames and stop before extraction if two people are in view.
+`assets/video/` can hold several videos. Without `--video` or `--image`, the run uses the file **most recently added** to `assets/video/`; if that folder is empty it falls back to the latest still in `assets/image/`.
+Each clip or photo must show only one person, **head to toe in frame** — nothing cropped at the edges. `m2mr doctor` / `m2mr run` stop before extraction if two people are in view.
 
 ## Quick Start
 
-Results land in `outputs/<run-time>_<video>/`. Open that folder's `videos/` to watch them.
+Results land in `outputs/<run-time>_<source>/`. Video runs write `videos/`; still runs write `images/`.
 
 ### 1. Check assets and the environment
 
@@ -103,6 +104,17 @@ m2mr run --skeleton outputs/<previous-run-dir>/skeleton_motion.npz --rig assets/
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 ```
 
+### 5. A still photo (static pose)
+
+`--image` recovers a **static 3D pose** from a photo of one person, then retargets it onto the Mixamo character the same way a video run does. Previews are four stills in `images/` (same views as the video run), plus a left/right orbit clip `before_after_360_compare.mp4`. Do not pass `--video` at the same time.
+
+```bash
+m2mr run --image assets/image/pose.jpg
+m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
+```
+
+`--image` with no path uses the file most recently added to `assets/image/`.
+
 ## Outputs
 
 Each `m2mr run` creates a directory named by **the time the command started**:
@@ -113,11 +125,15 @@ outputs/20260829_193205_dance/
 ├── skeleton_motion.npz         # 3D human skeleton (reuse when swapping rigs; no re-extract)
 ├── mixamo_rotations.npz        # per-bone Mixamo rotations
 ├── mixamo_character.glb        # skinned character + animation, import into Blender / Unity
-└── videos/                     # same aspect ratio as the input
-    ├── human_skeleton.mp4      # human skeleton
-    ├── mixamo_skeleton.mp4     # Mixamo rig skeleton
-    ├── mixamo_character.mp4    # Mixamo rig character
+└── videos/                     # video input: same aspect ratio as the clip
+    ├── human_skeleton.mp4
+    ├── mixamo_skeleton.mp4
+    ├── mixamo_character.mp4
     └── compare.mp4             # 2×2: original (TL) / Mixamo skeleton (TR) / human skeleton (BL) / character (BR)
+
+# still input writes images/ instead, same four views:
+#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
+#   plus before_after_360_compare.mp4 (left original / right 10° orbit of the rig)
 ```
 
 Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character and use View → Frame Selected. The cluster of spheres on the head and hands is the bone display, not the mesh: select the armature and turn off Shapes under Armature → Viewport Display. Set the timeline end frame to the clip length, then play. Compare against `videos/mixamo_character.mp4` from the same run.

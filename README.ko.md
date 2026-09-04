@@ -6,9 +6,9 @@
   <a href="README.zh-CN.md">中文</a> · <a href="README.md">English</a> · 한국어 · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.ar.md">العربية</a>
 </p>
 
-영상 속 사람의 동작을 Adobe Mixamo rig 3D 캐릭터로 옮깁니다.
+영상 속 사람의 동작 — 또는 사진 속 자세 — 를 Adobe Mixamo rig 3D 캐릭터로 옮깁니다.
 
-게임 개발자를 위한 도구입니다. **한 사람만** 나오는 동작 영상과 Mixamo 캐릭터를 넣으면 미리보기 영상과, Blender / Unity에 바로 넣을 수 있는 스키닝된 캐릭터 파일(`.glb`)을 생성합니다.
+게임 개발자를 위한 도구입니다. **한 사람만** 나오는 동작 영상(또는 사진)과 Mixamo 캐릭터를 넣으면 미리보기와, Blender / Unity에 바로 넣을 수 있는 스키닝된 캐릭터 파일(`.glb`)을 생성합니다.
 
 Agent는 먼저 [`AGENTS.md`](AGENTS.md)를 읽어 주세요.
 
@@ -46,25 +46,26 @@ pip install --upgrade pip setuptools wheel \
 ffmpeg도 권장합니다(macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 없어도 실행되지만, 출력 영상에 **소리가 없고** 브라우저에서 바로 재생되지 않습니다.
 
-## 실행 전: `assets/`에 세 가지를 넣으세요
+## 실행 전: 이것을 `assets/`에 넣으세요
 
-이 저장소는 해당 파일을 포함하지 않습니다. 직접 준비해야 합니다. SMPL-X 파일명은 아래 표와 한 글자도 같아야 합니다. FBX와 영상 이름은 상관없습니다.
+이 저장소는 해당 파일을 포함하지 않습니다. 직접 준비해야 합니다. SMPL-X 파일명은 아래 표와 한 글자도 같아야 합니다. FBX, 영상, 사진 이름은 상관없습니다. 한 번의 실행에는 SMPL-X, Mixamo 캐릭터, 그리고 **영상 또는 사진 중 하나**가 필요합니다.
 
 | 무엇 | 어디에 | 어디서 |
 |---|---|---|
 | SMPL-X 바디 모델 | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | [SMPL-X](https://smpl-x.is.tue.mpg.de/)에서 등록한 뒤 다운로드 |
 | Mixamo 캐릭터 FBX | `assets/mixamo/Y_Bot.fbx` | Adobe 계정으로 [Mixamo](https://www.mixamo.com)에서 Y Bot(또는 다른 Mixamo rig 캐릭터) 다운로드 |
 | 동작 영상 | `assets/video/<your_clip>.mp4` | **사람 한 명만**, 잘 보이고, **머리부터 발끝까지 영상 내내 화면 안에** (여러 파일 가능, 실행마다 가장 최근에 넣은 것 사용) |
+| 자세 사진(선택) | `assets/image/<your_photo>.jpg` | **사람 한 명만**, 잘 보이고, **머리부터 발끝까지 화면 안에**. `--image`와 함께 사용 |
 
 주의: Mixamo에서 받은 파일은 `Y Bot.fbx`(**공백**)이고, 표의 `Y_Bot.fbx`(**밑줄**)과 한 글자 다릅니다.
 밑줄로 바꾸면 기본 rig가 되어 `m2mr run`에 `--rig` 없이 씁니다. 이름을 안 바꿔도 됩니다 — `Y_Bot.fbx`가 없으면 `assets/mixamo/`의 첫 `.fbx`를 씁니다.
 
-`assets/video/`에는 영상을 여러 개 넣을 수 있습니다. `--video`를 지정하지 않으면 **이 폴더에 가장 마지막에 넣은** 파일을 씁니다.
-각 영상에는 사람이 한 명만 나와야 하고, **머리부터 발끝까지 영상 내내 화면 안**에 있어야 하며 화면 밖으로 나가면 안 됩니다. `m2mr doctor` / `m2mr run`이 프레임을 샘플링해 두 명이 보이면 추출 전에 멈춥니다.
+`assets/video/`에는 영상을 여러 개 넣을 수 있습니다. `--video`나 `--image`를 지정하지 않으면 **`assets/video/`에 가장 마지막에 넣은** 파일을 쓰고, 그 폴더가 비어 있으면 `assets/image/`의 최신 사진을 씁니다.
+각 영상이나 사진에는 사람이 한 명만 나와야 하고, **머리부터 발끝까지 화면 안**에 있어야 하며 화면 밖으로 나가면 안 됩니다. `m2mr doctor` / `m2mr run`이 두 명이 보이면 추출 전에 멈춥니다.
 
 ## 빠른 시작
 
-결과는 `outputs/<실행시각>_<영상명>/`에 있습니다. 영상은 그 안의 `videos/`를 여세요.
+결과는 `outputs/<실행시각>_<입력명>/`에 있습니다. 영상 입력은 `videos/`, 사진 입력은 `images/`에 씁니다.
 
 ### 1. 자산과 환경 확인
 
@@ -103,6 +104,17 @@ m2mr run --skeleton outputs/<previous-run-dir>/skeleton_motion.npz --rig assets/
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 ```
 
+### 5. 사진(정적 자세)
+
+`--image`는 **한 사람** 사진에서 **정적 3D 자세**를 복원한 뒤, 영상 실행과 같은 경로로 Mixamo 캐릭터에 옮깁니다. 미리보기는 `images/`의 네 장(영상 실행과 같은 뷰)과 좌우 비교 궤도 클립 `before_after_360_compare.mp4`입니다. `--video`와 함께 쓰지 마세요.
+
+```bash
+m2mr run --image assets/image/pose.jpg
+m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
+```
+
+경로 없이 `--image`만 쓰면 `assets/image/`에 가장 최근에 넣은 파일을 씁니다.
+
 ## 출력
 
 각 `m2mr run`은 **명령이 시작된 시각**으로 디렉터리를 만듭니다:
@@ -113,11 +125,15 @@ outputs/20260829_193205_dance/
 ├── skeleton_motion.npz         # 인체 3D 스켈레톤 (rig 교체 시 재사용, 추출 생략)
 ├── mixamo_rotations.npz        # Mixamo 본별 회전
 ├── mixamo_character.glb        # 스키닝된 캐릭터 + 애니메이션, Blender / Unity에 바로 임포트
-└── videos/                     # 입력 영상과 같은 화면비
-    ├── human_skeleton.mp4      # 인체 스켈레톤
-    ├── mixamo_skeleton.mp4     # Mixamo rig 스켈레톤
-    ├── mixamo_character.mp4    # Mixamo rig 캐릭터
+└── videos/                     # 영상 입력: 클립과 같은 화면비
+    ├── human_skeleton.mp4
+    ├── mixamo_skeleton.mp4
+    ├── mixamo_character.mp4
     └── compare.mp4             # 2×2: 원본(좌상) / Mixamo 스켈레톤(우상) / 인체 스켈레톤(좌하) / 캐릭터(우하)
+
+# 사진 입력은 images/에 같은 네 뷰를 씁니다:
+#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
+#   그리고 before_after_360_compare.mp4 (왼쪽 원본 / 오른쪽 10° 궤도)
 ```
 
 `mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Armature를 선택하고 Armature → Viewport Display에서 Shapes를 끄세요. 타임라인 끝 프레임을 클립 길이에 맞춘 뒤 재생하세요. 같은 실행의 `videos/mixamo_character.mp4`와 비교하면 됩니다.

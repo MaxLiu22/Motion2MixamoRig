@@ -6,9 +6,9 @@
   <a href="README.zh-CN.md">中文</a> · <a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · العربية
 </p>
 
-ينقل حركة شخص في مقطع فيديو إلى شخصية ثلاثية الأبعاد بهيكل تحريك Adobe Mixamo.
+ينقل حركة شخص في مقطع فيديو — أو الوضعية في صورة ثابتة — إلى شخصية ثلاثية الأبعاد بهيكل تحريك Adobe Mixamo.
 
-للمطوّرين في مجال الألعاب: قدّم فيديو حركة لـ**شخص واحد** وشخصية Mixamo؛ يكتب مقاطع معاينة وملف شخصية مكسوّة (`.glb`) يمكن وضعه في Blender أو Unity.
+للمطوّرين في مجال الألعاب: قدّم فيديو حركة لـ**شخص واحد** (أو صورة) وشخصية Mixamo؛ يكتب معاينات وملف شخصية مكسوّة (`.glb`) يمكن وضعه في Blender أو Unity.
 
 ينبغي للوكلاء البرمجيين (Agents) البدء من [`AGENTS.md`](AGENTS.md).
 
@@ -46,25 +46,26 @@ pip install --upgrade pip setuptools wheel \
 يُفضَّل تثبيت ffmpeg (macOS: `brew install ffmpeg`، Ubuntu: `apt install ffmpeg`).
 يعمل مسار المعالجة بدونه، لكن مقاطع الإخراج ستكون **صامتة** ولن تُشغَّل في المتصفح.
 
-## قبل التشغيل: ضع ثلاثة أشياء في `assets/`
+## قبل التشغيل: ضع هذه في `assets/`
 
-هذا المستودع لا يتضمّن هذه الملفات؛ ينبغي جلبها بنفسك. يجب أن يطابق اسم ملف SMPL-X الجدول حرفيًا؛ أما أسماء FBX والفيديو فحرة.
+هذا المستودع لا يتضمّن هذه الملفات؛ ينبغي جلبها بنفسك. يجب أن يطابق اسم ملف SMPL-X الجدول حرفيًا؛ أما أسماء FBX والفيديو والصورة فحرة. يحتاج التشغيل إلى SMPL-X وشخصية Mixamo و**إما** فيديو **أو** صورة.
 
 | ماذا | أين | من أين |
 |---|---|---|
 | نموذج جسم SMPL-X | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | سجّل في [SMPL-X](https://smpl-x.is.tue.mpg.de/) ثم نزّله |
 | ملف FBX لشخصية Mixamo | `assets/mixamo/Y_Bot.fbx` | بحساب Adobe نزّل Y Bot (أو أي شخصية بهيكل Mixamo) من [Mixamo](https://www.mixamo.com) |
 | فيديو الحركة | `assets/video/<your_clip>.mp4` | مقطع فيه **شخص واحد بالضبط** ظاهر بوضوح، **من الرأس إلى القدمين داخل الإطار طوال المقطع** (يمكن وضع عدة ملفات؛ كل تشغيل يستخدم آخر ملف أُضيف) |
+| صورة وضعية (اختياري) | `assets/image/<your_photo>.jpg` | صورة فيها **شخص واحد بالضبط** ظاهر بوضوح، **من الرأس إلى القدمين داخل الإطار**. مع `--image` |
 
 ملاحظة: ملف التنزيل من Mixamo اسمه `Y Bot.fbx` (**مسافة**)، ويختلف بحرف واحد عن `Y_Bot.fbx` (**شرطة سفلية**) في الجدول.
 أعد تسميته بالشرطة السفلية فيصبح الهيكل الافتراضي (`m2mr run` دون `--rig`). الإبقاء على المسافة جائز أيضًا — إن غاب `Y_Bot.fbx` يُستخدم أول `.fbx` في `assets/mixamo/`.
 
-يمكن وضع عدة فيديوهات في `assets/video/`. دون `--video` يستخدم التشغيل **آخر ملف أُضيف إلى هذا المجلد**.
-يجب أن يظهر في كل مقطع شخص واحد فقط، **من الرأس إلى القدمين داخل الإطار طوال المقطع** — دون قص عند الحواف. يأخذ `m2mr doctor` / `m2mr run` عيّنات من الإطارات ويتوقفان قبل الاستخراج إن ظهر شخصان.
+يمكن وضع عدة فيديوهات في `assets/video/`. دون `--video` أو `--image` يستخدم التشغيل **آخر ملف أُضيف إلى `assets/video/`**؛ إن كان المجلد فارغًا يعود إلى أحدث صورة في `assets/image/`.
+يجب أن يظهر في كل مقطع أو صورة شخص واحد فقط، **من الرأس إلى القدمين داخل الإطار** — دون قص عند الحواف. يتوقف `m2mr doctor` / `m2mr run` قبل الاستخراج إن ظهر شخصان.
 
 ## البدء السريع
 
-النتائج في `outputs/<وقت-التشغيل>_<الفيديو>/`. افتح مجلد `videos/` لمشاهدتها.
+النتائج في `outputs/<وقت-التشغيل>_<المصدر>/`. تشغيل الفيديو يكتب `videos/`؛ تشغيل الصورة يكتب `images/`.
 
 ### 1. تحقق من الأصول والبيئة
 
@@ -103,6 +104,17 @@ m2mr run --skeleton outputs/<previous-run-dir>/skeleton_motion.npz --rig assets/
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 ```
 
+### 5. صورة ثابتة (وضعية ساكنة)
+
+`--image` يستعيد **وضعية ثلاثية الأبعاد ساكنة** من صورة لشخص واحد، ثم ينقلها إلى شخصية Mixamo كما يفعل تشغيل الفيديو. المعاينات أربع صور في `images/` (نفس المناظر كتشغيل الفيديو) إضافة إلى مقطع المدار يمين/يسار `before_after_360_compare.mp4`. لا تُجمع مع `--video`.
+
+```bash
+m2mr run --image assets/image/pose.jpg
+m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
+```
+
+`--image` دون مسار يستخدم آخر ملف أُضيف إلى `assets/image/`.
+
 ## المخرجات
 
 كل `m2mr run` ينشئ مجلدًا باسم **وقت بدء الأمر**:
@@ -113,11 +125,15 @@ outputs/20260829_193205_dance/
 ├── skeleton_motion.npz         # هيكل إنسان ثلاثي الأبعاد (يُعاد استخدامه عند تبديل الهيكل؛ بلا إعادة استخراج)
 ├── mixamo_rotations.npz        # دورانات عظام Mixamo لكل عظم
 ├── mixamo_character.glb        # شخصية مكسوّة + تحريك، استيراد إلى Blender / Unity
-└── videos/                     # نسبة العرض إلى الارتفاع نفسها كفيديو الإدخال
-    ├── human_skeleton.mp4      # هيكل الإنسان
-    ├── mixamo_skeleton.mp4     # هيكل Mixamo
-    ├── mixamo_character.mp4    # شخصية Mixamo
+└── videos/                     # إدخال فيديو: نسبة العرض إلى الارتفاع نفسها كالمقطع
+    ├── human_skeleton.mp4
+    ├── mixamo_skeleton.mp4
+    ├── mixamo_character.mp4
     └── compare.mp4             # 2×2: الأصل (أعلى اليسار) / هيكل Mixamo (أعلى اليمين) / هيكل الإنسان (أسفل اليسار) / الشخصية (أسفل اليمين)
+
+# إدخال الصورة يكتب images/ بنفس المناظر الأربعة:
+#   human_skeleton.png / mixamo_skeleton.png / mixamo_character.png / compare.png
+#   إضافة إلى before_after_360_compare.mp4 (اليسار الأصل / اليمين مدار 10°)
 ```
 
 افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: حدّد الهيكل (Armature) وأوقف Shapes تحت Armature → Viewport Display. اضبط إطار نهاية الخط الزمني على طول المقطع ثم شغّل. قارن مع `videos/mixamo_character.mp4` من التشغيل نفسه.

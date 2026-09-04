@@ -109,6 +109,29 @@ def check_video(path: Path) -> str | None:
     return None
 
 
+def check_image(path: Path) -> str | None:
+    """Decodable still, and exactly one person — same rule as check_video."""
+    import cv2
+
+    frame = cv2.imread(str(path), cv2.IMREAD_COLOR)
+    if frame is None:
+        return (
+            "cannot be decoded as an image — use a jpg/png/webp still of one person"
+        )
+    n = _count_people(frame)
+    if n >= 2:
+        return (
+            f"shows about {n} people — this pipeline maps one body "
+            "to one Mixamo rig. Use a photo with a single, clearly visible person"
+        )
+    if n < 1:
+        return (
+            "no person was detected — use a photo with one clearly visible person, "
+            "head to toe in frame"
+        )
+    return None
+
+
 def check_smplx(path: Path) -> str | None:
     """SMPLX_NEUTRAL.npz must be the npz variant of SMPL-X (not SMPL, not .pkl)."""
     import numpy as np
