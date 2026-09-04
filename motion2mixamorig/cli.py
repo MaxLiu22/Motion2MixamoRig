@@ -16,6 +16,8 @@ import sys
 from pathlib import Path
 
 from . import checks, paths
+from .progress import ProgressWriter
+from .run_report import write_failed_report
 
 OK = "[ok]     "
 MISS = "[missing]"
@@ -256,20 +258,52 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
 
 
 def run(args: argparse.Namespace) -> int:
-    video, rig, skeleton, image = preflight(args)
+    progress = ProgressWriter(getattr(args, "progress_jsonl", None))
+    output_dir = Path(args.output_dir).resolve() if getattr(args, "output_dir", None) else None
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+    progress.emit("preflight", 0.05, "Checking inputs")
+    try:
+        video, rig, skeleton, image = preflight(args)
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else (0 if exc.code in (0, None) else 1)
+        if code != 0:
+            progress.emit("failed", 0.05, "Input check failed")
+            write_failed_report(
+                output_dir,
+                stage="preflight",
+                error_code="PREFLIGHT_FAILED",
+                message="Input check failed",
+            )
+        raise
+
     print()
 
     from .pipeline import run_pipeline
 
-    run_dir = run_pipeline(
-        video, rig, image=image, device=args.device, skeleton_npz=skeleton
-    )
+    try:
+        run_dir = run_pipeline(
+            video,
+            rig,
+            image=image,
+            device=args.device,
+            skeleton_npz=skeleton,
+            output_dir=output_dir,
+            progress=progress,
+            no_preview=bool(getattr(args, "no_preview", False)),
+        )
+    except Exception:
+        import traceback
+
+        traceback.print_exc()
+        return 1
     preview = "images" if image is not None else "videos"
     print(f"\nresults: {run_dir / preview}")
     return 0
 
 
-def main() -> None:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="m2mr",
         description=(
@@ -310,8 +344,29 @@ def main() -> None:
         choices=["cpu", "cuda", "mps"],
         help="inference device for the extraction step (default: cpu)",
     )
+    p_run.add_argument(
+        "--output-dir",
+        help="write this run's files into PATH instead of a timestamped outputs/ folder",
+    )
+    p_run.add_argument(
+        "--progress-jsonl",
+        help="append machine-readable JSONL progress events to PATH",
+    )
+    p_run.add_argument(
+        "--no-preview",
+        action="store_true",
+        help="skip preview videos/images; still write NPZ, GLB, and run.json",
+    )
+    return parser
 
+
+def main() -> None:
+    parser = build_parser()
     args = parser.parse_args()
     if args.command == "doctor":
         sys.exit(doctor())
     sys.exit(run(args))
+
+
+if __name__ == "__main__":
+    main()

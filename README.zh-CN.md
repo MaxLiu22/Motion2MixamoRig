@@ -10,7 +10,7 @@
 
 面向游戏开发者：输入一段**单人**动作视频（或一张人物照片）和一个 Mixamo 角色，输出预览视频，以及可直接丢进 Blender / Unity 的带皮角色文件（`.glb`）。
 
-> Motion2MixamoRig 目前仍处于实验阶段。v0.1.0 提供命令行工作流；Blender Extension 计划在 v0.2.0 中加入。
+> Motion2MixamoRig 目前仍处于实验阶段。v0.1.0 是命令行工作流。本仓库另有一个 Blender 4.2+ Extension，在外部 Python 里跑同一条 pipeline。插件的安装和用法见 [`blender_extension/README.md`](blender_extension/README.md)。
 
 Agent 请先读 [`AGENTS.md`](AGENTS.md)。
 
@@ -154,7 +154,7 @@ images/
                                         # 右：10° 俯视绕角色转一圈
 ```
 
-`mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，先选中角色，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：选中骨架，在 Armature → Viewport Display 里去掉 Shapes。视频 run 把时间轴结束帧改成和片段一样长，对照 `videos/mixamo_character.mp4`。照片 run 对照 `images/mixamo_character.png` 或那条绕转视频。
+`mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，选中角色网格，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：在 Outliner 里隐藏 **Icosphere** 和骨架（armature），留下带皮网格。时间轴 FPS 和结束帧按 `run.json` 里的 `fps` / `n_frames` 设置，播放才会和原片一样长。视频 run 对照 `videos/mixamo_character.mp4`，照片 run 对照 `images/mixamo_character.png` 或那条绕转视频。
 
 ## 许可证
 

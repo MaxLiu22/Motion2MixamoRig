@@ -35,10 +35,45 @@ m2mr run           # latest video in assets/video/ + assets/mixamo/Y_Bot.fbx
 m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Y_Bot.fbx
 m2mr run --skeleton outputs/<run>/skeleton_motion.npz --rig ...   # reuse extraction, swap rig
+m2mr run --output-dir DIR --progress-jsonl FILE --no-preview      # Blender Extension / automation
 ```
 
 `--video` / `--image` and `--rig` combine freely (not `--video` with `--image`).
 Extraction is the slow step; reuse it with `--skeleton` when only the rig changes.
+
+## Blender Extension
+
+The add-on is a thin UI. It must **not** import PyTorch / GVHMR / OpenCV in
+Blender’s Python. It launches the user’s venv:
+
+```text
+<external-python> -m motion2mixamorig.cli run ...
+```
+
+How to install and use it (for the user, or to walk them through it):
+[`blender_extension/README.md`](blender_extension/README.md).
+
+When helping a user:
+
+1. They need the same venv + SMPL-X + Mixamo FBX as the CLI (see Setup above).
+2. Build `dist/motion2mixamorig-0.1.0.zip` with
+   `python scripts/package_blender_extension.py`.
+3. In Blender 4.2+: **Edit → Preferences → Get Extensions**, then the **∨**
+   next to Repositories → **Install from Disk…** (no large button). Enable it.
+4. The panel is **3D Viewport → N sidebar → Motion2MixamoRig**, not Get
+   Extensions. Setup is the first box: UI Language, External Python
+   (`.venv/bin/python` or `Scripts\python.exe`, not Blender’s interpreter),
+   Project Directory, Device, then **Check Environment**.
+5. After add-on **code** changes they must rebuild the zip and reinstall.
+   The installed copy is not live from this repo. If
+   `already registered` / `EnumProperty could not register` appears: disable,
+   **quit Blender fully**, reopen, install again.
+6. Jobs write `<project>/outputs/blender_jobs/<job-id>/`. After import, hide
+   **Icosphere** and the **armature** in the Outliner; leave **skinned_mesh**
+   visible. FPS must match the source clip duration (a 60 fps video tagged as
+   30 fps plays at half speed).
+
+Smoke-test checklist: [`docs/blender-extension.md`](docs/blender-extension.md).
 
 ## Outputs
 
@@ -58,3 +93,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `motion2mixamorig/mixamo/` — FBX parsing, FK, retargeting, skinning, rendering
 - `motion2mixamorig/pipeline.py` — one run end to end
 - `motion2mixamorig/cli.py` — `m2mr doctor` / `m2mr run`
+- `blender_extension/motion2mixamorig_blender/` — Blender 4.2+ Extension (UI + external process)
+- `blender_extension/README.md` — install and use the add-on
+- `docs/blender-extension.md` — maintainer smoke-test checklist
+- `scripts/package_blender_extension.py` — build `dist/motion2mixamorig-0.1.0.zip`

@@ -10,6 +10,8 @@
 
 게임 개발자를 위한 도구입니다. **한 사람만** 나오는 동작 영상(또는 사진)과 Mixamo 캐릭터를 넣으면 미리보기와, Blender / Unity에 바로 넣을 수 있는 스키닝된 캐릭터 파일(`.glb`)을 생성합니다.
 
+> Motion2MixamoRig는 아직 실험 단계입니다. v0.1.0은 명령줄 파이프라인입니다. 이 저장소의 Blender 4.2+ Extension은 같은 파이프라인을 외부 Python에서 실행합니다. 애드온 설치와 사용법: [`blender_extension/README.md`](blender_extension/README.md).
+
 Agent는 먼저 [`AGENTS.md`](AGENTS.md)를 읽어 주세요.
 
 https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
@@ -152,7 +154,7 @@ images/
                                         # 오른쪽: 10° 궤도(한 바퀴)
 ```
 
-`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Armature를 선택하고 Armature → Viewport Display에서 Shapes를 끄세요. 영상 실행은 타임라인 끝 프레임을 클립 길이에 맞추고 `videos/mixamo_character.mp4`와 비교하세요. 사진 실행은 `images/mixamo_character.png` 또는 궤도 클립과 비교하세요.
+`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터 메시를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Outliner에서 **Icosphere**와 **armature**를 숨기고, 스키닝된 메시는 그대로 두세요. 재생이 원본과 같아지려면 `run.json`의 `fps` / `n_frames`로 장면 FPS와 타임라인 끝 프레임을 맞추세요. 영상 실행은 `videos/mixamo_character.mp4`와, 사진 실행은 `images/mixamo_character.png` 또는 궤도 클립과 비교하세요.
 
 ## 라이선스
 

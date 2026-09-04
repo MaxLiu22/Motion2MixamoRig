@@ -10,6 +10,8 @@
 
 Для разработчиков игр: видео с **одним человеком** (или фото) и персонаж Mixamo; на выходе превью и файл персонажа со скином (`.glb`) для Blender или Unity.
 
+> Motion2MixamoRig пока экспериментален. Версия 0.1.0 — конвейер командной строки. В этом репозитории также есть расширение Blender 4.2+, которое запускает тот же конвейер во внешнем Python. Установка и использование аддона: [`blender_extension/README.md`](blender_extension/README.md).
+
 Агентам следует начать с [`AGENTS.md`](AGENTS.md).
 
 https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
@@ -152,7 +154,7 @@ images/
                                         # справа: орбита 10° вокруг рига (полный оборот)
 ```
 
-`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: выберите арматуру и отключите Shapes в Armature → Viewport Display. Для видео-запуска поставьте конечный кадр таймлайна по длине клипа и сверяйте с `videos/mixamo_character.mp4`. Для фото-запуска сверяйте с `images/mixamo_character.png` или клипом орбиты.
+`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите меш персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: в Outliner спрячьте **Icosphere** и **armature**, оставьте видимым меш со скином. FPS сцены и конечный кадр таймлайна возьмите из `run.json` (`fps`, `n_frames`), чтобы длительность совпала с исходником. Видео-запуск сверяйте с `videos/mixamo_character.mp4`, фото-запуск — с `images/mixamo_character.png` или клипом орбиты.
 
 ## Лицензия
 

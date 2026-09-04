@@ -10,6 +10,8 @@
 
 Für Spieleentwickler: ein Video mit **genau einer Person** (oder ein Still) und ein Mixamo-Charakter; Ausgabe sind Vorschauen plus eine Charakterdatei mit Skinning (`.glb`) für Blender oder Unity.
 
+> Motion2MixamoRig ist noch experimentell. Version 0.1.0 ist die Kommandozeilen-Pipeline. In diesem Repository liegt außerdem eine Blender-4.2+-Extension, die dieselbe Pipeline in einem externen Python ausführt. Installation und Bedienung des Add-ons: [`blender_extension/README.md`](blender_extension/README.md).
+
 Agents beginnen mit [`AGENTS.md`](AGENTS.md).
 
 https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
@@ -152,7 +154,7 @@ images/
                                         # rechts: 10°-Orbit um den Rig (eine volle Umdrehung)
 ```
 
-`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, den Charakter wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: Armature wählen und unter Armature → Viewport Display die Shapes ausschalten. Beim Videolauf das letzte Timeline-Frame auf die Cliplänge setzen und mit `videos/mixamo_character.mp4` vergleichen. Beim Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip vergleichen.
+`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, das Charakter-Mesh wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: im Outliner **Icosphere** und die **Armature** ausblenden, das Mesh mit Skinning sichtbar lassen. Szene-FPS und letztes Timeline-Frame aus `run.json` (`fps`, `n_frames`) setzen, damit die Wiedergabe zur Quelle passt. Videolauf mit `videos/mixamo_character.mp4` vergleichen, Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip.
 
 ## Lizenz
 

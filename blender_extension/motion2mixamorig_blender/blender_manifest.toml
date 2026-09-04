@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+
+id = "motion2mixamorig"
+version = "0.1.0"
+name = "Motion2MixamoRig"
+tagline = "Transfer human motion from video to Mixamo characters"
+maintainer = "Max Liu"
+type = "add-on"
+
+website = "https://github.com/MaxLiu22/Motion2MixamoRig"
+tags = ["Animation", "Import-Export"]
+blender_version_min = "4.2.0"
+
+license = ["SPDX:Apache-2.0"]
+copyright = ["2026 Max Liu"]
+
+[permissions]
+files = "Read inputs and write job logs and generated GLB files"

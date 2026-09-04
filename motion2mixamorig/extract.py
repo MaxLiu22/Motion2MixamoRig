@@ -55,6 +55,138 @@ HOLD_FPS = 30.0
 HOLD_MAX_SIDE = 1920
 
 
+def video_duration_seconds(path: Path) -> float | None:
+    """Wall-clock length of a clip. Prefers ffprobe; OpenCV is the fallback."""
+    import os
+    import subprocess
+
+    try:
+        completed = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=duration:format=duration",
+                "-of",
+                "json",
+                os.fspath(path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=8,
+        )
+        if completed.returncode == 0 and completed.stdout.strip():
+            import json
+
+            payload = json.loads(completed.stdout)
+            streams = payload.get("streams") or []
+            candidates = []
+            if streams and streams[0].get("duration"):
+                candidates.append(streams[0]["duration"])
+            fmt = payload.get("format") or {}
+            if fmt.get("duration"):
+                candidates.append(fmt["duration"])
+            for raw in candidates:
+                duration = float(raw)
+                if duration > 0:
+                    return duration
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        pass
+    try:
+        import cv2
+
+        cap = cv2.VideoCapture(os.fspath(path))
+        try:
+            fps = float(cap.get(cv2.CAP_PROP_FPS) or 0)
+            count = float(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+        finally:
+            cap.release()
+        if fps > 1e-6 and count > 0:
+            return count / fps
+    except Exception:
+        pass
+    return None
+
+
+def video_native_fps(path: Path) -> float | None:
+    """Container frame rate (e.g. 60000/1001). None if it cannot be read."""
+    import os
+    import subprocess
+
+    try:
+        completed = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=avg_frame_rate,r_frame_rate",
+                "-of",
+                "json",
+                os.fspath(path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=8,
+        )
+        if completed.returncode == 0 and completed.stdout.strip():
+            import json
+
+            streams = json.loads(completed.stdout).get("streams") or []
+            if streams:
+                rate = streams[0].get("avg_frame_rate") or streams[0].get("r_frame_rate") or "0/1"
+                num, _, den = str(rate).partition("/")
+                fps = float(num) / float(den or 1)
+                if fps > 0:
+                    return fps
+    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError):
+        pass
+    try:
+        import cv2
+
+        cap = cv2.VideoCapture(os.fspath(path))
+        try:
+            fps = float(cap.get(cv2.CAP_PROP_FPS) or 0)
+        finally:
+            cap.release()
+        if fps > 1e-6:
+            return fps
+    except Exception:
+        pass
+    return None
+
+
+def playback_fps(video: Path, n_motion_frames: int, fallback: float = 30.0) -> float:
+    """FPS that plays `n_motion_frames` in the source clip's real duration.
+
+    GVHMR always reports 30 fps (the model rate). If staging fails to resample a
+    60 fps source, keeping that 30 would stretch the clip to ~2× length.
+    """
+    n = max(1, int(n_motion_frames))
+    duration = video_duration_seconds(video)
+    native = video_native_fps(video)
+    if duration and duration > 1e-6:
+        implied_source_frames = native * duration if native else None
+        if (
+            implied_source_frames is not None
+            and abs(implied_source_frames - n) <= 2
+            and native
+            and native > 0
+        ):
+            return float(native)
+        return n / duration
+    if native and native > 0:
+        return float(native)
+    return float(fallback) if fallback > 0 else 30.0
+
+
 def _to_numpy(x):
     if hasattr(x, "detach"):
         return x.detach().cpu().numpy()
@@ -266,14 +398,21 @@ def extract_motion(
     joints_3d = joints_world_from_smplx(world, device=device)
     root_translation = _to_numpy(world["transl"]).astype(np.float32)
     root_orientation = _to_numpy(world["global_orient"]).astype(np.float32)
-    timestamps = np.arange(len(joints_3d), dtype=np.float64) / float(result.fps)
+    reported = float(getattr(result, "fps", 0) or 0)
+    fps = playback_fps(video, len(joints_3d), fallback=reported or HOLD_FPS)
+    if verbose and reported > 0 and abs(fps - reported) > 1.5:
+        print(
+            f"source is {fps:.3g} fps ({len(joints_3d)} frames); "
+            f"GVHMR reported {reported:g} fps — using the source rate so playback matches the video"
+        )
+    timestamps = np.arange(len(joints_3d), dtype=np.float64) / float(fps)
 
     output_npz = Path(output_npz)
     output_npz.parent.mkdir(parents=True, exist_ok=True)
     payload = dict(
         joints_3d=joints_3d,
         joint_names=np.array(SMPL_JOINT_NAMES),
-        fps=np.float32(result.fps),
+        fps=np.float32(fps),
         timestamps=timestamps,
         root_translation=root_translation,
         root_orientation=root_orientation,

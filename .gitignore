@@ -28,5 +28,10 @@ dist/
 .env
 .env.*
 
+# ── Local tests and editor junk: not committed ───────────────
+tests/
+scripts/verify_blender_addon.py
+:memory:.ses
+
 # ── OS junk ──────────────────────────────────────────────────
 .DS_Store

@@ -10,6 +10,8 @@
 
 للمطوّرين في مجال الألعاب: قدّم فيديو حركة لـ**شخص واحد** (أو صورة) وشخصية Mixamo؛ يكتب معاينات وملف شخصية مكسوّة (`.glb`) يمكن وضعه في Blender أو Unity.
 
+> Motion2MixamoRig لا يزال تجريبيًا. الإصدار 0.1.0 هو مسار سطر الأوامر. يضم هذا المستودع أيضًا امتداد Blender 4.2+ يشغّل المسار نفسه في Python خارجي. تثبيت الإضافة واستخدامها: [`blender_extension/README.md`](blender_extension/README.md).
+
 ينبغي للوكلاء البرمجيين (Agents) البدء من [`AGENTS.md`](AGENTS.md).
 
 https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
@@ -152,7 +154,7 @@ images/
                                         # اليمين: مدار 10° حول الهيكل (دورة كاملة)
 ```
 
-افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: حدّد الهيكل (Armature) وأوقف Shapes تحت Armature → Viewport Display. في تشغيل الفيديو اضبط إطار نهاية الخط الزمني على طول المقطع وقارن مع `videos/mixamo_character.mp4`. في تشغيل الصورة قارن مع `images/mixamo_character.png` أو مقطع المدار.
+افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد شبكة الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: في Outliner أخفِ **Icosphere** و**armature** واترك الشبكة المكسوّة ظاهرة. اضبط FPS المشهد وإطار نهاية الخط الزمني من `run.json` (`fps` و`n_frames`) حتى تطابق مدة المصدر. في تشغيل الفيديو قارن مع `videos/mixamo_character.mp4`، وفي تشغيل الصورة مع `images/mixamo_character.png` أو مقطع المدار.
 
 ## الرخصة
 

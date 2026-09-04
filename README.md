@@ -10,7 +10,7 @@ Transfer the motion of a person in a video — or the pose in a still photo — 
 
 For game developers: give it a **single-person** action video (or a still) and a Mixamo character; it writes preview videos plus a skinned character file (`.glb`) you can drop into Blender or Unity.
 
-> Motion2MixamoRig is currently experimental. Version 0.1.0 provides the command-line pipeline; a Blender Extension is planned for v0.2.0.
+> Motion2MixamoRig is currently experimental. Version 0.1.0 is the command-line pipeline. This repository also includes a Blender 4.2+ Extension that runs that same pipeline in an external Python environment. How to install and use the add-on: [`blender_extension/README.md`](blender_extension/README.md).
 
 Agents should start with [`AGENTS.md`](AGENTS.md).
 
@@ -154,7 +154,7 @@ images/
                                         # right: 10° orbit of the rig (one full turn)
 ```
 
-Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character and use View → Frame Selected. The cluster of spheres on the head and hands is the bone display, not the mesh: select the armature and turn off Shapes under Armature → Viewport Display. For a video run, set the timeline end frame to the clip length and compare against `videos/mixamo_character.mp4`. For a still run, compare against `images/mixamo_character.png` or the orbit clip.
+Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character mesh and use View → Frame Selected. The cluster of spheres on the head and hands is bone display, not the mesh: in the Outliner, hide **Icosphere** and the **armature**; leave the skinned mesh visible. Set scene FPS and the timeline end frame from `run.json` (`fps`, `n_frames`) so playback matches the source. Compare a video run against `videos/mixamo_character.mp4`, a still run against `images/mixamo_character.png` or the orbit clip.
 
 ## License
 
