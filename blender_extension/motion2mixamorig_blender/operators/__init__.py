@@ -1,4 +1,4 @@
-from . import check_environment, import_result, open_output, run_pipeline, runtime, setup_runtime
+from . import check_environment, diagnostics, import_result, open_output, run_pipeline, runtime, setup_runtime
 
 
 def register() -> None:
@@ -8,10 +8,12 @@ def register() -> None:
     run_pipeline.register()
     import_result.register()
     open_output.register()
+    diagnostics.register()
 
 
 def unregister() -> None:
     runtime.unregister()
+    diagnostics.unregister()
     open_output.unregister()
     import_result.unregister()
     run_pipeline.unregister()

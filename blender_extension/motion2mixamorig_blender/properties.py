@@ -79,6 +79,8 @@ class M2MRProperties(PropertyGroup):
     setup_progress: FloatProperty(name="Runtime setup progress", default=0.0, min=0.0, max=1.0)
     setup_message: StringProperty(name="Runtime setup message", default="", maxlen=512)
     show_advanced: BoolProperty(name="Advanced", default=False)
+    diag_show_time: BoolProperty(name="Show seconds", default=False)
+    show_diagnostics: BoolProperty(name="Diagnostics", description="Show or hide the Diagnostics section", default=True)
     show_setup: BoolProperty(name="Setup", description="Show or hide the Setup section", default=True)
 
     job_status: StringProperty(name="Job status", default="idle", maxlen=64)

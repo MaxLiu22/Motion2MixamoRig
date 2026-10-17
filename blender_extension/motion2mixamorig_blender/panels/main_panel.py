@@ -48,6 +48,8 @@ class M2MR_PT_main(Panel):
             self._draw_setup(layout, prefs, props, busy)
         self._draw_input(layout, prefs, props, busy)
         self._draw_progress(layout, props, busy)
+        if not busy and props.job_output_dir:
+            _draw_diagnostics(layout, context.scene)
 
     def _draw_setup(self, layout, prefs, props, busy: bool) -> None:
         box = layout.box()
@@ -170,6 +172,96 @@ class M2MR_PT_main(Panel):
             return
 
         box.label(text=t("no_job_yet"))
+
+
+_CELLS = 48
+
+
+def _draw_diagnostics(layout, scene) -> None:
+    """Frame bar of the job's self-intersections: red cells are frames to fix."""
+    from ..operators.diagnostics import pair_label
+    from ..services.diagnostics_reader import format_frame, frame_cells, issues_at, load_diagnostics
+
+    props = scene.m2mr
+    report = load_diagnostics(props.job_output_dir)
+    box = layout.box()
+    # Collapsible like Setup's Advanced; when folded, the header still says whether anything is wrong.
+    head = box.row()
+    toggle = head.row()
+    toggle.alignment = "LEFT"
+    toggle.prop(
+        props,
+        "show_diagnostics",
+        text=t("section_diagnostics"),
+        icon="TRIA_DOWN" if props.show_diagnostics else "TRIA_RIGHT",
+        emboss=False,
+    )
+    if report is not None and not props.show_diagnostics:
+        tail = head.row()
+        tail.alignment = "RIGHT"
+        if report["issues"]:
+            tail.alert = True
+            tail.label(text=t("diag_folded", n=len(report["issues"])), icon="ERROR")
+        else:
+            tail.label(text="", icon="CHECKMARK")
+    if not props.show_diagnostics:
+        return
+    if report is None:
+        box.label(text=t("diag_missing"), icon="INFO")
+        return
+    summary = report["summary"]["self_intersection"]
+    if not report["issues"]:
+        box.label(text=t("diag_clean", cm=f"{report['threshold_cm']:g}"), icon="CHECKMARK")
+        return
+    box.label(text=t("diag_summary", n=summary["issue_count"], cm=f"{summary['max_depth_cm']:g}"), icon="ERROR")
+
+    # Frame bar: one button per cell, red where any frame in it intersects.
+    # Click a cell to go there; the triangle row below marks the current frame.
+    now = scene.frame_current
+    cells = frame_cells(report, _CELLS)
+    col = box.column(align=True)
+    bar = col.row(align=True)
+    bar.scale_y = 1.5
+    for cell in cells:
+        slot = bar.row(align=True)
+        slot.alert = cell.hit
+        slot.operator("m2mr.diag_jump", text="", depress=cell.start <= now <= cell.end).frame = cell.target
+    head = col.row(align=True)
+    head.scale_y = 0.5
+    for cell in cells:
+        head.label(text="", icon="TRIA_UP" if cell.start <= now <= cell.end else "BLANK1")
+
+    n = int(report["frame_count"])
+    fps = float(report.get("fps") or 0)
+    show_time = props.diag_show_time
+    # Thirds of the bar width, so the middle tick sits at the centre.
+    axis = box.split(factor=1 / 3)
+    axis.scale_y = 0.6
+    axis.label(text=format_frame(0, fps, show_time))
+    rest = axis.split(factor=0.5)
+    for value, align in (((n - 1) // 2, "CENTER"), (n - 1, "RIGHT")):
+        c = rest.row()
+        c.alignment = align
+        c.label(text=format_frame(value, fps, show_time))
+
+    here = issues_at(report, now)
+    at = format_frame(now, fps, show_time)
+    status = box.column(align=True)
+    if here:
+        status.alert = True
+        status.label(text=t("diag_time_bad" if show_time else "diag_frame_bad", f=at), icon="ERROR")
+        for issue in sorted(here, key=lambda i: -i["max_depth_cm"]):
+            status.label(text=f"    {pair_label(issue)}  {issue['max_depth_cm']:.1f} cm")
+    else:
+        status.label(text=t("diag_time_ok" if show_time else "diag_frame_ok", f=at), icon="CHECKMARK")
+    nav = box.row(align=True)
+    nav.operator("m2mr.diag_step", text=t("diag_prev"), icon="TRIA_LEFT").direction = -1
+    nav.operator("m2mr.diag_step", text=t("diag_next"), icon="TRIA_RIGHT").direction = 1
+
+    tools = box.row(align=True)
+    tools.operator("m2mr.diag_toggle_time", text=t("diag_show_frames") if show_time else t("diag_show_seconds"), icon="TIME")
+    tools.operator("m2mr.diag_markers", text=t("diag_add_markers"), icon="MARKER_HLT")
+    tools.operator("m2mr.diag_clear_markers", text="", icon="X")
 
 
 def _first_run(prefs) -> bool:
