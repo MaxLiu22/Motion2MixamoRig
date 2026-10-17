@@ -97,6 +97,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `skeleton_motion.npz` — 3D human skeleton (24 SMPL joints, Y-up meters)
 - `mixamo_rotations.npz` — per-bone animation rotations (quaternion wxyz; convention string inside)
 - `mixamo_character.glb` — skinned character + clip (glTF 2.0; Blender: File → Import → glTF 2.0)
+- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames = Blender frame numbers, first = 0). `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`. No floor check.
 - Video in: `videos/human_skeleton.mp4`, `videos/mixamo_skeleton.mp4`, `videos/mixamo_character.mp4`, `videos/compare.mp4` (2x2: original / mixamo skeleton / human skeleton / character)
 - Photo in: the same four views as PNG under `images/`, plus `images/before_after_360_compare.mp4` (left original / right 10° orbit of the rig)
 

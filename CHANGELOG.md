@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Self-intersection diagnostics: every `m2mr run` checks the finished `mixamo_character.glb` for one body part going into another and writes `diagnostics.json` (part pairs, frame ranges, worst frame, depth in cm) plus a one-line summary. `m2mr diagnose <run>` re-checks a run; `--visualize` also writes `diagnostics.html` with a 3D view, a timeline, and a clickable issue list; `--threshold-cm` sets the reporting depth (default 1 cm). The floor is not checked.
+
 ## [0.1.7] - 2026-10-17
 
 Tested on macOS (Apple Silicon) only; Windows and Linux are untested.

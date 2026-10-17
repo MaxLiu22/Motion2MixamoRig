@@ -357,7 +357,41 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="skip preview videos/images; still write NPZ, GLB, and run.json",
     )
+
+    p_diag = sub.add_parser(
+        "diagnose",
+        help="check a run's mixamo_character.glb for self-intersection -> diagnostics.json",
+    )
+    p_diag.add_argument("run_dir", help="a run folder from `m2mr run` (contains mixamo_character.glb)")
+    p_diag.add_argument(
+        "--visualize",
+        action="store_true",
+        help="also write diagnostics.html: 3D view, timeline, and clickable issue list",
+    )
+    p_diag.add_argument(
+        "--threshold-cm",
+        type=float,
+        default=None,
+        help="report penetrations deeper than this (default: 1.0)",
+    )
     return parser
+
+
+def diagnose(args: argparse.Namespace) -> int:
+    from .diagnose import DEFAULT_THRESHOLD_CM, DIAGNOSTICS_HTML, DIAGNOSTICS_JSON, diagnose_run, summary_line
+
+    run_dir = Path(args.run_dir)
+    threshold = DEFAULT_THRESHOLD_CM if args.threshold_cm is None else args.threshold_cm
+    try:
+        report = diagnose_run(run_dir, threshold_cm=threshold, visualize=args.visualize)
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(summary_line(report))
+    print(f"report: {run_dir / DIAGNOSTICS_JSON}")
+    if args.visualize:
+        print(f"view:   {run_dir / DIAGNOSTICS_HTML}")
+    return 0
 
 
 def main() -> None:
@@ -365,6 +399,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "doctor":
         sys.exit(doctor())
+    if args.command == "diagnose":
+        sys.exit(diagnose(args))
     sys.exit(run(args))
 
 
