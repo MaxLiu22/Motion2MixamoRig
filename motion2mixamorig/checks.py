@@ -25,6 +25,8 @@ _PERSON_SAMPLES = 16
 _PERSON_CONF = 0.5
 # Ignore postage-stamp extras (audience, posters). A second dancer is larger.
 _PERSON_MIN_AREA = 0.015
+# Share of a box's area inside a larger box above which it counts as the same person.
+_PERSON_NESTED = 0.8
 
 _yolo = None
 
@@ -51,14 +53,27 @@ def _count_people(frame) -> int:
     result = _person_detector().predict(
         frame, conf=_PERSON_CONF, classes=[0], verbose=False
     )[0]
-    n = 0
     if result.boxes is None:
         return 0
-    for box in result.boxes:
-        x1, y1, x2, y2 = (float(v) for v in box.xyxy[0])
-        if (x2 - x1) * (y2 - y1) >= min_area:
-            n += 1
-    return n
+    boxes = [tuple(float(v) for v in box.xyxy[0]) for box in result.boxes]
+    boxes = sorted(
+        (b for b in boxes if _area(b) >= min_area), key=_area, reverse=True
+    )
+    kept: list[tuple[float, float, float, float]] = []
+    for b in boxes:
+        # YOLO can emit a second, smaller box on the same body (e.g. a crouch);
+        # a box lying mostly inside a larger one is that duplicate, not a person.
+        if all(_overlap(b, k) < _PERSON_NESTED * _area(b) for k in kept):
+            kept.append(b)
+    return len(kept)
+
+
+def _area(b) -> float:
+    return max(0.0, b[2] - b[0]) * max(0.0, b[3] - b[1])
+
+
+def _overlap(a, b) -> float:
+    return _area((max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])))
 
 
 def check_video(path: Path) -> str | None:
