@@ -19,8 +19,8 @@ SMPL_VERTS = 6890
 
 FBX_BINARY_MAGIC = b"Kaydara FBX Binary"
 
-# Sampled frames for the person-count check. The pipeline maps one body to one
-# rig, so two people in frame is a hard stop — we do not wait for extraction.
+# Sampled frames for the default person-count check. Explicit subject selection
+# skips this check and validates the chosen track before extraction instead.
 _PERSON_SAMPLES = 16
 _PERSON_CONF = 0.5
 # Ignore postage-stamp extras (audience, posters). A second dancer is larger.
@@ -76,7 +76,7 @@ def _overlap(a, b) -> float:
     return _area((max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])))
 
 
-def check_video(path: Path) -> str | None:
+def check_video(path: Path, *, check_people: bool = True) -> str | None:
     """Decodable, and a single person on the sampled frames — not a group."""
     import cv2
 
@@ -96,6 +96,10 @@ def check_video(path: Path) -> str | None:
                 "ffmpeg -i input -c:v libx264 output.mp4"
             )
         return "has no readable frame count — re-export the clip as a plain mp4"
+    if not check_people:
+        ok, _ = cap.read()
+        cap.release()
+        return None if ok else "cannot read video frames — re-export the clip as a plain mp4"
     k = min(_PERSON_SAMPLES, n_frames)
     sample = {int(round(i * (n_frames - 1) / max(k - 1, 1))) for i in range(k)}
     counts: list[int] = []
@@ -115,7 +119,8 @@ def check_video(path: Path) -> str | None:
         peak = max(counts)
         return (
             f"shows about {peak} people in frame — this pipeline maps one body "
-            "to one Mixamo rig. Use a clip with a single, clearly visible person"
+            "to one Mixamo rig. Use --select-person to choose a subject, "
+            "or a clip with a single, clearly visible person"
         )
     if max(counts) < 1:
         return (
@@ -125,7 +130,7 @@ def check_video(path: Path) -> str | None:
     return None
 
 
-def check_image(path: Path) -> str | None:
+def check_image(path: Path, *, check_people: bool = True) -> str | None:
     """Decodable still, and exactly one person — same rule as check_video."""
     import cv2
 
@@ -134,11 +139,14 @@ def check_image(path: Path) -> str | None:
         return (
             "cannot be decoded as an image — use a jpg/png/webp still of one person"
         )
+    if not check_people:
+        return None
     n = _count_people(frame)
     if n >= 2:
         return (
             f"shows about {n} people — this pipeline maps one body "
-            "to one Mixamo rig. Use a photo with a single, clearly visible person"
+            "to one Mixamo rig. Use --select-person to choose a subject, "
+            "or a photo with a single, clearly visible person"
         )
     if n < 1:
         return (

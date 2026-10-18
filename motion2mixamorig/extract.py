@@ -356,6 +356,8 @@ def extract_motion(
     static_camera: bool = True,
     verbose: bool = True,
     source_image: Path | None = None,
+    person_id: int | None = None,
+    select_person: bool = False,
 ) -> Path:
     """Run GVHMR on `video` and save skeleton_motion.npz to `output_npz`.
 
@@ -371,6 +373,19 @@ def extract_motion(
         raise FileNotFoundError(video)
 
     output_dir = Path(work_dir) / video.stem
+    selection = None
+    if person_id is not None or select_person:
+        from .person_selection import analyze_people, pick_person, seed_person_cache
+
+        people = analyze_people(source_image or video, image=source_image is not None, device=device)
+        if select_person:
+            person_id = pick_person(people)
+        assert person_id is not None
+        # Separate subjects and source revisions must never reuse one another's
+        # pose/features caches, even when the caller reuses an output directory.
+        output_dir = output_dir / f"person-{person_id}-{people['source_key']}"
+        selection = seed_person_cache(video, output_dir, people, person_id)
+        print(f"selected person {person_id}: {selection['observed_frames']}/{selection['total_frames']} frames observed")
 
     def recover():
         return gvhmr.recover(
@@ -422,6 +437,11 @@ def extract_motion(
     if source_image is not None:
         payload["image"] = np.array(str(source_image))
         _strip_cache_videos(output_dir)
+    if selection is not None:
+        import json
+
+        payload["person_id"] = np.int64(person_id)
+        payload["person_selection"] = np.array(json.dumps(selection))
     np.savez_compressed(output_npz, **payload)
     if verbose:
         print(f"saved {output_npz}")

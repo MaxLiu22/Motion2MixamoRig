@@ -13,6 +13,9 @@ def classify_error(exc: BaseException) -> tuple[str, str]:
     low = text.lower()
     name = type(exc).__name__
 
+    if name == "PersonSelectionError":
+        return "PERSON_SELECTION_FAILED", _short_message(text) or "Person selection failed"
+
     if isinstance(exc, ModuleNotFoundError) or "no module named" in low:
         return "PACKAGE_MISSING", "Motion2MixamoRig package not installed"
 

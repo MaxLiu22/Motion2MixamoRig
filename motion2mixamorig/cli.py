@@ -12,6 +12,7 @@ work, and reports everything that is missing in one pass.
 from __future__ import annotations
 
 import argparse
+from functools import partial
 import sys
 from pathlib import Path
 
@@ -32,12 +33,12 @@ RIG_HINT = (
     "into assets/mixamo/ , e.g. Y_Bot.fbx"
 )
 VIDEO_HINT = (
-    "put a *single-person* motion video (.mp4/.mov/...) into assets/video/ "
-    "— group shots are rejected before extraction"
+    "put a motion video (.mp4/.mov/...) into assets/video/ "
+    "— for group shots, run with --select-person"
 )
 IMAGE_HINT = (
-    "put a *single-person* still (.jpg/.png/...) into assets/image/ "
-    "— group photos are rejected before extraction"
+    "put a still (.jpg/.png/...) into assets/image/ "
+    "— for group photos, run with --select-person"
 )
 SOURCE_HINT = VIDEO_HINT + "; or " + IMAGE_HINT
 
@@ -141,6 +142,11 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
     missing. Returns (video, rig, skeleton, image).
     """
     problems = 0
+    selecting = getattr(args, "person", None) is not None or bool(getattr(args, "select_person", False))
+    # Reused skeletons already identify their subject; the source is only a preview.
+    check_people = not (selecting or getattr(args, "skeleton", None))
+    check_video = partial(checks.check_video, check_people=check_people)
+    check_image = partial(checks.check_image, check_people=check_people)
 
     def check(label: str, present: bool, hint: str) -> bool:
         nonlocal problems
@@ -183,17 +189,17 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
                 False,
                 "use a still (.jpg/.png/webp/bmp), or pass a clip with --video",
             )
-        check_content(f"image is usable    {image.name if image else ''}", image, checks.check_image)
+        check_content(f"image is usable    {image.name if image else ''}", image, check_image)
     elif want_video:
         video = Path(args.video)
         if video.exists() and paths.is_image(video):
             image = video
             video = None
             print(f"{OK} input image        {image}  (detected from --video path)")
-            check_content(f"image is usable    {image.name}", image, checks.check_image)
+            check_content(f"image is usable    {image.name}", image, check_image)
         else:
             check(f"input video        {video}", video.exists(), "check the --video path")
-            check_content(f"video is usable    {video.name}", video, checks.check_video)
+            check_content(f"video is usable    {video.name}", video, check_video)
     else:
         video = paths.latest_video()
         if video is None:
@@ -205,7 +211,7 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
                 SOURCE_HINT + ", or pass --video / --image",
             )
             check_content(
-                f"image is usable    {image.name if image else ''}", image, checks.check_image
+                f"image is usable    {image.name if image else ''}", image, check_image
             )
         else:
             check(
@@ -214,7 +220,7 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
                 True,
                 VIDEO_HINT + ", or pass --video",
             )
-            check_content(f"video is usable    {video.name}", video, checks.check_video)
+            check_content(f"video is usable    {video.name}", video, check_video)
 
     # Rig: --rig wins, else Y_Bot.fbx, else the first .fbx in assets/mixamo/.
     if args.rig:
@@ -292,6 +298,8 @@ def run(args: argparse.Namespace) -> int:
             output_dir=output_dir,
             progress=progress,
             no_preview=bool(getattr(args, "no_preview", False)),
+            person_id=getattr(args, "person", None),
+            select_person=bool(getattr(args, "select_person", False)),
         )
     except Exception:
         import traceback
@@ -299,8 +307,38 @@ def run(args: argparse.Namespace) -> int:
         traceback.print_exc()
         return 1
     preview = "images" if image is not None else "videos"
-    print(f"\nresults: {run_dir / preview}")
+    result_path = run_dir if args.no_preview else run_dir / preview
+    print(f"\nresults: {result_path}")
     return 0
+
+
+def people(args: argparse.Namespace) -> int:
+    """List all track IDs and write visual candidates before running inference."""
+    from .person_selection import analyze_people
+
+    source = Path(args.image or args.video).resolve()
+    image = bool(args.image) or paths.is_image(source)
+    checker = checks.check_image if image else checks.check_video
+    if not source.is_file():
+        print(f"Input does not exist: {source}", file=sys.stderr)
+        return 1
+    problem = checker(source, check_people=False)
+    if problem:
+        print(problem, file=sys.stderr)
+        return 1
+    data = analyze_people(source, image=image, device=args.device)
+    for track in data["tracks"]:
+        print(f"Person {track['id']}: observed {len(track['frames'])}/{data['n_frames']} frames")
+    print(f"Gallery and cached tracks: {data['directory']}")
+    print("Run with --person ID to use one of these tracks, or --select-person for the click picker.")
+    return 0
+
+
+def positive_id(value: str) -> int:
+    value_int = int(value)
+    if value_int < 1:
+        raise argparse.ArgumentTypeError("person ID must be at least 1")
+    return value_int
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -314,6 +352,11 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="check assets, weights and dependencies")
+    p_people = sub.add_parser("people", help="analyze all people and write a numbered candidate gallery")
+    source = p_people.add_mutually_exclusive_group(required=True)
+    source.add_argument("--video", help="video to analyze")
+    source.add_argument("--image", help="still image to analyze")
+    p_people.add_argument("--device", default="cpu", choices=["cpu", "cuda", "mps"])
 
     p_run = sub.add_parser("run", help="video or still -> Mixamo rig, results in outputs/")
     p_run.add_argument(
@@ -326,7 +369,7 @@ def build_parser() -> argparse.ArgumentParser:
         const="",
         default=None,
         help=(
-            "still photo of one person (default: the file most recently added "
+            "still photo (default: the file most recently added "
             "to assets/image/). Recovers a static 3D pose; do not combine with --video"
         ),
     )
@@ -357,6 +400,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="skip preview videos/images; still write NPZ, GLB, and run.json",
     )
+    selection = p_run.add_mutually_exclusive_group()
+    selection.add_argument("--person", type=positive_id, help="track ID from `m2mr people`; permits other people in frame")
+    selection.add_argument("--select-person", action="store_true", help="open a click picker to choose a tracked person")
     return parser
 
 
@@ -365,6 +411,14 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "doctor":
         sys.exit(doctor())
+    if args.command == "people":
+        try:
+            sys.exit(people(args))
+        except (ValueError, OSError) as exc:
+            print(str(exc), file=sys.stderr)
+            sys.exit(1)
+    if args.skeleton and (args.person is not None or args.select_person):
+        parser.error("--person / --select-person cannot be combined with --skeleton; the saved skeleton already identifies a subject")
     sys.exit(run(args))
 
 
