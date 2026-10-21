@@ -239,10 +239,13 @@ def _stabilize_pose_cache(pose_cache: Path) -> bool:
     from .stabilize_kp2d import stabilize_coco17
 
     current = torch.load(pose_cache, weights_only=False)
-    fixed, swaps = stabilize_coco17(current)
+    # Always stabilize the estimator's own output: a cache written by an older
+    # rule must not be stabilized a second time on top of its earlier swaps.
+    raw_backup = pose_cache.with_name(pose_cache.stem + "_raw" + pose_cache.suffix)
+    source = torch.load(raw_backup, weights_only=False) if raw_backup.exists() else current
+    fixed, swaps = stabilize_coco17(source)
     if np.allclose(fixed, _to_numpy(current).astype(np.float32)):
         return False
-    raw_backup = pose_cache.with_name(pose_cache.stem + "_raw" + pose_cache.suffix)
     if not raw_backup.exists():
         shutil.copy2(pose_cache, raw_backup)
     torch.save(torch.from_numpy(fixed), pose_cache)
@@ -385,9 +388,10 @@ def extract_motion(
 
     result = recover()
 
-    # RTMPose labels left/right per frame and can swap them when the subject
-    # turns away, which spins the recovered 3D heading. Stabilize the 2D cache
-    # and redo the 3D lift once if anything was corrected.
+    # RTMPose labels left/right per frame and mislabels isolated frames, which
+    # spins the recovered 3D heading for those frames. Stabilize the 2D cache
+    # (segment majority, see stabilize_kp2d.py) and redo the 3D lift once if
+    # anything was corrected.
     pose_cache = output_dir / "preprocess" / "vitpose.pt"
     if pose_cache.exists() and _stabilize_pose_cache(pose_cache):
         motion_cache = output_dir / "hmr4d_results.pt"
