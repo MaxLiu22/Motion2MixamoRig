@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import sys
 import time
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -81,6 +82,8 @@ def run_pipeline(
     progress: ProgressWriter | None = None,
     progress_jsonl: Path | None = None,
     no_preview: bool = False,
+    person_id: int | None = None,
+    select_person: bool = False,
 ) -> Path:
     """Full pipeline for one video or still + one rig. Returns the run directory.
 
@@ -94,6 +97,10 @@ def run_pipeline(
     """
     if image is None and video is None:
         raise ValueError("run_pipeline needs a video or an image")
+    if skeleton_npz is not None and (person_id is not None or select_person):
+        raise ValueError("A reused skeleton already identifies its subject; do not combine it with person selection")
+    if person_id is not None and select_person:
+        raise ValueError("Choose either a person ID or the interactive picker")
     if image is not None:
         image = Path(image).resolve()
     if video is not None:
@@ -133,6 +140,8 @@ def run_pipeline(
                     device=device,
                     verbose=verbose,
                     source_image=image,
+                    person_id=person_id,
+                    select_person=select_person,
                 )
         else:
             from .extract import extract_motion
@@ -145,8 +154,12 @@ def run_pipeline(
                 work_dir=run_dir / "cache",
                 device=device,
                 verbose=verbose,
+                person_id=person_id,
+                select_person=select_person,
             )
         motion: HumanMotion = load_human_motion(motion_npz)
+        with np.load(motion_npz, allow_pickle=False) as saved:
+            person_selection = json.loads(str(saved["person_selection"])) if "person_selection" in saved else None
         print(f"human motion   {motion.n_frames} frames @ {motion.fps:g} fps")
 
         stage = "retarget"
@@ -214,6 +227,7 @@ def run_pipeline(
             "fps": float(motion.fps),
             "n_frames": motion.n_frames,
             "skeleton_reused_from": str(skeleton_npz) if skeleton_npz else None,
+            "person_selection": person_selection,
             "rest_fk_error": rest_err,
             "rest_skin_error_cm": skin_err,
             "twist_events": len(anim.twist_events),

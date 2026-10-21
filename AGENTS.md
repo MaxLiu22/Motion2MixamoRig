@@ -22,8 +22,8 @@ A run needs SMPL-X, a Mixamo character, and either a video or a still:
 | --- | --- | --- |
 | SMPL-X body model | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | https://smpl-x.is.tue.mpg.de/ (registration) |
 | Mixamo character | `assets/mixamo/<Name>.fbx` (FBX Binary, T-pose) | https://www.mixamo.com/ (Adobe account) |
-| Input video | `assets/video/<name>.mp4` | one clearly visible person (group shots fail preflight) |
-| Input still | `assets/image/<name>.jpg` | one clearly visible person, head to toe (optional; `--image`) |
+| Input video | `assets/video/<name>.mp4` | one clearly visible person, or choose a track with `--select-person` / `--person ID` |
+| Input still | `assets/image/<name>.jpg` | optional; `--image`; group photos also support person selection |
 
 Inference weights (~5 GB) auto-download into `weights/` on the first run.
 
@@ -36,10 +36,15 @@ m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Y_Bot.fbx
 m2mr run --skeleton outputs/<run>/skeleton_motion.npz --rig ...   # reuse extraction, swap rig
 m2mr run --output-dir DIR --progress-jsonl FILE --no-preview      # Blender Extension / automation
+m2mr people --video group.mp4                 # cache tracks and write a numbered gallery
+m2mr run --video group.mp4 --select-person     # native click picker, then extract the chosen track
+m2mr run --image group.jpg --person 2          # ID from people --image group.jpg
 ```
 
 `--video` / `--image` and `--rig` combine freely (not `--video` with `--image`).
 Extraction is the slow step; reuse it with `--skeleton` when only the rig changes.
+Person selection is currently CLI-only. It keeps GVHMR and its pose limitations;
+see [`docs/person-selection.md`](docs/person-selection.md) for cache/gap behavior.
 
 ## Blender Extension
 

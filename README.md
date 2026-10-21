@@ -14,7 +14,7 @@
 
 Transfer the motion of a person in a video — or the pose in a still photo — onto an Adobe Mixamo-rigged 3D character.
 
-For game developers: give it a **single-person** action video (or a still) and a Mixamo character; it writes preview videos plus a skinned character file (`.glb`) you can drop into Blender or Unity.
+For game developers: give it an action video (or a still) and a Mixamo character; it writes preview videos plus a skinned character file (`.glb`) you can drop into Blender or Unity. For group footage, the CLI can select a person with `--select-person`.
 
 > Motion2MixamoRig is currently experimental. Version 0.1.7 is the command-line pipeline. This repository also includes a Blender 4.2+ Extension that runs that same pipeline in an external Python environment. Building the add-on from source: [`blender_extension/README.md`](blender_extension/README.md).
 
@@ -78,16 +78,37 @@ This repository does not ship these files; you have to fetch them. The SMPL-X fi
 |---|---|---|
 | SMPL-X body model | `assets/body_models/smplx/SMPLX_NEUTRAL.npz` | Register at [SMPL-X](https://smpl-x.is.tue.mpg.de/) and download it |
 | Mixamo character FBX | `assets/mixamo/Y_Bot.fbx` | With an Adobe account, download Y Bot (or any other Mixamo-rigged character) from [Mixamo](https://www.mixamo.com) |
-| Action video | `assets/video/<your_clip>.mp4` | A clip with **exactly one** clearly visible person, **head to toe in frame the whole time** (you may keep several files; each run uses the most recently added) |
-| Pose still (optional) | `assets/image/<your_photo>.jpg` | A photo with **exactly one** clearly visible person, **head to toe in frame**. Use with `--image` |
+| Action video | `assets/video/<your_clip>.mp4` | One clearly visible person, or choose a subject with `--select-person`. Full-body visibility is recommended. Each run uses the most recently added clip unless `--video` is given. |
+| Pose still (optional) | `assets/image/<your_photo>.jpg` | Use with `--image`; choose a subject in a group with `--select-person`. Full-body visibility is recommended. |
 
 Note: Mixamo's download is named `Y Bot.fbx` (**space**), one character off from `Y_Bot.fbx` (**underscore**) in the table.
 Rename it to the underscore form and it becomes the default rig (`m2mr run` without `--rig`). Leaving the space is fine too — if `Y_Bot.fbx` is missing, the first `.fbx` in `assets/mixamo/` is used.
 
 `assets/video/` can hold several videos. Without `--video` or `--image`, the run uses the file **most recently added** to `assets/video/`; if that folder is empty it falls back to the latest still in `assets/image/`.
-Each clip or photo must show only one person, **head to toe in frame** — nothing cropped at the edges. `m2mr doctor` / `m2mr run` stop before extraction if two people are in view.
+Without explicit selection, `m2mr doctor` / `m2mr run` stop before extraction if two people are in view. Use the CLI's `--select-person` or `--person ID` to process a group shot. Keep the selected subject's full body visible for the best results; cropped or hidden limbs remain estimates.
 
 ## Quick Start
+
+### Choose a person in a group shot
+
+The CLI prototype can select a subject before pose extraction:
+
+```bash
+# Analyze all tracks and write numbered thumbnails; no 3D inference yet.
+m2mr people --video group.mp4 --device mps
+
+# Click a candidate, then press Enter to run on that person.
+m2mr run --video group.mp4 --select-person --device mps
+
+# Or use an ID from the gallery without opening a window.
+m2mr run --video group.mp4 --person 2 --device mps
+```
+
+The same options work with `--image group.jpg`. Selection keeps the full input
+frame and supplies the chosen person's boxes to GVHMR. It does not change the
+3D estimator or reliably reconstruct body parts that are outside the image.
+The Blender extension does not yet expose this picker. See
+[`docs/person-selection.md`](docs/person-selection.md) for details.
 
 Results land in `outputs/<run-time>_<source>/`. Video runs write `videos/`; still runs write `images/`.
 
