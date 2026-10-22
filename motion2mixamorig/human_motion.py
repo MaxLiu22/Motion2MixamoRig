@@ -1,6 +1,6 @@
-"""Load the skeleton_motion.npz produced by extract.py.
+"""Load the skeleton_motion.npz produced by an extractor.
 
-Human world (GVHMR gravity frame):
+Human world (the frame every extractor must write; GVHMR's gravity frame):
     +Y up, +X right, +Z forward (right-handed), units = meters.
 """
 

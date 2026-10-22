@@ -188,11 +188,22 @@ def check_skeleton_npz(path: Path) -> str | None:
     try:
         with np.load(path, allow_pickle=True) as data:
             missing = {"joints_3d", "joint_names", "fps"} - set(data.keys())
+            if missing:
+                return (
+                    f"is missing {sorted(missing)} — pass the skeleton_motion.npz "
+                    "found inside a previous run's output directory"
+                )
+            joints = np.asarray(data["joints_3d"])
+            names = [str(x) for x in data["joint_names"]]
     except Exception:
         return "is not a valid .npz file"
-    if missing:
+    from .extractors.base import SMPL_JOINT_NAMES
+
+    if names != list(SMPL_JOINT_NAMES):
         return (
-            f"is missing {sorted(missing)} — pass the skeleton_motion.npz "
-            "found inside a previous run's output directory"
+            "joint_names are not the 24 SMPL joints this pipeline retargets "
+            "— pass the skeleton_motion.npz from a previous run"
         )
+    if joints.ndim != 3 or tuple(joints.shape[1:]) != (len(SMPL_JOINT_NAMES), 3):
+        return f"joints_3d must be (frames, 24, 3), got {getattr(joints, 'shape', None)}"
     return None

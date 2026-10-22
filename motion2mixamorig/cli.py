@@ -4,6 +4,7 @@
     m2mr run                    latest video in assets/video/ + default Y Bot
     m2mr run --video V --rig R  pick the inputs explicitly (flags combine freely)
     m2mr run --image I --rig R  still photo -> 3D pose on the same Mixamo path
+    m2mr run --set-extractor NAME   choose how the skeleton is recovered (default: gvhmr)
 
 `m2mr run` performs the same asset checks as `m2mr doctor` before doing any
 work, and reports everything that is missing in one pass.
@@ -16,6 +17,7 @@ import sys
 from pathlib import Path
 
 from . import checks, paths
+from .extractors import DEFAULT_EXTRACTOR, extractor_names, get_extractor
 from .progress import ProgressWriter
 from .run_report import write_failed_report
 
@@ -23,10 +25,6 @@ OK = "[ok]     "
 MISS = "[missing]"
 BAD = "[invalid]"
 
-SMPLX_HINT = (
-    "register at https://smpl-x.is.tue.mpg.de/ , download SMPLX_NEUTRAL.npz, "
-    "place it at assets/body_models/smplx/SMPLX_NEUTRAL.npz"
-)
 RIG_HINT = (
     "download a character from https://www.mixamo.com/ (FBX Binary, T-pose) "
     "into assets/mixamo/ , e.g. Y_Bot.fbx"
@@ -58,6 +56,16 @@ def _check_content(label: str, path: Path, checker) -> bool:
     return problem is None
 
 
+def _report_requirement(item) -> bool:
+    if item.ok:
+        print(f"{OK} {item.label}")
+        return True
+    print(f"{BAD if item.invalid else MISS} {item.label}")
+    if item.hint:
+        print(f"          -> {item.hint}")
+    return False
+
+
 def _module_available(name: str) -> bool:
     import importlib.util
 
@@ -68,16 +76,22 @@ def _available_rigs() -> list[Path]:
     return sorted(paths.MIXAMO_DIR.glob("*.fbx")) if paths.MIXAMO_DIR.is_dir() else []
 
 
-def doctor() -> int:
+def doctor(extractor_name: str | None = None) -> int:
     """Check every user-supplied asset and dependency; say where to get what's missing."""
     print(f"project root: {paths.PROJECT_ROOT}\n")
 
-    ok = True
-    smplx_label = f"SMPL-X body model  {paths.SMPLX_NEUTRAL.relative_to(paths.PROJECT_ROOT)}"
-    if paths.SMPLX_NEUTRAL.exists():
-        ok &= _check_content(smplx_label, paths.SMPLX_NEUTRAL, checks.check_smplx)
-    else:
-        ok &= _check(smplx_label, False, SMPLX_HINT)
+    name = extractor_name or DEFAULT_EXTRACTOR
+    try:
+        extractor = get_extractor(name)
+    except ValueError as exc:
+        print(f"{BAD} motion extractor   {name}")
+        print(f"          -> {exc}")
+        return 1
+    requirements = extractor.check()
+    ok = _check(f"motion extractor   {name}", True, "")
+    for item in requirements:
+        if item.section == "asset" and item.audience in ("doctor", "both"):
+            ok &= _report_requirement(item)
     rigs = _available_rigs()
     ok &= _check(
         f"Mixamo rig .fbx    assets/mixamo/  ({len(rigs)} found"
@@ -109,10 +123,11 @@ def doctor() -> int:
     for module, hint in (
         ("numpy", "pip install -e ."),
         ("cv2", "pip install -e ."),
-        ("torch", "pip install -e ."),
-        ("gvhmr", "pip install -e ."),
     ):
         deps_ok &= _check(f"python module      {module}", _module_available(module), hint)
+    for item in requirements:
+        if item.section == "module" and item.audience in ("doctor", "both"):
+            deps_ok &= _report_requirement(item)
     import shutil as _shutil
 
     _check(
@@ -121,10 +136,8 @@ def doctor() -> int:
         "brew install ffmpeg / apt install ffmpeg — runs fine without, but videos are silent mp4v",
     )
 
-    weights_note = (
-        "downloaded automatically into weights/ on the first `m2mr run` (~5 GB)"
-    )
-    print(f"\ninference weights: {weights_note}")
+    if extractor.weights_note:
+        print(f"\ninference weights: {extractor.weights_note}")
 
     if ok and deps_ok:
         print("\neverything in place — try: m2mr run")
@@ -232,7 +245,7 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
         )
     check_content(f"rig is Mixamo      {rig.name if rig else ''}", rig, checks.check_rig)
 
-    # Skeleton reuse skips extraction; only then is SMPL-X not needed.
+    # Skeleton reuse skips extraction; only then is the extractor's model check skipped.
     skeleton = Path(args.skeleton) if args.skeleton else None
     if skeleton is not None:
         check(
@@ -242,14 +255,17 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
         )
         check_content(f"skeleton loads     {skeleton.name}", skeleton, checks.check_skeleton_npz)
     else:
-        check(
-            f"SMPL-X body model  {paths.SMPLX_NEUTRAL.relative_to(paths.PROJECT_ROOT)}",
-            paths.SMPLX_NEUTRAL.exists(),
-            SMPLX_HINT,
-        )
-        check_content(
-            "SMPL-X loads       SMPLX_NEUTRAL.npz", paths.SMPLX_NEUTRAL, checks.check_smplx
-        )
+        chosen_name = getattr(args, "set_extractor", None) or DEFAULT_EXTRACTOR
+        try:
+            chosen = get_extractor(chosen_name)
+        except ValueError as exc:
+            check("motion extractor   --set-extractor", False, str(exc))
+        else:
+            check(f"motion extractor   {chosen_name}", True, "")
+            for item in chosen.check():
+                if item.section == "asset" and item.audience in ("preflight", "both"):
+                    if not _report_requirement(item):
+                        problems += 1
 
     if problems:
         print(f"\n{problems} problem(s) — nothing was run. `m2mr doctor` checks everything.")
@@ -288,6 +304,7 @@ def run(args: argparse.Namespace) -> int:
             rig,
             image=image,
             device=args.device,
+            extractor=getattr(args, "set_extractor", None) or DEFAULT_EXTRACTOR,
             skeleton_npz=skeleton,
             output_dir=output_dir,
             progress=progress,
@@ -313,7 +330,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("doctor", help="check assets, weights and dependencies")
+    p_doctor = sub.add_parser("doctor", help="check assets, weights and dependencies")
+    _add_extractor_arg(p_doctor)
 
     p_run = sub.add_parser("run", help="video or still -> Mixamo rig, results in outputs/")
     p_run.add_argument(
@@ -338,6 +356,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--skeleton",
         help="reuse a previous run's skeleton_motion.npz and skip extraction",
     )
+    _add_extractor_arg(p_run)
     p_run.add_argument(
         "--device",
         default="cpu",
@@ -360,11 +379,23 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _add_extractor_arg(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--set-extractor",
+        default=DEFAULT_EXTRACTOR,
+        choices=list(extractor_names()),
+        help=(
+            "how to turn the video or still into skeleton_motion.npz "
+            f"(default: {DEFAULT_EXTRACTOR})"
+        ),
+    )
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     if args.command == "doctor":
-        sys.exit(doctor())
+        sys.exit(doctor(getattr(args, "set_extractor", None)))
     sys.exit(run(args))
 
 

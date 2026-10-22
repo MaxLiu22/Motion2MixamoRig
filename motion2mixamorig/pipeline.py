@@ -7,7 +7,7 @@ Everything a run produces lands in its own timestamped folder:
     ├── skeleton_motion.npz     3D human skeleton (24 SMPL joints per frame)
     ├── mixamo_rotations.npz    per-bone animation rotations for the rig
     ├── mixamo_character.glb    skinned character + animation (Blender / Unity)
-    ├── cache/                  GVHMR intermediates (2D pose, 3D lift)
+    ├── cache/                  extractor intermediates (GVHMR: 2D pose, 3D lift)
     └── videos/ or images/      four result clips (video in) or four stills (photo in)
 """
 
@@ -22,6 +22,8 @@ import numpy as np
 
 from . import paths
 from .errors import classify_error
+from .extractors import DEFAULT_EXTRACTOR, get_extractor
+from .extractors.base import read_extractor_name
 from .human_motion import HumanMotion, load_human_motion
 from .mixamo.animation import build_animation
 from .mixamo.gltf import write_glb
@@ -75,6 +77,7 @@ def run_pipeline(
     *,
     image: Path | None = None,
     device: str = "cpu",
+    extractor: str = DEFAULT_EXTRACTOR,
     skeleton_npz: Path | None = None,
     verbose: bool = True,
     output_dir: Path | None = None,
@@ -84,9 +87,9 @@ def run_pipeline(
 ) -> Path:
     """Full pipeline for one video or still + one rig. Returns the run directory.
 
-    `skeleton_npz` reuses a previous run's skeleton_motion.npz and skips the
-    (slow) extraction entirely. A still is turned into a short hold clip so
-    the same GVHMR path can recover a static 3D pose.
+    `extractor` chooses which method writes skeleton_motion.npz. `skeleton_npz`
+    reuses a previous run's file and skips extraction entirely. A still is
+    handed to the extractor as-is; GVHMR turns it into a short hold clip.
 
     `output_dir` writes this run into a caller-chosen folder (used by the
     Blender extension). When omitted, a timestamped directory is created.
@@ -121,26 +124,14 @@ def run_pipeline(
 
             shutil.copy2(skeleton_npz, motion_npz)
             print(f"reusing skeleton from {skeleton_npz}")
-        elif image is not None:
-            from .extract import extract_motion, temp_hold_video
-
-            print(f"extracting human pose from {image.name}")
-            with temp_hold_video(image) as hold:
-                extract_motion(
-                    hold,
-                    motion_npz,
-                    work_dir=run_dir / "cache",
-                    device=device,
-                    verbose=verbose,
-                    source_image=image,
-                )
         else:
-            from .extract import extract_motion
-
-            assert extract_video is not None
-            print(f"extracting human motion from {extract_video.name}")
-            extract_motion(
-                extract_video,
+            if image is not None:
+                print(f"extracting human pose from {image.name}")
+            else:
+                assert video is not None
+                print(f"extracting human motion from {video.name}")
+            get_extractor(extractor).extract(
+                source,
                 motion_npz,
                 work_dir=run_dir / "cache",
                 device=device,
@@ -211,6 +202,9 @@ def run_pipeline(
             "image": str(image) if image is not None else None,
             "rig": str(rig),
             "device": device,
+            "extractor": (
+                read_extractor_name(motion_npz) if skeleton_npz is not None else extractor
+            ),
             "fps": float(motion.fps),
             "n_frames": motion.n_frames,
             "skeleton_reused_from": str(skeleton_npz) if skeleton_npz else None,
