@@ -72,8 +72,11 @@ class MotionExtractor(Protocol):
     name: str
     weights_note: str
 
-    def check(self) -> list[CheckResult]:
-        """Assets and modules this extractor needs, for doctor and preflight."""
+    def check(self, detect_hands: bool = False) -> list[CheckResult]:
+        """Assets and modules this extractor needs, for doctor and preflight.
+
+        ``detect_hands`` adds the hand model paired with this extractor.
+        """
 
     def extract(
         self,
@@ -83,8 +86,14 @@ class MotionExtractor(Protocol):
         work_dir: Path,
         device: str = "cpu",
         verbose: bool = True,
+        detect_hands: bool = False,
     ) -> Path:
-        """Write the shared skeleton file for `source` (a video or a still)."""
+        """Write the shared skeleton file for `source` (a video or a still).
+
+        ``detect_hands`` asks the extractor to append its paired hand model
+        into the same file. Preflight rejects the flag when this extractor
+        has no paired hand model.
+        """
 
 
 def write_skeleton_npz(

@@ -11,12 +11,18 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ASSETS = PROJECT_ROOT / "assets"
 BODY_MODELS = ASSETS / "body_models"
 SMPLX_NEUTRAL = BODY_MODELS / "smplx" / "SMPLX_NEUTRAL.npz"
+MANO_DIR = BODY_MODELS / "mano"
+MANO_RIGHT_PKL = MANO_DIR / "MANO_RIGHT.pkl"
+MANO_RIGHT_NPZ = MANO_DIR / "MANO_RIGHT.npz"
 MIXAMO_DIR = ASSETS / "mixamo"
 DEFAULT_RIG = MIXAMO_DIR / "Y_Bot.fbx"
 VIDEO_DIR = ASSETS / "video"
 IMAGE_DIR = ASSETS / "image"
 
 WEIGHTS = PROJECT_ROOT / "weights"
+HAMER_WEIGHTS = WEIGHTS / "hamer"
+HAMER_CKPT = HAMER_WEIGHTS / "hamer.ckpt"
+HAMER_MEAN_PARAMS = HAMER_WEIGHTS / "mano_mean_params.npz"
 OUTPUTS = PROJECT_ROOT / "outputs"
 
 VIDEO_SUFFIXES = (".mp4", ".mov", ".avi", ".mkv", ".webm")

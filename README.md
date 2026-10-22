@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Inference weights (GVHMR and so on) are not downloaded here. The first `m2mr run` pulls them into `weights/` (~5 GB, once only).
+Inference weights are not downloaded here. The first `m2mr run` pulls the GVHMR weights into `weights/` (~5 GB, once only). The first `m2mr run --detect-hands` also pulls the HaMeR hand weights into `weights/hamer/` (~2.7 GB, once only).
 
 ffmpeg is recommended (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 The pipeline runs without it, but the output videos will be **silent** and will not play in a browser.
@@ -80,6 +80,7 @@ This repository does not ship these files; you have to fetch them. The SMPL-X fi
 | Mixamo character FBX | `assets/mixamo/Y_Bot.fbx` | With an Adobe account, download Y Bot (or any other Mixamo-rigged character) from [Mixamo](https://www.mixamo.com) |
 | Action video | `assets/video/<your_clip>.mp4` | A clip with **exactly one** clearly visible person, **head to toe in frame the whole time** (you may keep several files; each run uses the most recently added) |
 | Pose still (optional) | `assets/image/<your_photo>.jpg` | A photo with **exactly one** clearly visible person, **head to toe in frame**. Use with `--image` |
+| MANO right hand (only for `--detect-hands`) | `assets/body_models/mano/MANO_RIGHT.pkl` | Register at [MANO](https://mano.is.tue.mpg.de/) and download **Models & Code**. A body-only run does not need this file |
 
 Note: Mixamo's download is named `Y Bot.fbx` (**space**), one character off from `Y_Bot.fbx` (**underscore**) in the table.
 Rename it to the underscore form and it becomes the default rig (`m2mr run` without `--rig`). Leaving the space is fine too — if `Y_Bot.fbx` is missing, the first `.fbx` in `assets/mixamo/` is used.
@@ -97,6 +98,12 @@ Anything missing is printed with where to download it and where to put it.
 
 ```bash
 m2mr doctor
+```
+
+`m2mr doctor` checks the body run. It does not require the MANO hand model. To check the extra file and Python packages used by finger detection:
+
+```bash
+m2mr doctor --detect-hands
 ```
 
 ### 2. First run: get something on screen
@@ -139,6 +146,30 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` with no path uses the file most recently added to `assets/image/`.
 
+### 6. Fingers (`--detect-hands`)
+
+A plain `m2mr run` moves the body and leaves the Mixamo finger bones at rest. `--detect-hands` turns on the hand model that travels with the body extractor. With the default extractor, GVHMR, that model is [HaMeR](https://github.com/geopavlakos/hamer). HaMeR crops the wrists from the person and the frames GVHMR already chose. It does not search the clip for a second person.
+
+**This about doubles the runtime.** A clip that finishes in a few minutes without the flag takes about twice that long with `--detect-hands`, because the hand pass runs on top of the body extraction. On a long video, plan for that extra time before you start.
+
+Place `MANO_RIGHT.pkl` as in the table above, then:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+The first `--detect-hands` run downloads the HaMeR weights into `weights/hamer/` (~2.7 GB, once). Finger rotations are written into `skeleton_motion.npz` and drive the 30 Mixamo finger bones on the skinned character. A wrist the body pass did not see clearly stays at rest for that hand.
+
+`--hand-smooth` is how many seconds of smoothing to apply to those rotations. The default is `0.08`. `0` keeps the raw estimate. Smoothing runs whenever the skeleton file already contains hand motion, including a later run that only reuses that file.
+
+Reusing a previous skeleton:
+
+- The file already contains hand motion: `--skeleton` drives the fingers by itself. `--detect-hands` is not required again.
+- It does not, but that run's body cache is still beside it (`cache/<clip>/0_input_video.mp4`, plus `preprocess/vitpose.pt` and `preprocess/bbx.pt`): `--skeleton ... --detect-hands` adds the fingers without extracting the body again.
+- That cache is gone: run the video or still again with `--detect-hands`.
+
 ## Outputs
 
 Each `m2mr run` creates a directory named by **the time the command started**. The four files at the root are the same for video and still; only the preview folder changes.
@@ -176,6 +207,8 @@ images/
                                         # right: 10° orbit of the rig (one full turn)
 ```
 
+With `--detect-hands`, `skeleton_motion.npz` also stores the finger rotations, and `mixamo_rotations.npz` / `mixamo_character.glb` include the 30 finger bones. Without that flag, and without hand motion already stored in a reused skeleton, those bones stay at rest.
+
 Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character mesh and use View → Frame Selected. The cluster of spheres on the head and hands is bone display, not the mesh: in the Outliner, hide **Icosphere** and the **armature**; leave the skinned mesh visible. Set scene FPS and the timeline end frame from `run.json` (`fps`, `n_frames`) so playback matches the source. Compare a video run against `videos/mixamo_character.mp4`, a still run against `images/mixamo_character.png` or the orbit clip.
 
 ## License
@@ -183,8 +216,10 @@ Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf
 This repository's code is Apache-2.0. The assets you download have their own terms and must not be redistributed with this repo:
 
 - **SMPL-X**: MPI-gated; default non-commercial research / education / art; commercial use needs a separate deal
+- **MANO** (only if you use `--detect-hands`): MPI-gated, same kind of download as SMPL-X; place `MANO_RIGHT.pkl` locally and do not redistribute it
 - **Mixamo FBX**: fine in a shipped product; do not redistribute the raw FBX as an asset pack
-- **GVHMR and other inference weights**: auto-downloaded into `weights/` on the first `m2mr run`, under each upstream license
+- **GVHMR weights**: auto-downloaded into `weights/` on the first `m2mr run`, under the upstream license
+- **HaMeR**: the inference code in this repository is MIT; the weights download into `weights/hamer/` on the first `m2mr run --detect-hands`, under the upstream release
 
 ## Contact
 

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `m2mr run --detect-hands` turns on the hand model that travels with the body extractor. With the default extractor, GVHMR, that model is HaMeR: it crops the wrists from the person and the frames GVHMR already chose, writes the finger rotations into `skeleton_motion.npz`, and drives the 30 Mixamo finger bones on the skinned character. Off by default; a plain `m2mr run` leaves those bones at rest. A wrist the body pass did not see clearly stays at rest for that hand.
+- The flag needs `assets/body_models/mano/MANO_RIGHT.pkl` (register at https://mano.is.tue.mpg.de/ and download Models & Code). The first `m2mr run --detect-hands` downloads the HaMeR weights into `weights/hamer/` (~2.7 GB, once). `m2mr doctor --detect-hands` checks that file and the extra Python packages; `m2mr doctor` without the flag does not.
+- A run with `--detect-hands` takes about twice as long as the same clip without it. The extra time is the hand pass on top of the body extraction.
+- `--hand-smooth SECONDS` smooths the finger rotations (default `0.08`; `0` keeps the raw estimate). It applies whenever the skeleton file already contains hand motion, including a later `--skeleton` reuse. A reused skeleton that already has hand motion drives the fingers without `--detect-hands`. If it does not, `--detect-hands` can add them only while that run's body cache is still beside the file; otherwise run the video or still again with the flag.
+- The README quick start documents `--detect-hands`, the MANO file, the extra runtime, and how reuse behaves.
+
 ### Fixed
 
 - A subject who turned away and back could stay facing away in the recovered 3D motion for the rest of the clip. The 2D left/right stabilizer decided "real turn or label flip" at the single transition frame (it required four consecutive side-view frames after the first turn) and never revisited the decision, so one mislabelled frame or one fast spin locked the wrong facing in. `motion2mixamorig/stabilize_kp2d.py` now cuts the clip into segments at side-view frames and takes the majority of RTMPose's labels inside each segment; only runs of the opposite sign shorter than ~0.33 s count as flips. No facial keypoints are used (hats and masks do not matter) and each person track is handled on its own. On a dance clip with a fast half-second turn, wrong-facing frames went from 320 of 642 to 3. Re-running on an existing cache re-stabilizes from the `vitpose_raw.pt` backup, not from the previous rule's output.

@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from .hand_retarget import HandMapping, HandMotion
 from .kinematics import forward_kinematics, world_positions_m
 from .retarget import joint_mixamo, retarget_one_frame
 from .skinned_mesh import YBotAsset, bone_palette, skin_mesh
@@ -39,7 +40,13 @@ class RetargetedAnimation:
 
 
 def build_animation(
-    motion, mapping: YBotMapping, frames: list[int], *, verbose: bool = True
+    motion,
+    mapping: YBotMapping,
+    frames: list[int],
+    *,
+    verbose: bool = True,
+    hands: HandMotion | None = None,
+    hand_mapping: HandMapping | None = None,
 ) -> RetargetedAnimation:
     """Retarget Human -> Mixamo, then carry the rest-relative motion onto the rig."""
     skel = mapping.skeleton_rig
@@ -63,6 +70,8 @@ def build_animation(
             skel, forward_kinematics(skel, result.r_anim, hips_translation_cm=hips_cm)
         )
         r_rig = mapping.apply_rest_relative_rotations(result.r_anim)
+        if hands is not None and hand_mapping is not None and frame < hands.n_frames:
+            r_rig.update(hand_mapping.finger_rotations(hands.pose[frame], hands.valid[frame]))
         hips_rig = mapping.hips_translation_cm(hips_cm)
         rig_pos = mapping.ybot_positions_m(r_rig, hips_rig)
 

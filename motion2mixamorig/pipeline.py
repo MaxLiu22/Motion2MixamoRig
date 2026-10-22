@@ -24,6 +24,14 @@ from . import paths
 from .errors import classify_error
 from .extractors import DEFAULT_EXTRACTOR, get_extractor
 from .extractors.base import read_extractor_name
+from .extractors.hamer import (
+    detect_and_append,
+    find_body_cache,
+    read_hands_name,
+    skeleton_from_still,
+    skeleton_has_hands,
+)
+from .mixamo.hand_retarget import build_hand_mapping, load_hand_motion
 from .human_motion import HumanMotion, load_human_motion
 from .mixamo.animation import build_animation
 from .mixamo.gltf import write_glb
@@ -43,10 +51,15 @@ ROTATION_CONVENTION = (
 )
 
 
-def save_mixamo_rotations(anim, mapping, rig_path: Path, out_npz: Path) -> Path:
+def save_mixamo_rotations(
+    anim, mapping, rig_path: Path, out_npz: Path, *, extra_bones: list[str] | None = None
+) -> Path:
     """Per-bone animation rotations, both the portable Mixamo Skeleton channel
     and the channel already converted for this rig file."""
     bones = list(mapping.controlled)
+    for name in extra_bones or []:
+        if name not in bones:
+            bones.append(name)
     n = anim.n
     q_skel = np.zeros((n, len(bones), 4), dtype=np.float64)
     q_rig = np.zeros((n, len(bones), 4), dtype=np.float64)
@@ -78,6 +91,8 @@ def run_pipeline(
     image: Path | None = None,
     device: str = "cpu",
     extractor: str = DEFAULT_EXTRACTOR,
+    detect_hands: bool = False,
+    hand_smooth_s: float = 0.08,
     skeleton_npz: Path | None = None,
     verbose: bool = True,
     output_dir: Path | None = None,
@@ -136,6 +151,23 @@ def run_pipeline(
                 work_dir=run_dir / "cache",
                 device=device,
                 verbose=verbose,
+                detect_hands=detect_hands,
+            )
+        if detect_hands and skeleton_npz is not None and not skeleton_has_hands(motion_npz):
+            cache_dir = find_body_cache(Path(skeleton_npz).parent)
+            if cache_dir is None:
+                raise FileNotFoundError(
+                    "hand detection needs the body cache next to the reused skeleton "
+                    "(cache/*/0_input_video.mp4, vitpose.pt, bbx.pt)"
+                )
+            print("detecting hands on the reused skeleton")
+            detect_and_append(
+                cache_dir,
+                motion_npz,
+                load_human_motion(motion_npz).n_frames,
+                device=device,
+                verbose=verbose,
+                single_frame=image is not None or skeleton_from_still(motion_npz),
             )
         motion: HumanMotion = load_human_motion(motion_npz)
         print(f"human motion   {motion.n_frames} frames @ {motion.fps:g} fps")
@@ -153,10 +185,27 @@ def run_pipeline(
 
         print("retargeting")
         frames = list(range(motion.n_frames))
-        anim = build_animation(motion, mapping, frames, verbose=verbose)
+        hands = load_hand_motion(motion_npz, smooth_s=hand_smooth_s)
+        hand_mapping = None
+        if hands is not None:
+            hand_mapping = build_hand_mapping(asset.rig, hands.template_joints, verbose=verbose)
+        anim = build_animation(
+            motion,
+            mapping,
+            frames,
+            verbose=verbose,
+            hands=hands,
+            hand_mapping=hand_mapping,
+        )
 
         rotations_npz = run_dir / "mixamo_rotations.npz"
-        save_mixamo_rotations(anim, mapping, rig, rotations_npz)
+        save_mixamo_rotations(
+            anim,
+            mapping,
+            rig,
+            rotations_npz,
+            extra_bones=list(hand_mapping.bones) if hand_mapping is not None else None,
+        )
         print(f"saved {rotations_npz}")
 
         stage = "export"
@@ -205,6 +254,9 @@ def run_pipeline(
             "extractor": (
                 read_extractor_name(motion_npz) if skeleton_npz is not None else extractor
             ),
+            "hands": read_hands_name(motion_npz),
+            "hand_smooth_s": hand_smooth_s if hands is not None else None,
+            "finger_bones": 0 if hand_mapping is None else len(hand_mapping.bones),
             "fps": float(motion.fps),
             "n_frames": motion.n_frames,
             "skeleton_reused_from": str(skeleton_npz) if skeleton_npz else None,

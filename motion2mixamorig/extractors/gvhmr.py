@@ -241,9 +241,16 @@ class GvhmrExtractor:
     """Recover a world-grounded skeleton with GVHMR."""
 
     name = "gvhmr"
+    hand_model = "hamer"
     weights_note = "downloaded automatically into weights/ on the first `m2mr run` (~5 GB)"
+    hand_weights_note = (
+        "HaMeR hand weights (~2.7 GB) download into weights/hamer/ on the first "
+        "`m2mr run --detect-hands`"
+    )
 
-    def check(self) -> list[CheckResult]:
+    def check(self, detect_hands: bool = False) -> list[CheckResult]:
+        from .hamer import hand_requirements
+
         results = _smplx_checks()
         for module in ("torch", "gvhmr"):
             results.append(
@@ -255,6 +262,8 @@ class GvhmrExtractor:
                     audience="doctor",
                 )
             )
+        if detect_hands:
+            results.extend(hand_requirements())
         return results
 
     def extract(
@@ -265,6 +274,7 @@ class GvhmrExtractor:
         work_dir: Path,
         device: str = "cpu",
         verbose: bool = True,
+        detect_hands: bool = False,
     ) -> Path:
         source = Path(source)
         if paths.is_image(source):
@@ -276,6 +286,7 @@ class GvhmrExtractor:
                     device=device,
                     verbose=verbose,
                     source_image=source,
+                    detect_hands=detect_hands,
                 )
         return _extract_video(
             source,
@@ -283,6 +294,7 @@ class GvhmrExtractor:
             work_dir=work_dir,
             device=device,
             verbose=verbose,
+            detect_hands=detect_hands,
         )
 
 
@@ -295,6 +307,7 @@ def _extract_video(
     static_camera: bool = True,
     verbose: bool = True,
     source_image: Path | None = None,
+    detect_hands: bool = False,
 ) -> Path:
     """Run GVHMR on `video` and save skeleton_motion.npz to `output_npz`.
 
@@ -347,8 +360,6 @@ def _extract_video(
         )
     timestamps = np.arange(len(joints_3d), dtype=np.float64) / float(fps)
     image = None if source_image is None else np.array(str(source_image))
-    if source_image is not None:
-        _strip_cache_videos(output_dir)
     written = write_skeleton_npz(
         output_npz,
         extractor=GvhmrExtractor.name,
@@ -363,4 +374,19 @@ def _extract_video(
     )
     if verbose:
         print(f"saved {written}")
+    if detect_hands:
+        from .hamer import detect_and_append
+
+        if verbose:
+            print("detecting hands")
+        detect_and_append(
+            output_dir,
+            written,
+            len(joints_3d),
+            device=device,
+            verbose=verbose,
+            single_frame=source_image is not None,
+        )
+    if source_image is not None:
+        _strip_cache_videos(output_dir)
     return written
