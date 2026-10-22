@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - A run with `--detect-hands` takes about twice as long as the same clip without it. The extra time is the hand pass on top of the body extraction.
 - `--hand-smooth SECONDS` smooths the finger rotations (default `0.08`; `0` keeps the raw estimate). It applies whenever the skeleton file already contains hand motion, including a later `--skeleton` reuse. A reused skeleton that already has hand motion drives the fingers without `--detect-hands`. If it does not, `--detect-hands` can add them only while that run's body cache is still beside the file; otherwise run the video or still again with the flag.
 - The README quick start documents `--detect-hands`, the MANO file, the extra runtime, and how reuse behaves.
+- Blender add-on: the Input section has a **Body Model** menu (`--set-extractor`, currently GVHMR) and **Detect Hands** (`--detect-hands`, off by default). Turning hands on shows the about-twice runtime, finger smoothing, and **Choose MANO Hand Model…**. **Check Environment** runs `m2mr doctor` with the same two choices.
 
 ### Fixed
 

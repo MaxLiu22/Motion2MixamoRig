@@ -35,8 +35,37 @@ def build_version_argv(python: str | Path) -> list[str]:
     return [os.fspath(as_user_path(python)), "--version"]
 
 
-def build_doctor_argv(python: str | Path) -> list[str]:
-    return [os.fspath(as_user_path(python)), "-m", "motion2mixamorig.cli", "doctor"]
+# Names the add-on may pass to `--set-extractor`. Keep this in step with
+# motion2mixamorig.extractors; the add-on must not import that package.
+EXTRACTORS = ("gvhmr",)
+DEFAULT_EXTRACTOR = "gvhmr"
+
+
+def mano_model_present(project_dir: str | Path) -> bool:
+    """True when the project already has a MANO right-hand file for `--detect-hands`."""
+    folder = as_user_path(project_dir) / "assets" / "body_models" / "mano"
+    return (folder / "MANO_RIGHT.pkl").is_file() or (folder / "MANO_RIGHT.npz").is_file()
+
+
+def build_doctor_argv(
+    python: str | Path,
+    *,
+    extractor: str = DEFAULT_EXTRACTOR,
+    detect_hands: bool = False,
+) -> list[str]:
+    if extractor not in EXTRACTORS:
+        raise ValueError(f"extractor must be one of {EXTRACTORS}, got {extractor!r}")
+    cmd = [
+        os.fspath(as_user_path(python)),
+        "-m",
+        "motion2mixamorig.cli",
+        "doctor",
+        "--set-extractor",
+        extractor,
+    ]
+    if detect_hands:
+        cmd.append("--detect-hands")
+    return cmd
 
 
 def build_run_argv(
@@ -49,18 +78,25 @@ def build_run_argv(
     output_dir: str | Path,
     progress_jsonl: str | Path,
     preview: bool,
+    extractor: str = DEFAULT_EXTRACTOR,
+    detect_hands: bool = False,
+    hand_smooth_s: float = 0.08,
 ) -> list[str]:
     """Build `external-python -m motion2mixamorig.cli run ...` as a list."""
     if source_type not in {"video", "image"}:
         raise ValueError(f"source_type must be 'video' or 'image', got {source_type!r}")
     if device not in {"cpu", "cuda", "mps"}:
         raise ValueError(f"device must be cpu, cuda, or mps, got {device!r}")
+    if extractor not in EXTRACTORS:
+        raise ValueError(f"extractor must be one of {EXTRACTORS}, got {extractor!r}")
 
     cmd = [
         os.fspath(as_user_path(python)),
         "-m",
         "motion2mixamorig.cli",
         "run",
+        "--set-extractor",
+        extractor,
         "--device",
         device,
         "--rig",
@@ -72,6 +108,9 @@ def build_run_argv(
     ]
     flag = "--image" if source_type == "image" else "--video"
     cmd.extend([flag, os.fspath(as_user_path(source))])
+    if detect_hands:
+        cmd.append("--detect-hands")
+        cmd.extend(["--hand-smooth", f"{float(hand_smooth_s):g}"])
     if not preview:
         cmd.append("--no-preview")
     return cmd
@@ -124,6 +163,7 @@ def validate_run_inputs(
     source: str | Path,
     rig: str | Path,
     busy: bool,
+    detect_hands: bool = False,
 ) -> list[str]:
     errors: list[str] = []
     if busy:
@@ -136,6 +176,8 @@ def validate_run_inputs(
         errors.append("err_source")
     if not file_exists(rig):
         errors.append("err_rig")
+    if detect_hands and directory_exists(project_dir) and not mano_model_present(project_dir):
+        errors.append("err_mano")
     return errors
 
 
@@ -258,11 +300,14 @@ def interpret_doctor_output(exit_code: int | None, stdout: str) -> tuple[str, st
         return "ERROR", "err_package"
 
     blocking: list[str] = []
-    if _doctor_line_missing(text, "python module") or "no module named" in low:
-        if "torch" in low or "gvhmr" in low or "cv2" in low or "numpy" in low:
-            blocking.append("err_package")
+    if any(_doctor_module_missing(text, name) for name in ("torch", "gvhmr", "cv2", "numpy")) or "no module named" in low:
+        blocking.append("err_package")
     if _doctor_line_missing(text, "SMPL-X") or _doctor_line_bad(text, "SMPL-X"):
         blocking.append("err_smplx")
+    if _doctor_line_missing(text, "MANO") or _doctor_line_bad(text, "MANO"):
+        blocking.append("err_mano")
+    if _doctor_module_missing(text, "timm") or _doctor_module_missing(text, "skimage") or _doctor_module_missing(text, "smplx"):
+        blocking.append("err_hand_deps")
     if blocking:
         seen: list[str] = []
         for item in blocking:
@@ -291,6 +336,15 @@ def classify_log_text_safe(text: str) -> tuple[str, str]:
 
 def _doctor_line_missing(text: str, label: str) -> bool:
     needle = label.lower()
+    for line in text.splitlines():
+        if "[missing]" in line.lower() and needle in line.lower():
+            return True
+    return False
+
+
+def _doctor_module_missing(text: str, module: str) -> bool:
+    """A `[missing]` doctor line for one Python module, not a similarly named asset."""
+    needle = f"python module      {module}".lower()
     for line in text.splitlines():
         if "[missing]" in line.lower() and needle in line.lower():
             return True

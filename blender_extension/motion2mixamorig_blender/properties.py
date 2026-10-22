@@ -11,6 +11,7 @@ from .registration import safe_register_class, safe_unregister_class
 
 _SOURCE_TYPE_ITEMS = ()
 _DEVICE_ITEMS = ()
+_EXTRACTOR_ITEMS = ()
 
 
 def _source_type_items(self, context):
@@ -22,6 +23,16 @@ def _source_type_items(self, context):
         ("IMAGE", t("source_image"), t("source_image_desc")),
     )
     return _SOURCE_TYPE_ITEMS
+
+
+def _extractor_items(self, context):
+    from .i18n import t
+
+    global _EXTRACTOR_ITEMS
+    _EXTRACTOR_ITEMS = (
+        ("gvhmr", "GVHMR", t("extractor_gvhmr_desc")),
+    )
+    return _EXTRACTOR_ITEMS
 
 
 def _device_items(self, context):
@@ -56,6 +67,29 @@ class M2MRProperties(PropertyGroup):
     device: EnumProperty(
         name="Device",
         items=_device_items,
+    )
+    extractor: EnumProperty(
+        name="Body Model",
+        description="How the video or still becomes a 3D skeleton",
+        items=_extractor_items,
+    )
+    detect_hands: BoolProperty(
+        name="Detect Hands",
+        description=(
+            "Also run the hand model that belongs to the selected body model "
+            "(GVHMR uses HaMeR). Off leaves the fingers at rest. "
+            "The run takes about twice as long"
+        ),
+        default=False,
+    )
+    hand_smooth: FloatProperty(
+        name="Finger Smoothing",
+        description="Smooth detected finger rotations over this many seconds. 0 keeps the raw estimate",
+        default=0.08,
+        min=0.0,
+        max=2.0,
+        step=1,
+        precision=2,
     )
     generate_preview: BoolProperty(
         name="Generate Preview Videos",

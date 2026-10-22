@@ -7,6 +7,8 @@ ERROR_MESSAGES = {
     "PYTHON_NOT_FOUND": "External Python not found",
     "PACKAGE_MISSING": "Motion2MixamoRig package not installed",
     "SMPLX_MISSING": "SMPL-X model missing",
+    "MANO_MISSING": "MANO hand model missing",
+    "HAND_DEPS_MISSING": "Hand-detection Python packages missing",
     "INVALID_RIG": "Mixamo FBX invalid",
     "MULTIPLE_PEOPLE": "Input contains multiple people",
     "NO_PERSON": "No person was detected in the input",
@@ -23,6 +25,8 @@ _CODE_TO_KEY = {
     "PYTHON_NOT_FOUND": "err_python",
     "PACKAGE_MISSING": "err_package",
     "SMPLX_MISSING": "err_smplx",
+    "MANO_MISSING": "err_mano",
+    "HAND_DEPS_MISSING": "err_hand_deps",
     "INVALID_RIG": "err_invalid_rig",
     "MULTIPLE_PEOPLE": "err_multiple_people",
     "NO_PERSON": "err_no_person",
@@ -54,6 +58,8 @@ def classify_log_text(text: str) -> tuple[str, str]:
         return "PACKAGE_MISSING", message_for_code("PACKAGE_MISSING")
     if "no module named 'torch'" in low or "no module named 'gvhmr'" in low:
         return "PACKAGE_MISSING", message_for_code("PACKAGE_MISSING")
+    if any("mano" in line and ("[missing]" in line or "[invalid]" in line) for line in low.splitlines()):
+        return "MANO_MISSING", message_for_code("MANO_MISSING")
     if "smplx" in low and (
         "missing" in low or "not found" in low or "[missing]" in low or "filenotfound" in low
     ):

@@ -78,7 +78,11 @@ class M2MR_OT_check_environment(Operator):
 
         try:
             process, log_file = launch_process(
-                build_doctor_argv(python),
+                build_doctor_argv(
+                    python,
+                    extractor=props.extractor,
+                    detect_hands=bool(props.detect_hands),
+                ),
                 cwd=project,
                 log_path=log_path,
                 env=subprocess_env(project),
