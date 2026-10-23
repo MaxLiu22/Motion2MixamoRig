@@ -33,6 +33,7 @@ STRINGS = {
     "generation_import_failed": "產生成功，但自動匯入失敗",
     "cancelled": "已取消",
     "import_character": "匯入產生的角色",
+    "show_floor_markers": "地面標記",
     "open_output": "開啟輸出資料夾",
     "view_log": "檢視完整記錄",
     "no_job_yet": "尚無工作",

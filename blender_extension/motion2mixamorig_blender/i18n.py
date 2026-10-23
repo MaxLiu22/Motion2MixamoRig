@@ -299,6 +299,16 @@ _add(
     ar="استيراد الشخصية المولَّدة",
 )
 _add(
+    "show_floor_markers",
+    en="Floor Markers",
+    **{"zh-CN": "地面标记"},
+    ko="바닥 마커",
+    ja="床マーカー",
+    de="Bodenmarkierungen",
+    ru="Метки на полу",
+    ar="علامات الأرضية",
+)
+_add(
     "open_output",
     en="Open Output Folder",
     **{"zh-CN": "打开输出文件夹"},

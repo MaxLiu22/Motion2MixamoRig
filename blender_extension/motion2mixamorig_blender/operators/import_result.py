@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import bpy
@@ -117,6 +118,185 @@ def hide_joint_bubbles(armature, imported_objects) -> None:
         obj.hide_viewport = True
 
 
+_MARKER_FLAG = "m2mr_floor_markers"
+_MARKER_STEP = 0.5
+_MARKER_PAD = 1.5
+
+
+def _marker_material(name: str, rgba: tuple[float, float, float, float]):
+    mat = bpy.data.materials.get(name)
+    if mat is None:
+        mat = bpy.data.materials.new(name)
+        mat.use_nodes = True
+    mat.diffuse_color = rgba
+    tree = mat.node_tree
+    bsdf = tree.nodes.get("Principled BSDF") if tree is not None else None
+    if bsdf is not None and "Base Color" in bsdf.inputs:
+        bsdf.inputs["Base Color"].default_value = rgba
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 1.0
+    return mat
+
+
+def _clear_floor_markers(collection) -> None:
+    for obj in list(collection.objects):
+        if not obj.get(_MARKER_FLAG):
+            continue
+        mesh = obj.data if obj.type == "MESH" else None
+        bpy.data.objects.remove(obj, do_unlink=True)
+        if mesh is not None and mesh.users == 0:
+            bpy.data.meshes.remove(mesh)
+
+
+def _hips_travel(context: Context, armature):
+    """World XY bounds of the hips across the timeline. Blender is Z-up."""
+    bone = None
+    if armature is not None and getattr(armature, "pose", None) is not None:
+        for candidate in armature.pose.bones:
+            if candidate.name.lower().endswith("hips"):
+                bone = candidate
+                break
+    if bone is None:
+        return None
+    scene = context.scene
+    span = max(0, int(scene.frame_end) - int(scene.frame_start))
+    stride = max(1, span // 120)
+    original = scene.frame_current
+    # A hidden armature drops out of the depsgraph, so the pose would stay
+    # on the rest hips and the markers would miss the travel.
+    was_hidden = False
+    was_viewport = bool(armature.hide_viewport)
+    try:
+        was_hidden = bool(armature.hide_get())
+    except Exception:
+        was_hidden = False
+    xs: list[float] = []
+    ys: list[float] = []
+    try:
+        armature.hide_viewport = False
+        try:
+            armature.hide_set(False)
+        except Exception:
+            pass
+        frame = int(scene.frame_start)
+        last = int(scene.frame_end)
+        while frame <= last:
+            scene.frame_set(frame)
+            context.view_layer.update()
+            co = armature.matrix_world @ bone.head
+            xs.append(float(co.x))
+            ys.append(float(co.y))
+            if frame == last:
+                break
+            frame = min(last, frame + stride)
+    finally:
+        scene.frame_set(original)
+        armature.hide_viewport = was_viewport
+        if was_hidden:
+            try:
+                armature.hide_set(True)
+            except Exception:
+                pass
+    if not xs:
+        return None
+    return min(xs), max(xs), min(ys), max(ys)
+
+
+def _add_floor_markers(context: Context, collection, armature) -> None:
+    """One mesh of floor crosses on Z=0, covering where the hips travel.
+
+    Replaced on the next import into the same collection. glTF Y-up lands on
+    Blender Z-up, so the grounded sole plane is z=0.
+    """
+    _clear_floor_markers(collection)
+    travel = _hips_travel(context, armature)
+    if travel is None:
+        min_x, max_x, min_y, max_y = -2.0, 2.0, -2.0, 2.0
+    else:
+        min_x, max_x, min_y, max_y = travel
+        min_x -= _MARKER_PAD
+        max_x += _MARKER_PAD
+        min_y -= _MARKER_PAD
+        max_y += _MARKER_PAD
+    step = _MARKER_STEP
+    x0, x1 = math.floor(min_x / step) * step, math.ceil(max_x / step) * step
+    y0, y1 = math.floor(min_y / step) * step, math.ceil(max_y / step) * step
+    nx = int(round((x1 - x0) / step))
+    ny = int(round((y1 - y0) / step))
+    if (nx + 1) * (ny + 1) > 2500:
+        step = 1.0
+        x0, x1 = math.floor(min_x), math.ceil(max_x)
+        y0, y1 = math.floor(min_y), math.ceil(max_y)
+        nx = int(round(x1 - x0))
+        ny = int(round(y1 - y0))
+
+    verts: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, int, int, int]] = []
+    slots: list[int] = []
+    z = 0.002
+
+    def plus(x: float, y: float, arm: float, thick: float, slot: int) -> None:
+        bars = (
+            (x - arm, y - thick, x + arm, y - thick, x + arm, y + thick, x - arm, y + thick),
+            (x - thick, y - arm, x + thick, y - arm, x + thick, y + arm, x - thick, y + arm),
+        )
+        for b in bars:
+            o = len(verts)
+            verts.extend((
+                (b[0], b[1], z), (b[2], b[3], z), (b[4], b[5], z), (b[6], b[7], z),
+            ))
+            faces.append((o, o + 1, o + 2, o + 3))
+            slots.append(slot)
+
+    for ix in range(nx + 1):
+        for iy in range(ny + 1):
+            x = x0 + ix * step
+            y = y0 + iy * step
+            origin = abs(x) < 1e-3 and abs(y) < 1e-3
+            metre = abs(x - round(x)) < 1e-3 and abs(y - round(y)) < 1e-3
+            if origin:
+                plus(x, y, 0.16, 0.016, 2)
+            elif metre:
+                plus(x, y, 0.10, 0.012, 1)
+            else:
+                plus(x, y, 0.055, 0.010, 0)
+
+    mesh = bpy.data.meshes.new("Floor Markers")
+    mesh.from_pydata(verts, [], faces)
+    grey = _marker_material("M2MR Floor Marker", (0.54, 0.54, 0.54, 1.0))
+    metre_mat = _marker_material("M2MR Floor Marker Metre", (0.82, 0.82, 0.82, 1.0))
+    origin_mat = _marker_material("M2MR Floor Marker Origin", (0.463, 0.725, 0.0, 1.0))
+    mesh.materials.append(grey)
+    mesh.materials.append(metre_mat)
+    mesh.materials.append(origin_mat)
+    for poly, slot in zip(mesh.polygons, slots):
+        poly.material_index = slot
+    mesh.update()
+
+    obj = bpy.data.objects.new("Floor Markers", mesh)
+    obj[_MARKER_FLAG] = True
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    collection.objects.link(obj)
+    visible = True
+    props = getattr(getattr(context, "scene", None), "m2mr", None)
+    if props is not None:
+        visible = bool(props.show_floor_markers)
+    apply_floor_marker_visibility(visible)
+
+
+def apply_floor_marker_visibility(visible: bool) -> None:
+    """Show or hide every floor-marker mesh. The result panel drives this."""
+    for obj in list(bpy.data.objects):
+        if not obj.get(_MARKER_FLAG):
+            continue
+        obj.hide_viewport = not visible
+        try:
+            obj.hide_set(not visible)
+        except Exception:
+            pass
+
+
 def import_generated_character(
     context: Context,
     result: RunResult,
@@ -172,6 +352,11 @@ def import_generated_character(
     elif new_objects:
         new_objects[0].select_set(True)
         view_layer.objects.active = new_objects[0]
+
+    try:
+        _add_floor_markers(context, collection, armature)
+    except Exception as exc:
+        print(f"Motion2MixamoRig floor markers skipped: {exc}")
 
 
 class M2MR_OT_import_result(Operator):

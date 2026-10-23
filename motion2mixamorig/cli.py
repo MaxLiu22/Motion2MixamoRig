@@ -292,6 +292,7 @@ def run(args: argparse.Namespace) -> int:
             output_dir=output_dir,
             progress=progress,
             no_preview=bool(getattr(args, "no_preview", False)),
+            foot_lock=not bool(getattr(args, "no_foot_lock", False)),
         )
     except Exception:
         import traceback
@@ -356,6 +357,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-preview",
         action="store_true",
         help="skip preview videos/images; still write NPZ, GLB, and run.json",
+    )
+    p_run.add_argument(
+        "--no-foot-lock",
+        action="store_true",
+        help="do not pin planted feet (keeps the raw retarget, feet may slide)",
     )
 
     p_diag = sub.add_parser(

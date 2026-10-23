@@ -166,6 +166,7 @@ class M2MR_PT_main(Panel):
                 box.label(text=t("glb_fmt", name=Path(props.job_glb_path).name))
             row = box.row()
             row.operator("m2mr.import_result", text=t("import_character"), icon="IMPORT")
+            box.prop(props, "show_floor_markers", text=t("show_floor_markers"))
             row = box.row()
             row.operator("m2mr.open_output", text=t("open_output"), icon="FILE_FOLDER")
             row.operator("m2mr.view_log", text=t("view_log"), icon="TEXT")

@@ -225,6 +225,22 @@ def joints_world_from_smplx(params, device: str = "cpu") -> np.ndarray:
     return joints.cpu().numpy().astype(np.float32)
 
 
+def foot_contact_from_raw(raw) -> np.ndarray | None:
+    """(F, 4) static probability of left ankle, left foot, right ankle, right foot.
+
+    GVHMR's static_conf_logits channels are [L_ankle, L_foot, R_ankle, R_foot,
+    L_wrist, R_wrist]; only the feet are kept.
+    """
+    try:
+        logits = _to_numpy(raw["net_outputs"]["static_conf_logits"])
+    except (KeyError, TypeError):
+        return None
+    logits = np.asarray(logits, dtype=np.float64).reshape(-1, logits.shape[-1])
+    if logits.shape[-1] < 4:
+        return None
+    return (1.0 / (1.0 + np.exp(-logits[:, :4]))).astype(np.float32)
+
+
 def _stabilize_pose_cache(pose_cache: Path) -> bool:
     """Stabilize GVHMR's 2D-pose cache in place. True if the file changed.
 
@@ -423,6 +439,9 @@ def extract_motion(
         camera=np.array(result.camera),
         video=np.array(str(video)),
     )
+    contact = foot_contact_from_raw(getattr(result, "raw", None))
+    if contact is not None and len(contact) == len(joints_3d):
+        payload["foot_contact"] = contact
     if source_image is not None:
         payload["image"] = np.array(str(source_image))
         _strip_cache_videos(output_dir)

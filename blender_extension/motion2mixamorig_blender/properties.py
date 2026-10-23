@@ -24,6 +24,18 @@ def _source_type_items(self, context):
     return _SOURCE_TYPE_ITEMS
 
 
+def _update_show_floor_markers(self, context) -> None:
+    from .operators.import_result import apply_floor_marker_visibility
+
+    apply_floor_marker_visibility(bool(self.show_floor_markers))
+    screen = getattr(context, "screen", None) if context is not None else None
+    if screen is None:
+        return
+    for area in screen.areas:
+        if area.type == "VIEW_3D":
+            area.tag_redraw()
+
+
 def _device_items(self, context):
     from .i18n import t
 
@@ -91,6 +103,12 @@ class M2MRProperties(PropertyGroup):
     job_id: StringProperty(name="Job id", default="", maxlen=128)
     job_source_name: StringProperty(name="Source name", default="", maxlen=128)
     import_note: StringProperty(name="Import note", default="", maxlen=512)
+    show_floor_markers: BoolProperty(
+        name="Floor Markers",
+        description="Show or hide the floor markers",
+        default=True,
+        update=_update_show_floor_markers,
+    )
 
     # First-run model download, filled in by the job poller.
     dl_active: BoolProperty(name="Downloading models", default=False)

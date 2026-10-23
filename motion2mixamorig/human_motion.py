@@ -20,6 +20,8 @@ class HumanMotion:
     timestamps: np.ndarray
     root_translation: np.ndarray | None
     path: Path
+    # (F, 4) static probability: left ankle, left foot, right ankle, right foot.
+    foot_contact: np.ndarray | None = None
 
     @property
     def n_frames(self) -> int:
@@ -54,6 +56,10 @@ def load_human_motion(path: Path) -> HumanMotion:
         if "root_translation" in data.files
         else None
     )
+    if "foot_contact" in data.files:
+        contact = np.asarray(data["foot_contact"], dtype=np.float64)
+    else:
+        contact = foot_contact_from_cache(path, len(joints))
     return HumanMotion(
         joints_3d=joints,
         joint_names=names,
@@ -61,7 +67,30 @@ def load_human_motion(path: Path) -> HumanMotion:
         timestamps=timestamps,
         root_translation=root,
         path=path,
+        foot_contact=contact,
     )
+
+
+def foot_contact_from_cache(npz_path: Path, n_frames: int) -> np.ndarray | None:
+    """Foot contact for a skeleton_motion.npz written before it carried one.
+
+    Reads GVHMR's cached prediction in the run's cache/<clip>/hmr4d_results.pt.
+    """
+    candidates = sorted((Path(npz_path).parent / "cache").glob("*/hmr4d_results.pt"))
+    if not candidates:
+        return None
+    try:
+        import torch
+
+        from .extract import foot_contact_from_raw
+
+        for candidate in candidates:
+            contact = foot_contact_from_raw(torch.load(candidate, map_location="cpu", weights_only=False))
+            if contact is not None and len(contact) == n_frames:
+                return contact.astype(np.float64)
+    except Exception:  # noqa: BLE001
+        return None
+    return None
 
 
 def source_video_path(motion: HumanMotion) -> Path | None:

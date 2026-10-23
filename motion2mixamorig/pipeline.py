@@ -23,7 +23,7 @@ import numpy as np
 from . import paths
 from .errors import classify_error
 from .diagnose import DIAGNOSTICS_JSON, diagnose_run, summary_line
-from .human_motion import HumanMotion, load_human_motion
+from .human_motion import HumanMotion, foot_contact_from_cache, load_human_motion
 from .mixamo.animation import build_animation
 from .mixamo.gltf import write_glb
 from .mixamo.kinematics import quat_wxyz
@@ -82,6 +82,7 @@ def run_pipeline(
     progress: ProgressWriter | None = None,
     progress_jsonl: Path | None = None,
     no_preview: bool = False,
+    foot_lock: bool = True,
 ) -> Path:
     """Full pipeline for one video or still + one rig. Returns the run directory.
 
@@ -92,6 +93,7 @@ def run_pipeline(
     `output_dir` writes this run into a caller-chosen folder (used by the
     Blender extension). When omitted, a timestamped directory is created.
     `no_preview` still writes the NPZ/GLB products but skips rendered previews.
+    `foot_lock` pins planted feet using GVHMR's foot contact (when available).
     """
     if image is None and video is None:
         raise ValueError("run_pipeline needs a video or an image")
@@ -148,6 +150,8 @@ def run_pipeline(
                 verbose=verbose,
             )
         motion: HumanMotion = load_human_motion(motion_npz)
+        if motion.foot_contact is None and skeleton_npz is not None:
+            motion.foot_contact = foot_contact_from_cache(Path(skeleton_npz), motion.n_frames)
         print(f"human motion   {motion.n_frames} frames @ {motion.fps:g} fps")
 
         stage = "retarget"
@@ -163,7 +167,9 @@ def run_pipeline(
 
         print("retargeting")
         frames = list(range(motion.n_frames))
-        anim = build_animation(motion, mapping, frames, verbose=verbose)
+        anim = build_animation(
+            motion, mapping, frames, verbose=verbose, foot_lock=foot_lock, asset=asset
+        )
 
         rotations_npz = run_dir / "mixamo_rotations.npz"
         save_mixamo_rotations(anim, mapping, rig, rotations_npz)
@@ -231,6 +237,8 @@ def run_pipeline(
             "rest_skin_error_cm": skin_err,
             "twist_events": len(anim.twist_events),
             "quat_sign_flips": len(anim.sign_events),
+            "foot_lock": anim.foot_lock,
+            "ground": anim.ground,
             "diagnostics": diagnostics,
             "outputs": outputs,
         }

@@ -5,6 +5,10 @@
     Mixamo Skeleton R_anim
             |  rest-relative transfer from the T-pose calibration
     character rig R_anim  ->  FK  ->  linear blend skinning
+
+When the motion carries foot contact, planted feet are pinned on both the
+Mixamo Skeleton and the character rig (foot_lock.py) after the transfer, and
+the hips then shift vertically so the planted sole sits on y = 0 (ground.py).
 """
 
 from __future__ import annotations
@@ -13,6 +17,8 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from .foot_lock import lock_feet
+from .ground import plant_soles
 from .kinematics import forward_kinematics, world_positions_m
 from .retarget import joint_mixamo, retarget_one_frame
 from .skinned_mesh import YBotAsset, bone_palette, skin_mesh
@@ -32,6 +38,8 @@ class RetargetedAnimation:
     human_pos: list[dict[str, np.ndarray]]
     twist_events: list[dict] = field(default_factory=list)
     sign_events: list[dict] = field(default_factory=list)
+    foot_lock: dict | None = None
+    ground: dict | None = None
 
     @property
     def n(self) -> int:
@@ -39,7 +47,13 @@ class RetargetedAnimation:
 
 
 def build_animation(
-    motion, mapping: YBotMapping, frames: list[int], *, verbose: bool = True
+    motion,
+    mapping: YBotMapping,
+    frames: list[int],
+    *,
+    verbose: bool = True,
+    foot_lock: bool = True,
+    asset: YBotAsset | None = None,
 ) -> RetargetedAnimation:
     """Retarget Human -> Mixamo, then carry the rest-relative motion onto the rig."""
     skel = mapping.skeleton_rig
@@ -81,6 +95,41 @@ def build_animation(
         r_prev, q_prev = result.r_anim_raw, result.q_anim
         if verbose and (i == 0 or (i + 1) % 200 == 0 or i == len(frames) - 1):
             print(f"  retarget {i + 1}/{len(frames)}")
+
+    contact = getattr(motion, "foot_contact", None)
+    contact_frames = None if contact is None else np.asarray(contact)[list(frames)]
+    if foot_lock and contact_frames is not None and len(frames) > 1:
+        anim.r_anim_skeleton, _ = lock_feet(
+            skel, anim.r_anim_skeleton, anim.hips_cm_skeleton, contact_frames, anim.fps
+        )
+        anim.r_anim_rig, stats = lock_feet(
+            mapping.ybot_rig, anim.r_anim_rig, anim.hips_cm_rig, contact_frames, anim.fps
+        )
+        anim.mixamo_pos = [
+            world_positions_m(skel, forward_kinematics(skel, r, hips_translation_cm=h))
+            for r, h in zip(anim.r_anim_skeleton, anim.hips_cm_skeleton)
+        ]
+        anim.rig_pos = [mapping.ybot_positions_m(r, h) for r, h in zip(anim.r_anim_rig, anim.hips_cm_rig)]
+        anim.foot_lock = stats.as_dict()
+        if verbose:
+            print(
+                f"  foot lock: mean correction {stats.mean_correction_cm:.1f} cm, "
+                f"max {stats.max_correction_cm:.1f} cm, "
+                f"hips shifted on {stats.hip_shift_frames} frames "
+                f"(mean {stats.mean_hip_shift_cm:.1f} cm, max {stats.max_hip_shift_cm:.1f} cm), "
+                f"out of reach {stats.unreachable_frames} frames"
+            )
+    elif verbose and foot_lock:
+        print("  foot lock: no foot contact in the skeleton; skipped")
+    if asset is not None and contact_frames is not None and len(frames) > 1:
+        anim.ground = plant_soles(anim, mapping, asset, contact_frames)
+        if verbose and anim.ground is not None:
+            sole = anim.ground["support_sole_cm"]
+            print(
+                f"  ground: hips shifted median {anim.ground['median_shift_cm']:.1f} cm, "
+                f"max {anim.ground['max_shift_cm']:.1f} cm, "
+                f"support sole median {sole['median']} cm"
+            )
     return anim
 
 

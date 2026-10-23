@@ -244,7 +244,7 @@ _TEMPLATE = r"""<!doctype html>
         <div class="body"></div>
       </div>
       <div class="vp" id="view">
-        <div class="phead">Viewport <span class="sub">Character</span></div>
+        <div class="phead">Viewport <span class="sub" id="viewSub">Character</span></div>
         <div class="body" id="viewBody">
           <span class="hint">LMB orbit · Wheel zoom</span>
           <div class="caption" id="caption"></div>
@@ -513,7 +513,7 @@ renderer.setPixelRatio(window.devicePixelRatio || 1);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 view.prepend(renderer.domElement);
 
-// Dark viewport: grey void, metre grid on the floor, soft contact shadow.
+// Dark viewport: grey void, fixed floor grid and crosses, soft contact shadow.
 const BG = 0x2b2b2b;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(BG);
@@ -528,11 +528,73 @@ sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6;
 Object.assign(sun.shadow.camera, { left: -2, right: 2, top: 2, bottom: -2, near: 0.5, far: 20 });
 scene.add(sun); scene.add(sun.target);
 const floor = new THREE.Group(); scene.add(floor);
-const minor = new THREE.GridHelper(40, 400, 0x353535, 0x353535), major = new THREE.GridHelper(40, 40, 0x4a4a4a, 0x4a4a4a);
+const minor = new THREE.GridHelper(40, 400, 0x555555, 0x555555), major = new THREE.GridHelper(40, 40, 0x8a8a8a, 0x8a8a8a);
 minor.position.y = 0.0005; major.position.y = 0.001;
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.45 }));
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
 floor.add(minor, major, ground);
+
+// World-fixed crosses on y=0. Half-metre marks, larger metre marks, green origin.
+function addFloorMarkers(parent, gltf, sceneBox) {
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  const clip = gltf.animations && gltf.animations[0];
+  if (clip) {
+    for (const track of clip.tracks) {
+      const name = track.name.toLowerCase();
+      if (!name.includes('hips') || (!name.endsWith('position') && !name.includes('translation'))) continue;
+      const v = track.values;
+      for (let i = 0; i + 2 < v.length; i += 3) {
+        minX = Math.min(minX, v[i]); maxX = Math.max(maxX, v[i]);
+        minZ = Math.min(minZ, v[i + 2]); maxZ = Math.max(maxZ, v[i + 2]);
+      }
+    }
+  }
+  if (!isFinite(minX)) {
+    minX = sceneBox.min.x; maxX = sceneBox.max.x; minZ = sceneBox.min.z; maxZ = sceneBox.max.z;
+  }
+  minX -= 1.5; maxX += 1.5; minZ -= 1.5; maxZ += 1.5;
+  let step = 0.5;
+  let x0 = Math.floor(minX / step) * step, x1 = Math.ceil(maxX / step) * step;
+  let z0 = Math.floor(minZ / step) * step, z1 = Math.ceil(maxZ / step) * step;
+  if ((Math.round((x1 - x0) / step) + 1) * (Math.round((z1 - z0) / step) + 1) > 2500) {
+    step = 1;
+    x0 = Math.floor(minX); x1 = Math.ceil(maxX); z0 = Math.floor(minZ); z1 = Math.ceil(maxZ);
+  }
+  const positions = [], colors = [], indices = [];
+  const y = 0.004;
+  const cOrigin = new THREE.Color(0x76b900), cMetre = new THREE.Color(0xd0d0d0), cHalf = new THREE.Color(0x8a8a8a);
+  function plus(x, z, arm, thick, color) {
+    const bars = [[-arm, -thick, arm, -thick, arm, thick, -arm, thick], [-thick, -arm, thick, -arm, thick, arm, -thick, arm]];
+    for (const b of bars) {
+      const o = positions.length / 3;
+      for (let k = 0; k < 8; k += 2) {
+        positions.push(x + b[k], y, z + b[k + 1]);
+        colors.push(color.r, color.g, color.b);
+      }
+      indices.push(o, o + 1, o + 2, o, o + 2, o + 3);
+    }
+  }
+  const nx = Math.round((x1 - x0) / step), nz = Math.round((z1 - z0) / step);
+  for (let ix = 0; ix <= nx; ix++) {
+    for (let iz = 0; iz <= nz; iz++) {
+      const x = x0 + ix * step, z = z0 + iz * step;
+      const origin = Math.abs(x) < 1e-3 && Math.abs(z) < 1e-3;
+      const metre = Math.abs(x - Math.round(x)) < 1e-3 && Math.abs(z - Math.round(z)) < 1e-3;
+      plus(x, z, origin ? 0.16 : metre ? 0.10 : 0.055, origin ? 0.016 : 0.010, origin ? cOrigin : metre ? cMetre : cHalf);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geo.setIndex(indices);
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    vertexColors: true, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+  }));
+  mesh.frustumCulled = false;
+  parent.add(mesh);
+  const sub = document.getElementById('viewSub');
+  if (sub) sub.textContent = 'floor markers ' + step + ' m';
+}
 
 function size() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); }
 window.addEventListener('resize', size); size();
@@ -576,7 +638,8 @@ new GLTFLoader().parse(bytes.buffer, '', gltf => {
 
   mixer.setTime(0); gltf.scene.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(gltf.scene), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
-  floor.position.y = box.min.y;
+  floor.position.y = 0;
+  addFloorMarkers(floor, gltf, box);
   controls.target.copy(c);
   camera.position.copy(c).add(new THREE.Vector3(sz.y * 0.7, sz.y * 0.75, Math.max(sz.y, sz.x) * 2.2));
   controls.update();
@@ -587,7 +650,7 @@ new GLTFLoader().parse(bytes.buffer, '', gltf => {
   window.diag.onFrame = (f, active) => {
     mixer.setTime(f / FPS); paint(active);
     if (hips) { gltf.scene.updateMatrixWorld(true); hips.getWorldPosition(follow); } else follow.copy(c);
-    sun.target.position.set(follow.x, box.min.y, follow.z); sun.position.set(follow.x + 2.5, box.min.y + 6, follow.z + 3);
+    sun.target.position.set(follow.x, 0, follow.z); sun.position.set(follow.x + 2.5, 6, follow.z + 3);
   };
   window.diag.setFrame(+document.getElementById('frameField').value || 0);
   renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
