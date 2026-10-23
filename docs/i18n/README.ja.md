@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+診断レポート（`diagnostics.html`）：
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>このリポジトリの <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> を開いてください。</sub>
+</p>
+
 ## 事前準備
 
 Python 3.11+ が必要です。クローン後に仮想環境を作り依存関係を入れると、`m2mr` が使えます：

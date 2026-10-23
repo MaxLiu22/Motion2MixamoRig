@@ -46,6 +46,14 @@ Another demo:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Diagnostics report (`diagnostics.html`):
+
+![diagnostics.html](docs/assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Open <a href="docs/assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> in this repository.</sub>
+</p>
+
 ## Prerequisites
 
 Python 3.11+. After cloning, create a virtualenv and install dependencies; the `m2mr` command is then available:

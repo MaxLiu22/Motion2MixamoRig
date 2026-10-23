@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+诊断报告（`diagnostics.html`）：
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>打开本仓库中的 <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a>。</sub>
+</p>
+
 ## 前置条件
 
 需要 Python 3.11+。克隆后建虚拟环境并安装依赖，`m2mr` 命令随之可用：

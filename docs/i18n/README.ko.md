@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+진단 리포트 (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>이 저장소의 <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a>를 열어 주세요.</sub>
+</p>
+
 ## 사전 요구 사항
 
 Python 3.11+가 필요합니다. 클론한 뒤 가상환경을 만들고 의존성을 설치하면 `m2mr` 명령을 쓸 수 있습니다:

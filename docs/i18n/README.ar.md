@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+تقرير التشخيص (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>افتح <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> في هذا المستودع.</sub>
+</p>
+
 ## المتطلبات
 
 يلزم توفر Python 3.11+. بعد الاستنساخ، أنشئ بيئة افتراضية وثبّت الاعتماديات؛ يصبح أمر `m2mr` متاحًا بعد ذلك:

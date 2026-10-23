@@ -46,6 +46,14 @@ Một bản demo khác:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Báo cáo chẩn đoán (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Mở <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> trong kho mã này.</sub>
+</p>
+
 ## Yêu cầu
 
 Python 3.11+. Sau khi clone, hãy tạo virtualenv và cài các phụ thuộc; khi đó lệnh `m2mr` sẽ dùng được:

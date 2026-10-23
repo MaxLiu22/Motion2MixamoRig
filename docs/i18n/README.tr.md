@@ -46,6 +46,14 @@ Başka bir demo:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Tanılama raporu (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Bu depodaki <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> dosyasını açın.</sub>
+</p>
+
 ## Gereksinimler
 
 Python 3.11+. Klonladıktan sonra bir virtualenv oluşturun ve bağımlılıkları kurun; ardından `m2mr` komutu kullanılabilir olur:

@@ -46,6 +46,14 @@ Demo lainnya:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Laporan diagnostik (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Buka <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> di repositori ini.</sub>
+</p>
+
 ## Prasyarat
 
 Python 3.11+. Setelah clone, buat virtualenv dan pasang dependensinya; setelah itu perintah `m2mr` bisa digunakan:

@@ -46,6 +46,14 @@ Nog een demo:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Diagnoserapport (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Open <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> in deze repository.</sub>
+</p>
+
 ## Vereisten
 
 Python 3.11+. Maak na het clonen een virtualenv aan en installeer de afhankelijkheden; daarna is het commando `m2mr` beschikbaar:

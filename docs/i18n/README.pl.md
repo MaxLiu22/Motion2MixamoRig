@@ -46,6 +46,14 @@ Kolejne demo:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Raport diagnostyczny (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>Otwórz <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> w tym repozytorium.</sub>
+</p>
+
 ## Wymagania
 
 Python 3.11+. Po sklonowaniu utwórz virtualenv i zainstaluj zależności; potem polecenie `m2mr` będzie dostępne:

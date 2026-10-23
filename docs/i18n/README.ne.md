@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+निदान प्रतिवेदन (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>यो रिपोजिटरीमा <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> खोल्नुहोस्।</sub>
+</p>
+
 ## आवश्यकताहरू
 
 Python 3.11+। clone गरेपछि virtualenv बनाउनुहोस् र dependency हरू इन्स्टल गर्नुहोस्; त्यसपछि `m2mr` कमान्ड प्रयोग गर्न मिल्छ:

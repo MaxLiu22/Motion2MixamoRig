@@ -46,6 +46,14 @@ https://github.com/user-attachments/assets/37c67642-f36c-4815-bcf3-028ed9546a2f
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+診斷報告（`diagnostics.html`）：
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub>開啟本儲存庫中的 <a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a>。</sub>
+</p>
+
 ## 前置需求
 
 需要 Python 3.11+。clone 之後建立虛擬環境並安裝相依套件，就可以使用 `m2mr` 指令：

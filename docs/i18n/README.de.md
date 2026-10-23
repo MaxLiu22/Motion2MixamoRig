@@ -46,6 +46,14 @@ Weiteres Demo:
 
 https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
+Diagnosebericht (`diagnostics.html`):
+
+![diagnostics.html](../assets/diagnostics_demo.gif)
+
+<p align="center">
+  <sub><a href="../assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> in diesem Repository öffnen.</sub>
+</p>
+
 ## Voraussetzungen
 
 Python 3.11+. Nach dem Klonen eine virtuelle Umgebung anlegen und Abhängigkeiten installieren; danach steht `m2mr` bereit:
