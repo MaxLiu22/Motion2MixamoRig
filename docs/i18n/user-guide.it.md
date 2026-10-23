@@ -144,7 +144,7 @@ installata è indicata accanto al componente aggiuntivo in **Get Extensions**.
   **Precedente** / **Successivo** (Previous / Next) passano da un problema
   all’altro. **Apri il report HTML** (Open HTML Report) apre nel browser un
   report con il video sorgente accanto al personaggio (la prima volta la
-  creazione richiede circa 15 secondi). Il personaggio sta su croci fisse del pavimento, una ogni 0,5 m, così si vede se sta scivolando.
+  creazione richiede circa 15 secondi). Il personaggio sta su croci fisse del pavimento, una ogni 0,5 m, così si vede se sta scivolando. La corsia ambra sopra le tracce rosse serve per le note che fai a occhio. Sono elencate a destra in **Notes**; un clic su una riga ci salta. **Download notes** salva queste note insieme agli istanti di intersezione. Il file prende il nome del video sorgente.
 
 Il componente aggiuntivo parla 19 lingue. **Automatica (Blender / Sistema)**
 (Auto) segue la lingua di Blender; puoi cambiarla nel riquadro Configurazione in

@@ -140,7 +140,7 @@ jest widoczna obok dodatku w **Get Extensions**.
   przenikają i jak głęboko. **Poprzedni** / **Następny** (Previous / Next)
   przechodzą między problemami. **Otwórz raport HTML** (Open HTML Report)
   otwiera w przeglądarce raport z wideo źródłowym obok postaci (za pierwszym
-  razem tworzenie trwa około 15 sekund). Postać stoi na stałych krzyżach podłogi, co 0,5 m, żeby było widać, czy się ślizga.
+  razem tworzenie trwa około 15 sekund). Postać stoi na stałych krzyżach podłogi, co 0,5 m, żeby było widać, czy się ślizga. Bursztynowy pas nad czerwonymi ścieżkami służy do uwag, które zauważysz na oko. Są na liście **Notes** po prawej; kliknięcie wiersza przenosi do niego. **Download notes** zapisuje te uwagi razem z czasami przenikania. Plik nazywa się jak wideo źródłowe.
 
 Dodatek mówi w 19 językach. **Automatycznie (Blender / system)**
 (Auto (Blender / System)) podąża za językiem Blendera; zmienisz to w sekcji

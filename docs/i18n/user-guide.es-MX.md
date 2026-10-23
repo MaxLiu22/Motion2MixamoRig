@@ -144,7 +144,7 @@ instalada aparece junto al complemento en **Get Extensions**.
   partes que se intersectan y qué tan profundo. **Anterior** / **Siguiente**
   (Previous / Next) saltan entre problemas. **Abrir reporte HTML** (Open HTML
   Report) abre en el navegador un reporte con el video fuente junto al
-  personaje (la primera vez tarda unos 15 segundos en generarse). El personaje está sobre cruces de piso fijas, una cada 0.5 m, para ver si se está deslizando.
+  personaje (la primera vez tarda unos 15 segundos en generarse). El personaje está sobre cruces de piso fijas, una cada 0.5 m, para ver si se está deslizando. El carril ámbar arriba de las pistas rojas es para notas que haces a simple vista. Aparecen a la derecha en **Notes**; haz clic en una para ir a ella. **Download notes** guarda esas notas junto con los tiempos de intersección. El archivo se llama como el video fuente.
 
 El complemento está disponible en 19 idiomas. **Automático (Blender / Sistema)**
 (Auto (Blender / System)) sigue el idioma de Blender; cámbialo en la sección

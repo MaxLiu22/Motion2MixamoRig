@@ -143,7 +143,7 @@ Güncelleme, indirilmiş modelleri korur; bu yüzden hızlıdır. Kurulu sürüm
   geçtiği ve ne kadar derin olduğu görünür. **Önceki** / **Sonraki** (Previous
   / Next) sorunlar arasında geçiş yapar. **HTML Raporunu Aç** (Open HTML
   Report), kaynak videonun karakterin yanında gösterildiği bir raporu web
-  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer). Karakter, kayıp kaymadığı görülsün diye her 0,5 m'de bir sabit zemin çarpısının üzerinde durur.
+  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer). Karakter, kayıp kaymadığı görülsün diye her 0,5 m'de bir sabit zemin çarpısının üzerinde durur. Kırmızı izlerin üstündeki amber şerit, gözünüzle gördüğünüz notlar içindir. Sağdaki **Notes** listesinde dururlar; bir satıra tıklamak oraya gider. **Download notes** bu notları kesişim zamanlarıyla birlikte kaydeder. Dosya kaynak videonun adını taşır.
 
 Eklenti 19 dili destekler. **Otomatik (Blender / Sistem)** (Auto (Blender / System))
 Blender'ın dilini izler; bunu Kurulum kutusundaki **Arayüz Dili** (UI Language)

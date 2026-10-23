@@ -142,7 +142,7 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
   Teile und wie tief sie ineinander stecken. **Zurück** / **Weiter** (Previous
   / Next) springen zwischen den Problemen. **HTML-Bericht öffnen** (Open HTML
   Report) öffnet im Webbrowser einen Bericht mit dem Quellvideo neben dem
-  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden). Der Charakter steht auf festen Bodenkreuzen, alle 0,5 m eines, damit zu sehen ist, ob er rutscht.
+  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden). Der Charakter steht auf festen Bodenkreuzen, alle 0,5 m eines, damit zu sehen ist, ob er rutscht. Die bernsteinfarbene Spur über den roten Spuren ist für Notizen, die du mit dem Auge machst. Sie stehen rechts unter **Notes**; ein Klick auf eine Zeile springt dorthin. **Download notes** speichert diese Notizen zusammen mit den Schnittzeiten. Die Datei heißt wie das Quellvideo.
 
 Das Add-on spricht 19 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
 ändern kannst du das im Bereich Einrichtung unter **UI-Sprache** (UI Language).

@@ -141,7 +141,7 @@ Je geïnstalleerde versie staat naast de add-on in **Get Extensions**.
   delen elkaar doorsnijden en hoe diep. **Vorige** / **Volgende** (Previous /
   Next) springen tussen problemen. **HTML-rapport openen** (Open HTML Report)
   opent in de webbrowser een rapport met de bronvideo naast het personage (de
-  eerste keer duurt het maken ongeveer 15 seconden). Het personage staat op vaste vloerkruisen, elke 0,5 m één, zodat te zien is of het schuift.
+  eerste keer duurt het maken ongeveer 15 seconden). Het personage staat op vaste vloerkruisen, elke 0,5 m één, zodat te zien is of het schuift. De amberkleurige baan boven de rode sporen is voor notities die je met het oog maakt. Ze staan rechts onder **Notes**; een klik op een rij springt ernaartoe. **Download notes** bewaart die notities samen met de snijtijden. Het bestand heet naar de bronvideo.
 
 De add-on spreekt 19 talen. **Automatisch (Blender / Systeem)** (Auto) volgt de taal van Blender;
 je wijzigt dit in het vak Instellen onder **Interfacetaal** (UI Language).

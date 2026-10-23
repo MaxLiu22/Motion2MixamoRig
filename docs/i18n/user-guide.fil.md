@@ -144,7 +144,7 @@ Makikita ang naka-install mong bersyon sa tabi ng add-on sa **Get Extensions**.
   pagitan ng mga problema ang **Nauna** / **Susunod** (Previous / Next).
   Binubuksan ng **Buksan ang HTML Report** (Open HTML Report) ang isang report
   sa web browser na katabi ng character ang source video (sa unang beses, mga
-  15 segundo bago ito mabuo). Nakatayo ang character sa mga nakapirming krus sa sahig, isa kada 0.5 m, para makita kung dumudulas ito.
+  15 segundo bago ito mabuo). Nakatayo ang character sa mga nakapirming krus sa sahig, isa kada 0.5 m, para makita kung dumudulas ito. Ang amber na lane sa ibabaw ng mga pulang track ay para sa mga talang nakikita ng mata. Nasa listahang **Notes** sa kanan ang mga ito; i-click ang isang row para lumipat doon. Sine-save ng **Download notes** ang mga talang ito kasama ang oras ng intersection. Ipinangalan ang file sa source video.
 
 Available ang add-on sa 19 wika. Sinusunod ng **Auto (sundan ang Blender / system)**
 ang wika ng Blender; palitan ito sa Setup box sa **Wika ng UI** (UI Language).

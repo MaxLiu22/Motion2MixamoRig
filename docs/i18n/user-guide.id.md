@@ -139,7 +139,7 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
   tembus serta seberapa dalam. **Sebelumnya** / **Berikutnya** (Previous /
   Next) melompat antarmasalah. **Buka Laporan HTML** (Open HTML Report)
   membuka laporan di browser dengan video sumber di samping karakter (pertama
-  kali butuh sekitar 15 detik untuk membuatnya). Karakter berdiri di atas silang lantai yang tetap, satu setiap 0,5 m, supaya terlihat apakah ia meluncur.
+  kali butuh sekitar 15 detik untuk membuatnya). Karakter berdiri di atas silang lantai yang tetap, satu setiap 0,5 m, supaya terlihat apakah ia meluncur. Lajur amber di atas jalur merah untuk catatan yang kamu lihat dengan mata. Daftar **Notes** di kanan menampilkannya; klik satu baris untuk meloncat ke sana. **Download notes** menyimpan catatan itu bersama waktu perpotongan. Berkas dinamai sesuai video sumber.
 
 Add-on ini tersedia dalam 19 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
 mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI Language).

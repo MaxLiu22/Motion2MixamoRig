@@ -138,7 +138,7 @@ hiển thị bên cạnh add-on trong **Get Extensions**.
   hình hiện tại, bên dưới là các bộ phận đang giao cắt và độ sâu. **Trước** /
   **Tiếp** (Previous / Next) nhảy giữa các vấn đề. **Mở báo cáo HTML** (Open
   HTML Report) mở trong trình duyệt một báo cáo có video nguồn bên cạnh nhân
-  vật (lần đầu mất khoảng 15 giây để tạo). Nhân vật đứng trên các dấu cộng sàn cố định, mỗi 0,5 m một dấu, để xem nó có đang trượt hay không.
+  vật (lần đầu mất khoảng 15 giây để tạo). Nhân vật đứng trên các dấu cộng sàn cố định, mỗi 0,5 m một dấu, để xem nó có đang trượt hay không. Làn màu hổ phách phía trên các dải đỏ dùng để ghi điều bạn thấy bằng mắt. Chúng nằm trong danh sách **Notes** bên phải; bấm một dòng để nhảy tới đó. **Download notes** lưu các ghi chú này cùng thời điểm giao cắt. Tệp được đặt tên theo video nguồn.
 
 Add-on hỗ trợ 19 ngôn ngữ. **Tự động (theo Blender / hệ thống)** (Auto (Blender / System))
 đi theo ngôn ngữ của Blender; bạn có thể đổi trong khung **Thiết lập**, tại
