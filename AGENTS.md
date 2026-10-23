@@ -109,9 +109,50 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `skeleton_motion.npz` — 3D human skeleton (24 SMPL joints, Y-up meters) + `foot_contact` (F, 4: left ankle, left foot, right ankle, right foot static probability from GVHMR; older runs read it from `cache/*/hmr4d_results.pt`)
 - `mixamo_rotations.npz` — per-bone animation rotations (quaternion wxyz; convention string inside)
 - `mixamo_character.glb` — skinned character + clip (glTF 2.0; Blender: File → Import → glTF 2.0)
-- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames counted from 0); summary also in `run.json`. Parts joined at a joint are not compared. No floor check. `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`. The report's 3D view keeps fixed floor markers on y=0 (0.5 m crosses, larger metre marks, green origin) so movement can be judged against the floor. The amber lane above the intersection tracks stores notes made by eye, and the Notes list on the right shows them. **Download notes** saves those notes with the intersection list and the source video's path. The file is named after that video. Labels in the file are English; note text is kept as typed.
+- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames counted from 0); summary also in `run.json`. Parts joined at a joint are not compared. No floor check. `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`. The report's 3D view keeps fixed floor markers on y=0 (0.5 m crosses, larger metre marks, green origin) so movement can be judged against the floor. Eye notes on that motion are a separate file; see Review notes.
 - Video in: `videos/human_skeleton.mp4`, `videos/mixamo_skeleton.mp4`, `videos/mixamo_character.mp4`, `videos/compare.mp4` (2x2: original / mixamo skeleton / human skeleton / character)
 - Photo in: the same four views as PNG under `images/`, plus `images/before_after_360_compare.mp4` (left original / right 10° orbit of the rig)
+
+## Review notes
+
+Problems only the eye can see (a sliding foot, a popped knee, a hand that misses the body) are not in `diagnostics.json`. They go in a review file, schema `m2mr-review-v1`, so a later pass can revise that run's `mixamo_rotations.npz`, `skeleton_motion.npz`, or the animation in `mixamo_character.glb`. The file does not contain the mesh or the npz bytes.
+
+In `diagnostics.html` the amber lane above the intersection tracks is that pass. Drag a range, or set **In** and **Out**, and write what is wrong. The **Notes** list on the right shows the same notes; click a row to jump to its first frame. **Download notes** saves `<video stem>_review.json`. The browser keeps the notes in `localStorage` under `m2mr-review-v1:<source glb>:<frame count>:<fps>`, so regenerating the HTML does not drop them.
+
+An agent automating the pass does not need the browser. Write `<run>/<video stem>_review.json` directly. Read `run.json` for the clip and the rig, and `diagnostics.json` for the intersections. Frame 0 is the first frame, the same index as Blender and `diagnostics.json`. Ranges are inclusive. `start_s` and `end_s` are `frame / fps`, rounded to 3 decimals.
+
+Keys and every fixed string are English. `manual_annotations[].note` is the reviewer's own words and is stored exactly as typed, in whatever language they used. A still uses `image` and `image_name` and leaves `video` null.
+
+`self_intersections` is `diagnostics.json` → `issues`. `self_intersection_summary` is `diagnostics.json` → `summary.self_intersection`. Copy them; do not rephrase part names. Pairs with `also_in_rest_pose` already intersect before the motion starts.
+
+```json
+{
+  "schema": "m2mr-review-v1",
+  "purpose": "Human notes on one Mixamo motion, plus the automatic self-intersection report. The clip is the file named in video, or in image for a still. Frame 0 is the first frame, matching Blender and diagnostics.json. Revise mixamo_rotations.npz, skeleton_motion.npz, or the animation in mixamo_character.glb so these ranges improve. Pairs with also_in_rest_pose already intersect before the motion starts. Each note is stored exactly as the reviewer typed it.",
+  "run": "20261024_032240_beat_it_shotaro_test_input_compatible",
+  "video": "/absolute/path/to/assets/video/beat_it_shotaro_test_input_compatible.mp4",
+  "video_name": "beat_it_shotaro_test_input_compatible.mp4",
+  "image": null,
+  "image_name": null,
+  "rig": "/absolute/path/to/assets/mixamo/Y_Bot.fbx",
+  "rig_name": "Y_Bot.fbx",
+  "source_glb": "mixamo_character.glb",
+  "fps": 30,
+  "frame_count": 554,
+  "threshold_cm": 1.0,
+  "generated": "2026-10-24T03:31:54",
+  "files": ["mixamo_character.glb", "mixamo_rotations.npz", "skeleton_motion.npz", "diagnostics.json"],
+  "manual_annotations": [
+    {"id": "n1", "start_frame": 380, "end_frame": 410, "start_s": 12.667, "end_s": 13.667, "note": "left foot slides"}
+  ],
+  "self_intersection_summary": {"issue_count": 16, "frame_count": 56, "ranges": [[47, 48]], "max_depth_cm": 7.37},
+  "self_intersections": [
+    {"kind": "self_intersection", "parts": ["left_hand", "left_thigh"], "ranges": [[372, 373], [378, 381]], "frame_count": 6, "worst_frame": 380, "max_depth_cm": 7.37,     "also_in_rest_pose": false}
+  ]
+}
+```
+
+The `ranges` inside `self_intersection_summary` and the `self_intersections` array above are shortened. Copy both lists in full from that run's `diagnostics.json`.
 
 ## Code map
 
@@ -123,7 +164,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `motion2mixamorig/mixamo/foot_lock.py` — pins planted feet (ball first, else heel) with two-bone leg IK, shifting the hips when a straight leg cannot reach; summary in `run.json` → `foot_lock`
 - `motion2mixamorig/mixamo/ground.py` — shifts the hips so the planted sole sits on y = 0; summary in `run.json` → `ground`
 - `motion2mixamorig/diagnose.py` — self-intersection check on the GLB -> `diagnostics.json`
-- `motion2mixamorig/diagnose_report.py` — `diagnostics.html` (`--visualize`); amber review lane and Download notes (`m2mr-review-v1`)
+- `motion2mixamorig/diagnose_report.py` — `diagnostics.html` (`--visualize`); review lane and `m2mr-review-v1` (see Review notes)
 - `motion2mixamorig/pipeline.py` — one run end to end
 - `motion2mixamorig/cli.py` — `m2mr doctor` / `m2mr run`
 - `blender_extension/motion2mixamorig_blender/` — Blender 4.2+ Extension (UI + external process)
