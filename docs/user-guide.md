@@ -1,7 +1,7 @@
 # Motion2MixamoRig for Blender — User Guide
 
 <p align="center">
-  <a href="i18n/user-guide.zh-Hans.md">简体中文</a> · <a href="i18n/user-guide.zh-Hant.md">繁體中文</a> · English · <a href="i18n/user-guide.ko.md">한국어</a> · <a href="i18n/user-guide.ja.md">日本語</a> · <a href="i18n/user-guide.de.md">Deutsch</a> · <a href="i18n/user-guide.ru.md">Русский</a> · <a href="i18n/user-guide.ar.md">العربية</a> · <a href="i18n/user-guide.vi.md">Tiếng Việt</a> · <a href="i18n/user-guide.fil.md">Filipino</a> · <a href="i18n/user-guide.th.md">ไทย</a> · <a href="i18n/user-guide.fr.md">Français</a> · <a href="i18n/user-guide.es-MX.md">Español</a> · <a href="i18n/user-guide.tr.md">Türkçe</a> · <a href="i18n/user-guide.ne.md">नेपाली</a> · <a href="i18n/user-guide.id.md">Bahasa Indonesia</a> · <a href="i18n/user-guide.pl.md">Polski</a> · <a href="i18n/user-guide.nl.md">Nederlands</a>
+  <a href="i18n/user-guide.zh-Hans.md">简体中文</a> · <a href="i18n/user-guide.zh-Hant.md">繁體中文</a> · English · <a href="i18n/user-guide.ko.md">한국어</a> · <a href="i18n/user-guide.ja.md">日本語</a> · <a href="i18n/user-guide.de.md">Deutsch</a> · <a href="i18n/user-guide.ru.md">Русский</a> · <a href="i18n/user-guide.ar.md">العربية</a> · <a href="i18n/user-guide.vi.md">Tiếng Việt</a> · <a href="i18n/user-guide.fil.md">Filipino</a> · <a href="i18n/user-guide.th.md">ไทย</a> · <a href="i18n/user-guide.fr.md">Français</a> · <a href="i18n/user-guide.es-MX.md">Español</a> · <a href="i18n/user-guide.tr.md">Türkçe</a> · <a href="i18n/user-guide.ne.md">नेपाली</a> · <a href="i18n/user-guide.id.md">Bahasa Indonesia</a> · <a href="i18n/user-guide.pl.md">Polski</a> · <a href="i18n/user-guide.nl.md">Nederlands</a> · <a href="i18n/user-guide.it.md">Italiano</a>
 </p>
 
 Turn a video of one person into an animated Mixamo character, inside Blender.
@@ -135,7 +135,7 @@ shown next to the add-on in **Get Extensions**.
   report in your web browser with the source video beside the character (the
   first time it takes about 15 seconds to build).
 
-The add-on speaks 18 languages. **Auto** follows Blender's language; change it
+The add-on speaks 19 languages. **Auto** follows Blender's language; change it
 in the Setup box under **UI Language**.
 
 ## If something goes wrong

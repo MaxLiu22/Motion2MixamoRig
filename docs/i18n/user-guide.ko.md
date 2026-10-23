@@ -1,7 +1,7 @@
 # Blender용 Motion2MixamoRig — 사용 가이드
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · 한국어 · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · 한국어 · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 한 사람이 나오는 영상을 Blender 안에서 애니메이션된 Mixamo 캐릭터로 바꿉니다.
@@ -134,7 +134,7 @@ SMPL-X는 애드온에 필요한 무료 바디 모델입니다. 라이선스상 
   이동합니다. **HTML 보고서 열기**(Open HTML Report)는 원본 영상과 캐릭터를 나란히 보여 주는 보고서를 웹
   브라우저에서 엽니다(처음에는 만드는 데 약 15초 걸립니다).
 
-애드온은 18개 언어를 지원합니다. **자동 (Blender / 시스템)** (Auto (Blender / System))은
+애드온은 19개 언어를 지원합니다. **자동 (Blender / 시스템)** (Auto (Blender / System))은
 Blender의 언어를 따릅니다. **설정** 상자의 **UI 언어** (UI Language)에서 바꿀 수
 있습니다.
 

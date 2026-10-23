@@ -1,7 +1,7 @@
 # Motion2MixamoRig สำหรับ Blender — คู่มือการใช้งาน
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · ไทย · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · ไทย · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 เปลี่ยนวิดีโอของคนหนึ่งคนให้เป็นตัวละคร Mixamo ที่เคลื่อนไหวได้ ภายใน Blender
@@ -128,7 +128,7 @@ add-on ใน **Get Extensions**
   **เปิดโฟลเดอร์ผลลัพธ์** (Open Output Folder), **ดูบันทึกทั้งหมด** (View Full Log)
 - **การวินิจฉัย** (Diagnostics): จุดที่ส่วนต่าง ๆ ของร่างกายตัวละครทะลุเข้าหากัน (มืออยู่ในหัว แขนไขว้กัน) ช่องสีแดงในแถบคือเฟรมที่มีปัญหา คลิกเพื่อไปยังเฟรมนั้น สามเหลี่ยมใต้แถบจะตามเฟรมปัจจุบัน และด้านล่างแสดงว่าส่วนใดทะลุกันและลึกเท่าใด **ก่อนหน้า** / **ถัดไป** (Previous / Next) ใช้กระโดดระหว่างปัญหา **เปิดรายงาน HTML** (Open HTML Report) จะเปิดรายงานในเว็บเบราว์เซอร์ โดยแสดงวิดีโอต้นฉบับข้างตัวละคร (ครั้งแรกใช้เวลาสร้างประมาณ 15 วินาที)
 
-add-on รองรับ 18 ภาษา **อัตโนมัติ (ตาม Blender / ระบบ)** (Auto (Blender / System))
+add-on รองรับ 19 ภาษา **อัตโนมัติ (ตาม Blender / ระบบ)** (Auto (Blender / System))
 จะใช้ภาษาตาม Blender เปลี่ยนได้ในกล่อง **ตั้งค่า** ที่ **ภาษาของอินเทอร์เฟซ** (UI Language)
 
 ## หากเกิดปัญหา

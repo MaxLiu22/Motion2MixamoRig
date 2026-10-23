@@ -1,7 +1,7 @@
 # Motion2MixamoRig für Blender — Benutzerhandbuch
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · Deutsch · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · Deutsch · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 Mach aus dem Video einer Person einen animierten Mixamo-Charakter — direkt in Blender.
@@ -138,7 +138,7 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
   Report) öffnet im Webbrowser einen Bericht mit dem Quellvideo neben dem
   Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden).
 
-Das Add-on spricht 18 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
+Das Add-on spricht 19 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
 ändern kannst du das im Bereich Einrichtung unter **UI-Sprache** (UI Language).
 
 ## Wenn etwas schiefgeht

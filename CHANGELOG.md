@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - Self-intersection diagnostics: every `m2mr run` checks the finished `mixamo_character.glb` for one body part going into another and writes `diagnostics.json` (body-part pairs, frame ranges, worst frame, depth in cm) plus a one-line summary; the summary also goes into `run.json`. A failed check does not fail the run. `m2mr diagnose <run>` re-checks a run; `--visualize` also writes `diagnostics.html` with the source video beside the character, a timeline, and a clickable issue list; `--threshold-cm` sets the reporting depth (default 1 cm). Parts joined at a joint are not compared, and stretches of one pair at most 3 frames apart are reported as one range. The floor is not checked.
 - Blender add-on: a **Diagnostics** box under Progress shows the job's self-intersections as a 48-cell frame bar (red = intersecting; click a cell to go there), the parts intersecting on the current frame with their depth, and Previous / Next buttons that jump between problem ranges. **Open HTML Report** opens the interactive report in the browser; the first click builds it in the background (`m2mr diagnose --visualize`, about 15 s). Results generated before this version show a note to update the runtime and generate again.
 
+- Italian: a README, a user guide, and the add-on UI (**UI Language → Italiano**; Auto picks it when Blender or the system is set to Italian). The README and the add-on now come in 19 languages.
+
 ### Fixed
 
 - Blender add-on: after import the timeline covers the clip as frames 0 to n-1 (was 1 to n), the frame numbers the glTF importer and `diagnostics.json` use.

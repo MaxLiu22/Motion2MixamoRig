@@ -1,7 +1,7 @@
 # Blender का लागि Motion2MixamoRig — प्रयोगकर्ता गाइड
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · नेपाली · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · नेपाली · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 एक जना व्यक्ति भएको भिडियोलाई Blender भित्रै चल्ने Mixamo क्यारेक्टरमा बदल्नुहोस्।
@@ -136,7 +136,7 @@ SMPL-X एड-अनलाई चाहिने निःशुल्क बड
   क्यारेक्टरसँगै स्रोत भिडियो देखाउने रिपोर्ट खोल्छ (पहिलो पटक बनाउन करिब 15
   सेकेन्ड लाग्छ)।
 
-एड-अन 18 भाषामा चल्छ। **स्वतः** (Auto) ले Blender को भाषा पछ्याउँछ; यसलाई
+एड-अन 19 भाषामा चल्छ। **स्वतः** (Auto) ले Blender को भाषा पछ्याउँछ; यसलाई
 **सेटअप** बक्सको **UI भाषा** (UI Language) मा बदल्नुहोस्।
 
 ## केही गडबड भयो भने

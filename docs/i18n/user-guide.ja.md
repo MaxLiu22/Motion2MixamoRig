@@ -1,7 +1,7 @@
 # Motion2MixamoRig for Blender — ユーザーガイド
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · 日本語 · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · 日本語 · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 一人の人物が映った動画を、Blender の中でアニメーション付きの Mixamo キャラクターに変換します。
@@ -128,7 +128,7 @@ SMPL-X はアドオンが必要とする無料のボディモデルです。ラ�
   **出力フォルダーを開く**（Open Output Folder）、**ログを表示**（View Full Log）。
 - **診断**（Diagnostics）：キャラクターの体の部位がめり込んでいる箇所（手が頭に入り込む、腕を組んだときに腕同士がめり込むなど）。バーの赤いセルは問題のあるフレームで、クリックするとそこへ移動します。バーの下の三角は現在のフレームを示し、その下にこのフレームでめり込んでいる部位と深さが表示されます。**前へ** / **次へ**（Previous / Next）で問題間を移動します。**HTML レポートを開く**（Open HTML Report）は、元動画とキャラクターを並べたレポートをブラウザで開きます（初回は作成に約 15 秒かかります）。
 
-アドオンは 18 言語に対応しています。**自動（Blender / システム）**（Auto (Blender / System)）は
+アドオンは 19 言語に対応しています。**自動（Blender / システム）**（Auto (Blender / System)）は
 Blender の言語に従います。セットアップボックスの **UI 言語**（UI Language）で変更できます。
 
 ## うまくいかないとき

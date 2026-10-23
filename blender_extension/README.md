@@ -134,7 +134,7 @@ ignored.
 3D Viewport → **N** → **Motion2MixamoRig** tab. The **⚙** after the title
 shows or hides **Setup**; Setup stays visible while the runtime installs.
 
-- **Setup**: UI Language (18 languages; Auto follows Blender / the system),
+- **Setup**: UI Language (19 languages; Auto follows Blender / the system),
   Install / Update Runtime, Choose SMPL-X Model, Device, **Check Environment**,
   and **Advanced** (External Python, Project Directory).
 - **Input**: Source Type, Source File, Mixamo Rig FBX, Generate Preview Videos,

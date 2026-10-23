@@ -46,6 +46,7 @@ _UI_LANGUAGE_ITEMS = (
     ("id", "Bahasa Indonesia", ""),
     ("pl", "Polski", ""),
     ("nl", "Nederlands", ""),
+    ("it", "Italiano", ""),
 )
 
 

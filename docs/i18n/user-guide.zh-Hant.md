@@ -1,7 +1,7 @@
 # Motion2MixamoRig for Blender — 使用指南
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · 繁體中文 · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · 繁體中文 · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 在 Blender 裡，把一段單人影片變成會動的 Mixamo 角色。
@@ -125,7 +125,7 @@ SMPL-X 是外掛需要的一個免費人體模型。它的授權不允許我們�
   **檢視完整記錄**（View Full Log）。
 - **診斷**（Diagnostics）：角色身體部位互相穿插的地方（例如手穿進頭裡、雙臂交叉時穿進去）。條上的紅格是有問題的影格，點一下就會跳過去。條下方的三角形跟著目前影格移動，再下方列出這一格有哪些部位穿插、深度多少。**上一個問題** / **下一個問題**（Previous / Next）可在問題之間跳轉。**開啟 HTML 報告**（Open HTML Report）會在瀏覽器中開啟報告，原始影片與角色並排顯示（第一次需要產生，大約 15 秒）。
 
-外掛支援 18 種語言。**自動（跟隨 Blender / 系統）**（Auto (Blender / System)）會跟隨
+外掛支援 19 種語言。**自動（跟隨 Blender / 系統）**（Auto (Blender / System)）會跟隨
 Blender 的語言；可以在設定區塊的 **介面語言**（UI Language）中變更。
 
 ## 發生問題時

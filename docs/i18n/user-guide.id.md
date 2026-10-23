@@ -1,7 +1,7 @@
 # Motion2MixamoRig untuk Blender — Panduan Pengguna
 
 <p align="center">
-  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · Bahasa Indonesia · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  <a href="user-guide.zh-Hans.md">简体中文</a> · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · Bahasa Indonesia · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 Ubah video satu orang menjadi karakter Mixamo yang beranimasi, langsung di Blender.
@@ -135,7 +135,7 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
   membuka laporan di browser dengan video sumber di samping karakter (pertama
   kali butuh sekitar 15 detik untuk membuatnya).
 
-Add-on ini tersedia dalam 18 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
+Add-on ini tersedia dalam 19 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
 mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI Language).
 
 ## Kalau ada masalah

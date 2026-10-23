@@ -1,7 +1,7 @@
 # Motion2MixamoRig for Blender — 使用指南
 
 <p align="center">
-  简体中文 · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a>
+  简体中文 · <a href="user-guide.zh-Hant.md">繁體中文</a> · <a href="../user-guide.md">English</a> · <a href="user-guide.ko.md">한국어</a> · <a href="user-guide.ja.md">日本語</a> · <a href="user-guide.de.md">Deutsch</a> · <a href="user-guide.ru.md">Русский</a> · <a href="user-guide.ar.md">العربية</a> · <a href="user-guide.vi.md">Tiếng Việt</a> · <a href="user-guide.fil.md">Filipino</a> · <a href="user-guide.th.md">ไทย</a> · <a href="user-guide.fr.md">Français</a> · <a href="user-guide.es-MX.md">Español</a> · <a href="user-guide.tr.md">Türkçe</a> · <a href="user-guide.ne.md">नेपाली</a> · <a href="user-guide.id.md">Bahasa Indonesia</a> · <a href="user-guide.pl.md">Polski</a> · <a href="user-guide.nl.md">Nederlands</a> · <a href="user-guide.it.md">Italiano</a>
 </p>
 
 在 Blender 里，把一段单人视频变成会动的 Mixamo 角色。
@@ -125,7 +125,7 @@ SMPL-X 是插件需要的一个免费人体模型。它的许可证不允许我�
   **查看完整日志**（View Full Log）。
 - **诊断**（Diagnostics）：角色身体部位互相穿插的地方（比如手插进头里、双臂交叉时穿进去）。条上的红格是有问题的帧，点一下就跳过去。条下面的三角跟着当前帧走，再下面列出这一帧哪些部位穿插、有多深。**上一个问题** / **下一个问题**（Previous / Next）在问题之间跳转。**打开 HTML 报告**（Open HTML Report）会在浏览器里打开一份报告，原视频和角色并排显示（第一次要生成，大约 15 秒）。
 
-插件支持 18 种语言。**自动（跟随 Blender / 系统）**（Auto (Blender / System)）会跟随
+插件支持 19 种语言。**自动（跟随 Blender / 系统）**（Auto (Blender / System)）会跟随
 Blender 的语言；可以在设置框的 **界面语言**（UI Language）里修改。
 
 ## 遇到问题时

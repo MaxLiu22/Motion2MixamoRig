@@ -25,6 +25,7 @@ LOCALE_MODULES = {
     "id": "id",
     "pl": "pl",
     "nl": "nl",
+    "it": "it",
 }
 
 # Blender EnumProperty identifiers cannot contain "-".
@@ -47,6 +48,7 @@ PREF_TO_LANG = {
     "id": "id",
     "pl": "pl",
     "nl": "nl",
+    "it": "it",
 }
 
 # Blender / system locale prefix -> UI language. Traditional Chinese must come
@@ -73,6 +75,7 @@ _BLENDER_PREFIX = (
     ("id", "id"),
     ("pl", "pl"),
     ("nl", "nl"),
+    ("it", "it"),
 )
 
 STRINGS: dict[str, dict[str, str]] = {}
