@@ -45,6 +45,12 @@ m2mr diagnose outputs/<run> [--visualize] [--threshold-cm N]      # re-check sel
 `--video` / `--image` and `--rig` combine freely (not `--video` with `--image`).
 Extraction is the slow step; reuse it with `--skeleton` when only the rig changes.
 
+## After a generation
+
+When an agent finishes a motion for the user (`m2mr run`, or a Blender job), the message that says it is done also names the quality report. That file is `diagnostics.json` in the run directory: which body parts intersect, on which frames, and how deep. A failed check does not fail the run. If the file is missing, say so and offer `m2mr diagnose <run>`. If they want the picture, `m2mr diagnose <run> --visualize` writes `diagnostics.html`; in Blender, **Open HTML Report** does the same. Tell them they can open it if they want. Do not start a revision until they ask.
+
+The same message can offer to mark the stretches that still look wrong. Do that with them through Review notes: the amber lane in `diagnostics.html`, or a `<video stem>_review.json` written from the frames they point out. They hand that JSON back with the character or the skeleton (`mixamo_character.glb`, `mixamo_rotations.npz`, `skeleton_motion.npz`). The agent then builds a new version of the Mixamo animation for those ranges only, in a new directory, and leaves the previous run untouched. Rotations stay quaternion wxyz, the convention string inside `mixamo_rotations.npz`. Import the new `mixamo_character.glb` into Blender for them to watch: hide **Icosphere** and the armature, leave the skinned meshes. Tell them where the new `diagnostics.json` is, the same way as the first report. Pairs with `also_in_rest_pose` already intersect before the motion starts; say that instead of posing those frames away.
+
 ## Blender Extension
 
 The add-on is a thin UI. It must **not** import PyTorch / GVHMR / OpenCV in
@@ -147,12 +153,14 @@ Keys and every fixed string are English. `manual_annotations[].note` is the revi
   ],
   "self_intersection_summary": {"issue_count": 16, "frame_count": 56, "ranges": [[47, 48]], "max_depth_cm": 7.37},
   "self_intersections": [
-    {"kind": "self_intersection", "parts": ["left_hand", "left_thigh"], "ranges": [[372, 373], [378, 381]], "frame_count": 6, "worst_frame": 380, "max_depth_cm": 7.37,     "also_in_rest_pose": false}
+    {"kind": "self_intersection", "parts": ["left_hand", "left_thigh"], "ranges": [[372, 373], [378, 381]], "frame_count": 6, "worst_frame": 380, "max_depth_cm": 7.37, "also_in_rest_pose": false}
   ]
 }
 ```
 
 The `ranges` inside `self_intersection_summary` and the `self_intersections` array above are shortened. Copy both lists in full from that run's `diagnostics.json`.
+
+Handing this file back with the GLB or the skeleton is the revision pass in After a generation. The agent writes a new version and imports that GLB into Blender; it does not overwrite the run this file describes.
 
 ## Code map
 
