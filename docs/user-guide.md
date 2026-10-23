@@ -145,6 +145,10 @@ shown next to the add-on in **Get Extensions**.
   report in your web browser with the source video beside the character (the
   first time it takes about 15 seconds to build). The character stands on
   fixed floor crosses, one every 0.5 m, so you can see whether it is sliding.
+  The amber lane above the red tracks is for notes you make by eye. Those notes
+  are listed under **Notes** on the right; click one to jump to it.   **Download
+  notes** saves those notes together with the intersection times. The file is
+  named after the source video.
 
 The add-on speaks 19 languages. **Auto** follows Blender's language; change it
 in the Setup box under **UI Language**.

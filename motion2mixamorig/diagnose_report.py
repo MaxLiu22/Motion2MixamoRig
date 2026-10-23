@@ -2,9 +2,12 @@
 
 One self-contained file next to the GLB: the source video (or photo) beside
 the character, both embedded and kept on the same frame, a timeline of every
-issue, and a list you can click to jump to the worst frame. Parts in an active
-issue turn red. three.js loads from a CDN, so the 3D view needs an internet
-connection; the source, list, and timeline work offline.
+issue, and a list you can click to jump to the worst frame. The lane above
+those tracks is for notes a person makes while watching the Mixamo motion.
+The Notes list on the right shows the same notes. Download notes saves
+the notes together with the self-intersection list.
+Parts in an active issue turn red. three.js loads from a CDN, so the 3D view
+needs an internet connection; the source, list, timeline, and notes work offline.
 """
 
 from __future__ import annotations
@@ -77,10 +80,36 @@ def source_media(run_dir: Path) -> tuple[dict, str]:
     return {"kind": "none", "note": "run.json lists no source video or photo."}, ""
 
 
+def _review_source(run_dir: Path) -> dict:
+    """Which clip this report belongs to. Paths are copied from run.json; labels stay English."""
+    info = {
+        "run": run_dir.name,
+        "video": None,
+        "video_name": None,
+        "image": None,
+        "image_name": None,
+        "rig": None,
+        "rig_name": None,
+    }
+    try:
+        run = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return info
+    for key in ("video", "image", "rig"):
+        src = run.get(key)
+        if not src:
+            continue
+        info[key] = str(src)
+        info[f"{key}_name"] = Path(src).name
+    return info
+
+
 def write_html_report(path: Path, glb_path: Path, report: dict, clip: SkinnedClip) -> Path:
-    media, media_b64 = source_media(Path(glb_path).parent)
+    run_dir = Path(glb_path).parent
+    media, media_b64 = source_media(run_dir)
     payload = {
         "report": report,
+        "source": _review_source(run_dir),
         "parts": list(PARTS),
         "media": media,
         # Body part per vertex, per skinned mesh node, in GLB vertex order.
@@ -187,11 +216,17 @@ _TEMPLATE = r"""<!doctype html>
   input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:8px; height:14px; margin-top:-5.5px; border-radius:1px; background:var(--text); }
   input[type=range]::-moz-range-track { height:3px; background:#4a4a4a; }
   input[type=range]::-moz-range-thumb { width:8px; height:14px; border-radius:1px; background:var(--text); border:none; }
+  #reviewbar { display:flex; align-items:center; gap:6px; padding:4px 8px; border-bottom:1px solid var(--line); background:#1a1a1a; }
+  #reviewbar .lab { font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:#e6a23c; }
+  #noteField { flex:1; min-width:80px; height:24px; padding:0 8px; background:var(--field); border:1px solid #444; border-radius:2px; color:var(--bright); }
+  #noteField:focus { outline:none; border-color:#e6a23c; }
   #nowbar { display:flex; align-items:center; gap:6px; padding:0 10px; height:28px; border-bottom:1px solid var(--line); overflow:hidden; white-space:nowrap; }
   #nowbar .lab { font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-right:4px; }
   .tag { display:inline-block; padding:1px 7px; border:1px solid rgba(240,82,79,.55); background:var(--red-sel); color:#ff8a87; font-size:11px; border-radius:1px; }
+  .tag.note { border-color:rgba(230,162,60,.7); background:rgba(230,162,60,.16); color:#f0c36a; cursor:pointer; }
   .clean { color:var(--green); font-size:11.5px; }
   #tlwrap { max-height:26vh; overflow-y:auto; overflow-x:hidden; background:var(--panel); }
+  #review { width:100%; display:block; position:sticky; top:0; z-index:2; background:#1a1a1a; border-bottom:1px solid #000; }
   #timeline { width:100%; display:block; cursor:pointer; }
 
   /* Inspector */
@@ -207,11 +242,15 @@ _TEMPLATE = r"""<!doctype html>
   .filters button:last-child { border-radius:0 2px 2px 0; }
   .filters button:hover { color:var(--bright); }
   .filters button.on { background:#3a4a22; border-color:var(--green); color:var(--bright); position:relative; z-index:1; }
+  #notesBody { flex:0 1 auto; max-height:34%; min-height:0; overflow:auto; border-bottom:1px solid var(--border); }
   #issuesBody { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
-  #issues { flex:1 1 auto; overflow:auto; }
+  #issues, #notes { flex:1 1 auto; overflow:auto; }
   .issue { position:relative; padding:7px 10px 7px 12px; border-bottom:1px solid var(--line); border-left:3px solid transparent; cursor:pointer; }
   .issue:hover { background:#262626; }
   .issue.sel { background:var(--green-sel); border-left-color:var(--green); }
+  .issue.review .d { color:#e6a23c; font-weight:500; }
+  .issue.review.sel { background:rgba(230,162,60,.16); border-left-color:#e6a23c; }
+  .issue.review .t.muted { color:var(--muted); font-style:italic; }
   .issue .t { color:var(--bright); padding-right:70px; }
   .issue .d { position:absolute; top:7px; right:10px; font-family:var(--mono); font-weight:700; color:var(--red); }
   .issue.restpose .d { color:var(--muted); }
@@ -254,7 +293,7 @@ _TEMPLATE = r"""<!doctype html>
     </div>
 
     <div class="panel" id="dock">
-      <div class="phead">Timeline</div>
+      <div class="phead">Timeline <span class="sub" id="reviewSub">Drag the amber lane to mark a range</span></div>
       <div class="toolbar">
         <button class="btn" id="first" title="First frame"><svg viewBox="0 0 16 16"><path d="M3 2h2v12H3zM13 2v12L6 8z"/></svg></button>
         <button class="btn" id="prev" title="Previous frame (←)"><svg viewBox="0 0 16 16"><path d="M11 2v12L4 8z"/></svg></button>
@@ -266,15 +305,27 @@ _TEMPLATE = r"""<!doctype html>
         <div class="grow"></div>
         <button class="btn" id="sound" title="Sound of the original video"></button>
         <input id="volume" type="range" min="0" max="1" step="0.05" value="0.8" title="Volume">
+        <span class="vsep"></span>
+        <button class="btn" id="exportReview" title="Download your notes together with the intersection times">Download notes</button>
+      </div>
+      <div id="reviewbar">
+        <span class="lab">Note</span>
+        <input id="noteField" type="text" placeholder="What looks wrong in the Mixamo motion" autocomplete="off" spellcheck="false">
+        <button class="btn" id="markIn" title="Start of a note at this frame (I)">In</button>
+        <button class="btn" id="markOut" title="End of the note at this frame (O)">Out</button>
+        <button class="btn" id="addNote" title="Save a note on this frame, or from In to here">Add</button>
+        <button class="btn" id="delNote" title="Delete the selected note (Delete)" disabled>Delete</button>
       </div>
       <div id="nowbar"><span class="lab">Active</span><span id="now"></span></div>
-      <div id="tlwrap"><canvas id="timeline"></canvas></div>
+      <div id="tlwrap"><canvas id="review"></canvas><canvas id="timeline"></canvas></div>
     </div>
   </div>
 
   <div class="panel" id="right">
     <div class="phead" data-toggle><span class="tri">▼</span>Summary</div>
     <div class="props" id="summary"></div>
+    <div class="phead" data-toggle><span class="tri">▼</span>Notes<span class="count" id="noteCount">0</span></div>
+    <div id="notesBody"><div id="notes"></div></div>
     <div class="phead" data-toggle><span class="tri">▼</span>Issues<span class="count" id="issueCount"></span></div>
     <div id="issuesBody">
       <div class="filters" id="filters">
@@ -387,33 +438,342 @@ document.querySelectorAll('#filters button').forEach(b => b.onclick = () => {
   filter = b.dataset.f; document.querySelectorAll('#filters button').forEach(x => x.classList.toggle('on', x === b)); renderList(); drawTimeline();
 });
 
-// Timeline: label column, ruler, one track per issue, green playhead.
-const TL = { label: 180, ruler: 22, row: 20, pad: 12 };
-function drawTimeline() {
-  const c = $('timeline'), items = filter === 'now' ? R.issues : visible();
-  const w = c.clientWidth || c.parentElement.clientWidth, h = TL.ruler + Math.max(1, items.length) * TL.row + 4;
+// Timeline: a sticky review lane (notes a person makes) above one track per issue.
+const TL = { label: 180, ruler: 22, lane: 32, row: 20, pad: 12 };
+const AMBER = '#e6a23c';
+const storeKey = `m2mr-review-v1:${R.source}:${N}:${FPS}`;
+let notes = [], selectedNote = -1, pendingIn = null, drag = null, noteSeq = 1;
+function newNoteId() { return 'n' + (noteSeq++); }
+function clampFrame(f) { return Math.max(0, Math.min(N - 1, f | 0)); }
+function loadNotes() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(storeKey) || 'null');
+    if (!Array.isArray(raw)) return;
+    notes = raw.filter(n => n && Number.isFinite(+n.start_frame) && Number.isFinite(+n.end_frame)).map(n => {
+      let a = clampFrame(n.start_frame), b = clampFrame(n.end_frame);
+      if (b < a) { const t = a; a = b; b = t; }
+      const id = String(n.id || newNoteId());
+      const m = /^n(\d+)$/.exec(id); if (m) noteSeq = Math.max(noteSeq, +m[1] + 1);
+      return { id, start_frame: a, end_frame: b, note: String(n.note || '') };
+    });
+  } catch (e) { notes = []; }
+}
+function saveNotes() { try { localStorage.setItem(storeKey, JSON.stringify(notes)); } catch (e) {} }
+function refreshReviewChrome() {
+  $('delNote').disabled = selectedNote < 0;
+  $('markIn').classList.toggle('on', pendingIn != null);
+  $('reviewSub').textContent = pendingIn != null
+    ? `In at frame ${pendingIn} · Out marks the end`
+    : (notes.length ? `${notes.length} note${notes.length === 1 ? '' : 's'} · drag the amber lane, or In / Out` : 'Drag the amber lane to mark a range, or set In and Out');
+}
+function selectNote(i) {
+  selectedNote = i;
+  $('noteField').value = i >= 0 && notes[i] ? notes[i].note : $('noteField').value;
+  if (i < 0) $('noteField').value = '';
+  refreshReviewChrome();
+  drawTimeline();
+}
+function addNote(a, b, text) {
+  let s = clampFrame(Math.min(a, b)), e = clampFrame(Math.max(a, b));
+  notes.push({ id: newNoteId(), start_frame: s, end_frame: e, note: text || '' });
+  pendingIn = null;
+  saveNotes();
+  selectNote(notes.length - 1);
+}
+function deleteSelected() {
+  if (selectedNote < 0) return;
+  notes.splice(selectedNote, 1);
+  selectedNote = -1;
+  $('noteField').value = '';
+  saveNotes();
+  refreshReviewChrome();
+  drawTimeline();
+}
+function setIn() {
+  stop();
+  pendingIn = frame;
+  selectedNote = -1;
+  $('noteField').value = '';
+  refreshReviewChrome();
+  drawTimeline();
+}
+function setOut() {
+  stop();
+  const a = pendingIn == null ? frame : pendingIn;
+  addNote(a, frame, selectedNote < 0 ? $('noteField').value : '');
+  $('noteField').focus();
+}
+function exportReview() {
+  const seconds = f => Math.round((f / FPS) * 1000) / 1000;
+  const src = D.source || {};
+  const videoName = src.video_name || (D.media && D.media.kind === 'video' && D.media.name) || null;
+  const imageName = src.image_name || (D.media && D.media.kind === 'image' && D.media.name) || null;
+  const manual = notes.map(n => ({
+    id: n.id, start_frame: n.start_frame, end_frame: n.end_frame,
+    start_s: seconds(n.start_frame), end_s: seconds(n.end_frame),
+    note: n.note,
+  })).sort((a, b) => a.start_frame - b.start_frame || a.end_frame - b.end_frame);
+  const payload = {
+    schema: 'm2mr-review-v1',
+    purpose: 'Human notes on one Mixamo motion, plus the automatic self-intersection report. The clip is the file named in video, or in image for a still. Frame 0 is the first frame, matching Blender and diagnostics.json. Revise mixamo_rotations.npz, skeleton_motion.npz, or the animation in mixamo_character.glb so these ranges improve. Pairs with also_in_rest_pose already intersect before the motion starts. Each note is stored exactly as the reviewer typed it.',
+    run: src.run || null,
+    video: src.video || null,
+    video_name: videoName,
+    image: src.image || null,
+    image_name: imageName,
+    rig: src.rig || null,
+    rig_name: src.rig_name || null,
+    source_glb: R.source,
+    fps: FPS,
+    frame_count: N,
+    threshold_cm: R.threshold_cm,
+    generated: R.generated,
+    files: ['mixamo_character.glb', 'mixamo_rotations.npz', 'skeleton_motion.npz', 'diagnostics.json'],
+    manual_annotations: manual,
+    self_intersection_summary: R.summary.self_intersection,
+    self_intersections: R.issues,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2) + '\n'], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const stem = String(videoName || imageName || src.run || R.source || 'review').split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+  a.download = (stem || 'review') + '_review.json';
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+$('noteField').oninput = () => {
+  if (selectedNote < 0 || !notes[selectedNote]) return;
+  notes[selectedNote].note = $('noteField').value;
+  saveNotes();
+  drawTimeline();
+};
+$('markIn').onclick = setIn;
+$('markOut').onclick = setOut;
+$('addNote').onclick = () => {
+  stop();
+  addNote(pendingIn == null ? frame : pendingIn, frame, selectedNote < 0 ? $('noteField').value : '');
+  $('noteField').focus();
+};
+$('delNote').onclick = deleteSelected;
+$('exportReview').onclick = exportReview;
+loadNotes();
+
+function timelineGeom(w) {
+  const x0 = TL.label + TL.pad, x1 = Math.max(x0 + 1, w - TL.pad);
+  const x = f => x0 + (x1 - x0) * (N > 1 ? f / (N - 1) : 0);
+  const frameAt = px => clampFrame(Math.round((px - x0) / (x1 - x0) * (N > 1 ? N - 1 : 0)));
+  return { x0, x1, x, frameAt };
+}
+function fitCanvas(c, w, h) {
   const dpr = window.devicePixelRatio || 1;
-  c.width = w * dpr; c.height = h * dpr; c.style.height = h + 'px';
+  c.width = Math.max(1, w) * dpr; c.height = Math.max(1, h) * dpr; c.style.height = h + 'px';
   const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const x0 = TL.label + TL.pad, x1 = w - TL.pad, x = f => x0 + (x1 - x0) * (N > 1 ? f / (N - 1) : 0);
-  g.clearRect(0, 0, w, h);
+  return g;
+}
+function refreshNow() {
+  const now = R.issues.filter(i => inRange(i, frame));
+  $('now').innerHTML = now.length ? '' : '<span class="clean">No intersection</span>';
+  now.forEach(i => { const t = document.createElement('span'); t.className = 'tag'; t.textContent = pairName(i); $('now').append(t); });
+  notes.filter(n => frame >= n.start_frame && frame <= n.end_frame).forEach(n => {
+    const t = document.createElement('span'); t.className = 'tag note';
+    t.textContent = n.note || `${n.start_frame}–${n.end_frame}`;
+    t.title = n.note || `frames ${n.start_frame}–${n.end_frame}`;
+    t.onclick = () => selectNote(notes.indexOf(n));
+    $('now').append(t);
+  });
+  $('caption').className = 'caption' + (now.length ? ' bad' : '');
+  $('caption').innerHTML = now.length ? `<span class="bad">${now.map(pairName).join(' · ')}</span>` : '<span class="ok">No intersection on this frame</span>';
+  return now;
+}
+function drawTimeline() {
+  const wrap = $('tlwrap'), w = wrap.clientWidth || wrap.parentElement.clientWidth;
   const font = '"NVIDIA Sans", "Helvetica Neue", Arial, sans-serif', mono = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
-  g.fillStyle = '#262626'; g.fillRect(0, 0, w, TL.ruler);
-  g.fillStyle = '#000'; g.fillRect(0, TL.ruler - 1, w, 1);
-  g.fillStyle = '#1b1b1b'; g.fillRect(0, TL.ruler, TL.label, h - TL.ruler);
-  g.fillStyle = '#000'; g.fillRect(TL.label, 0, 1, h);
-  const pxPerFrame = (x1 - x0) / Math.max(1, N - 1);
+  const geo = timelineGeom(w);
+  const x = geo.x;
+  const pxPerFrame = (geo.x1 - geo.x0) / Math.max(1, N - 1);
   const major = [1, 5, 10, 25, 50, 100, 250, 500, 1000].find(s => s * pxPerFrame >= 60) || 1000;
   const minor = major >= 10 ? major / 5 : 1;
+  drawReview(w, geo, font, mono, major, minor);
+  drawIssues(w, geo, font, major);
+  refreshNow();
+  refreshReviewChrome();
+  renderNotes();
+}
+let notesListSig = '', shownNote = -2;
+function renderNotes() {
+  const box = $('notes');
+  $('noteCount').textContent = String(notes.length);
+  const sig = notes.map(n => n.id + ':' + n.start_frame + ':' + n.end_frame + ':' + n.note).join('\n') + '#' + selectedNote;
+  if (sig === notesListSig) return;
+  notesListSig = sig;
+  const scroll = box.scrollTop;
+  box.innerHTML = '';
+  if (!notes.length) {
+    box.innerHTML = '<div class="empty">No notes yet. Drag the amber lane, or set In and Out.</div>';
+    shownNote = selectedNote;
+    return;
+  }
+  const order = notes.map((n, i) => i).sort((a, b) => notes[a].start_frame - notes[b].start_frame || notes[a].end_frame - notes[b].end_frame);
+  order.forEach(idx => {
+    const n = notes[idx], el = document.createElement('div');
+    el.className = 'issue review' + (idx === selectedNote ? ' sel' : '');
+    el.setAttribute('role', 'button');
+    el.innerHTML = '<div class="t"></div><div class="d"></div><div class="m"></div>';
+    const title = n.note.trim();
+    const t = el.querySelector('.t');
+    t.textContent = title || 'No description';
+    if (!title) t.classList.add('muted');
+    el.querySelector('.d').textContent = fmtRange([n.start_frame, n.end_frame]);
+    const frames = n.end_frame - n.start_frame + 1;
+    const sec = f => (f / FPS).toFixed(2);
+    el.querySelector('.m').textContent = `${sec(n.start_frame)}–${sec(n.end_frame)} s · ${frames} frame${frames === 1 ? '' : 's'}`;
+    el.onclick = () => { stop(); selectNote(idx); setFrame(n.start_frame); };
+    box.append(el);
+  });
+  box.scrollTop = scroll;
+  if (selectedNote !== shownNote) {
+    shownNote = selectedNote;
+    const sel = box.querySelector('.sel');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+}
+function drawReview(w, geo, font, mono, major, minor) {
+  const c = $('review'), h = TL.ruler + TL.lane, g = fitCanvas(c, w, h), x = geo.x;
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = '#262626'; g.fillRect(0, 0, w, TL.ruler);
+  g.fillStyle = '#000'; g.fillRect(0, TL.ruler - 1, w, 1);
+  g.fillStyle = '#241c10'; g.fillRect(0, TL.ruler, w, TL.lane);
+  g.fillStyle = '#1b1b1b'; g.fillRect(0, TL.ruler, TL.label, TL.lane);
+  g.fillStyle = '#000'; g.fillRect(TL.label, 0, 1, h);
+  g.fillStyle = AMBER; g.fillRect(0, TL.ruler, 3, TL.lane);
   g.font = `10px ${mono}`; g.textBaseline = 'top'; g.textAlign = 'center';
   for (let f = 0; f < N; f += minor) {
     const isMajor = f % major === 0, xx = Math.round(x(f)) + .5;
     g.strokeStyle = isMajor ? '#6a6a6a' : '#3e3e3e'; g.beginPath(); g.moveTo(xx, TL.ruler - (isMajor ? 8 : 4)); g.lineTo(xx, TL.ruler - 1); g.stroke();
-    if (isMajor) { g.fillStyle = '#8a8a8a'; g.fillText(String(f), xx, 3); g.fillStyle = 'rgba(255,255,255,.035)'; g.fillRect(xx - .5, TL.ruler, 1, h - TL.ruler); }
+    if (isMajor) { g.fillStyle = '#8a8a8a'; g.fillText(String(f), xx, 3); }
   }
-  g.textAlign = 'left';
+  g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.fillStyle = AMBER; g.font = `700 11px ${font}`;
+  g.fillText('Review', 10, TL.ruler + TL.lane / 2);
+  const y = TL.ruler + 6, bh = TL.lane - 12;
+  function bar(a, b, fill, label, ink) {
+    const left = Math.round(x(a)), right = Math.round(x(b));
+    const bw = Math.max(3, right - left + 2);
+    g.fillStyle = fill; g.fillRect(left - 1, y, bw, bh);
+    if (!label) return;
+    g.save(); g.beginPath(); g.rect(left + 2, y, Math.max(0, bw - 6), bh); g.clip();
+    g.fillStyle = ink; g.font = `11px ${font}`; g.textBaseline = 'middle';
+    g.fillText(label, left + 4, y + bh / 2 + .5); g.restore();
+  }
+  notes.forEach((n, i) => bar(
+    n.start_frame, n.end_frame,
+    i === selectedNote ? AMBER : 'rgba(230,162,60,.55)',
+    n.note || `${n.start_frame}–${n.end_frame}`,
+    i === selectedNote ? '#1a1206' : '#f6e2b8'));
+  if (drag && drag.mode === 'create') bar(Math.min(drag.start, drag.end), Math.max(drag.start, drag.end), 'rgba(230,162,60,.35)', '');
+  else if (pendingIn != null) bar(Math.min(pendingIn, frame), Math.max(pendingIn, frame), 'rgba(230,162,60,.28)', '');
+  if (!notes.length && !(drag && drag.mode === 'create') && pendingIn == null) {
+    g.fillStyle = '#6a5430'; g.font = `11px ${font}`; g.textBaseline = 'middle';
+    g.fillText('Drag to mark a range', TL.label + 14, TL.ruler + TL.lane / 2);
+  }
+  const px = Math.round(x(frame)) + .5;
+  g.strokeStyle = '#76b900'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, 0); g.lineTo(px, h); g.stroke();
+  g.fillStyle = '#76b900'; g.fillRect(px - 17, 1, 34, TL.ruler - 4);
+  g.fillStyle = '#000'; g.font = `700 10.5px ${mono}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(String(frame), px, TL.ruler / 2 - 1); g.textAlign = 'left';
+  bindReview(c, geo);
+}
+function noteAt(geo, mx) {
+  const f = geo.frameAt(mx);
+  for (let i = notes.length - 1; i >= 0; i--) {
+    const n = notes[i];
+    const left = geo.x(n.start_frame), right = Math.max(left + 3, geo.x(n.end_frame));
+    if (mx < left - 5 || mx > right + 5) continue;
+    if (f < n.start_frame - 1 || f > n.end_frame + 1) continue;
+    const width = right - left;
+    let edge = null;
+    if (width < 18) edge = (mx - left) <= (right - mx) ? 'l' : 'r';
+    else if (Math.abs(mx - left) <= 6) edge = 'l';
+    else if (Math.abs(mx - right) <= 6) edge = 'r';
+    else if (f < n.start_frame || f > n.end_frame) continue;
+    return { index: i, edge };
+  }
+  return null;
+}
+function bindReview(c, geo) {
+  c.onmousedown = e => {
+    if (e.button !== 0) return;
+    stop();
+    const rect = c.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const seek = ev => setFrame(geo.frameAt(ev.clientX - rect.left));
+    if (my < TL.ruler || mx < TL.label) {
+      seek(e);
+      const move = ev => seek(ev), up = () => { removeEventListener('mousemove', move); removeEventListener('mouseup', up); };
+      addEventListener('mousemove', move); addEventListener('mouseup', up);
+      return;
+    }
+    const hit = noteAt(geo, mx), anchor = geo.frameAt(mx), originX = e.clientX;
+    if (hit) {
+      const n = notes[hit.index];
+      drag = { mode: hit.edge === 'l' ? 'resize-l' : hit.edge === 'r' ? 'resize-r' : 'move', index: hit.index, anchor, start: n.start_frame, end: n.end_frame, moved: false };
+      selectNote(hit.index);
+    } else {
+      drag = { mode: 'create', anchor, start: anchor, end: anchor, moved: false, index: -1 };
+    }
+    const move = ev => {
+      const f = geo.frameAt(ev.clientX - rect.left);
+      if (Math.abs(ev.clientX - originX) > 4) drag.moved = true;
+      if (drag.mode === 'create') { drag.end = f; setFrame(f); return; }
+      const n = notes[drag.index]; if (!n) return;
+      if (drag.mode === 'move') {
+        let d = f - drag.anchor, s = drag.start + d, e2 = drag.end + d, span = drag.end - drag.start;
+        if (s < 0) { s = 0; e2 = span; }
+        if (e2 > N - 1) { e2 = N - 1; s = Math.max(0, e2 - span); }
+        n.start_frame = s; n.end_frame = e2;
+      } else if (drag.mode === 'resize-l') n.start_frame = Math.max(0, Math.min(f, n.end_frame));
+      else n.end_frame = Math.min(N - 1, Math.max(f, n.start_frame));
+      setFrame(f);
+    };
+    const up = () => {
+      removeEventListener('mousemove', move); removeEventListener('mouseup', up);
+      const d = drag; drag = null;
+      if (!d) return;
+      if (d.mode === 'create') {
+        if (!d.moved) {
+          if (selectedNote >= 0) selectNote(-1);
+          setFrame(d.anchor);
+          return;
+        }
+        addNote(d.start, d.end, selectedNote < 0 ? $('noteField').value : '');
+        $('noteField').focus();
+        return;
+      }
+      const n = notes[d.index];
+      if (n && n.end_frame < n.start_frame) { const t = n.start_frame; n.start_frame = n.end_frame; n.end_frame = t; }
+      saveNotes(); drawTimeline();
+    };
+    addEventListener('mousemove', move); addEventListener('mouseup', up);
+  };
+  c.onmousemove = e => {
+    if (drag) return;
+    const rect = c.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const hit = my >= TL.ruler && mx >= TL.label ? noteAt(geo, mx) : null;
+    c.style.cursor = hit && hit.edge ? 'ew-resize' : (my >= TL.ruler && mx >= TL.label ? 'crosshair' : 'pointer');
+    c.title = hit ? (notes[hit.index].note || `frames ${notes[hit.index].start_frame}–${notes[hit.index].end_frame}`) : '';
+  };
+}
+function drawIssues(w, geo, font, major) {
+  const c = $('timeline'), items = filter === 'now' ? R.issues : visible();
+  const h = Math.max(1, items.length) * TL.row + 4, g = fitCanvas(c, w, h), x = geo.x;
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = '#1b1b1b'; g.fillRect(0, 0, TL.label, h);
+  g.fillStyle = '#000'; g.fillRect(TL.label, 0, 1, h);
+  for (let f = 0; f < N; f += major) {
+    const xx = Math.round(x(f)) + .5;
+    g.fillStyle = 'rgba(255,255,255,.035)'; g.fillRect(xx - .5, 0, 1, h);
+  }
   items.forEach((i, k) => {
-    const y = TL.ruler + k * TL.row, idx = R.issues.indexOf(i), sel = idx === selected;
+    const y = k * TL.row, idx = R.issues.indexOf(i), sel = idx === selected;
     if (sel) { g.fillStyle = 'rgba(118,185,0,.16)'; g.fillRect(0, y, w, TL.row); g.fillStyle = '#76b900'; g.fillRect(0, y, 3, TL.row); }
     else if (k % 2) { g.fillStyle = 'rgba(255,255,255,.02)'; g.fillRect(0, y, w, TL.row); }
     g.fillStyle = '#2c2c2c'; g.fillRect(0, y + TL.row - 1, w, 1);
@@ -425,19 +785,17 @@ function drawTimeline() {
     for (const [a, b] of i.ranges) g.fillRect(Math.round(x(a)) - 1, y + 5, Math.max(3, Math.round(x(b) - x(a)) + 2), TL.row - 11);
   });
   const px = Math.round(x(frame)) + .5;
-  g.strokeStyle = '#76b900'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, TL.ruler - 2); g.lineTo(px, h); g.stroke();
-  g.fillStyle = '#76b900'; g.fillRect(px - 17, 1, 34, TL.ruler - 4);
-  g.fillStyle = '#000'; g.font = `700 10.5px ${mono}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(frame), px, TL.ruler / 2 - 1); g.textAlign = 'left';
-
+  g.strokeStyle = '#76b900'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, 0); g.lineTo(px, h); g.stroke();
   c.onmousedown = e => {
+    if (e.button !== 0) return;
     stop();
     const r = c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-    if (mx < TL.label && my > TL.ruler) {
-      const it = items[Math.floor((my - TL.ruler) / TL.row)];
+    if (mx < TL.label) {
+      const it = items[Math.floor(my / TL.row)];
       if (it) { selected = R.issues.indexOf(it); setFrame(it.worst_frame); renderList(); }
       return;
     }
-    const seek = ev => setFrame(Math.round((ev.clientX - r.left - x0) / (x1 - x0) * (N - 1)));
+    const seek = ev => setFrame(geo.frameAt(ev.clientX - r.left));
     seek(e);
     const move = ev => seek(ev), up = () => { removeEventListener('mousemove', move); removeEventListener('mouseup', up); };
     addEventListener('mousemove', move); addEventListener('mouseup', up);
@@ -449,14 +807,9 @@ function setFrame(f, fromVideo = false) {
   if (video && !fromVideo && video.readyState >= 1) video.currentTime = frame / FPS;
   if (document.activeElement !== $('frameField')) $('frameField').value = frame;
   $('timeInfo').textContent = `${(frame / FPS).toFixed(2)} s`;
-  const now = R.issues.filter(i => inRange(i, frame));
-  $('now').innerHTML = now.length ? '' : '<span class="clean">No intersection</span>';
-  now.forEach(i => { const t = document.createElement('span'); t.className = 'tag'; t.textContent = pairName(i); $('now').append(t); });
-  $('caption').className = 'caption' + (now.length ? ' bad' : '');
-  $('caption').innerHTML = now.length ? `<span class="bad">${now.map(pairName).join(' · ')}</span>` : '<span class="ok">No intersection on this frame</span>';
   drawTimeline();
   if (filter === 'now') renderList();
-  if (window.diag.onFrame) window.diag.onFrame(frame, now);
+  if (window.diag.onFrame) window.diag.onFrame(frame, R.issues.filter(i => inRange(i, frame)));
 }
 
 // Transport.
@@ -487,10 +840,13 @@ $('first').onclick = () => { stop(); setFrame(0); };
 $('last').onclick = () => { stop(); setFrame(N - 1); };
 $('frameField').onkeydown = e => { if (e.key === 'Enter') { stop(); setFrame(parseInt(e.target.value, 10) || 0); e.target.blur(); } };
 addEventListener('keydown', e => {
-  if (e.target.id === 'frameField') return;
+  if (e.target.closest && e.target.closest('input, textarea')) return;
   if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
   else if (e.key === 'ArrowLeft') { stop(); setFrame(frame - 1); }
   else if (e.key === 'ArrowRight') { stop(); setFrame(frame + 1); }
+  else if (e.key === 'i' || e.key === 'I') setIn();
+  else if (e.key === 'o' || e.key === 'O') setOut();
+  else if (e.key === 'Delete' && selectedNote >= 0) { e.preventDefault(); deleteSelected(); }
 });
 addEventListener('resize', drawTimeline);
 setPlayIcon();

@@ -109,7 +109,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `skeleton_motion.npz` — 3D human skeleton (24 SMPL joints, Y-up meters) + `foot_contact` (F, 4: left ankle, left foot, right ankle, right foot static probability from GVHMR; older runs read it from `cache/*/hmr4d_results.pt`)
 - `mixamo_rotations.npz` — per-bone animation rotations (quaternion wxyz; convention string inside)
 - `mixamo_character.glb` — skinned character + clip (glTF 2.0; Blender: File → Import → glTF 2.0)
-- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames counted from 0); summary also in `run.json`. Parts joined at a joint are not compared. No floor check. `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`. The report's 3D view keeps fixed floor markers on y=0 (0.5 m crosses, larger metre marks, green origin) so movement can be judged against the floor.
+- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames counted from 0); summary also in `run.json`. Parts joined at a joint are not compared. No floor check. `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`. The report's 3D view keeps fixed floor markers on y=0 (0.5 m crosses, larger metre marks, green origin) so movement can be judged against the floor. The amber lane above the intersection tracks stores notes made by eye, and the Notes list on the right shows them. **Download notes** saves those notes with the intersection list and the source video's path. The file is named after that video. Labels in the file are English; note text is kept as typed.
 - Video in: `videos/human_skeleton.mp4`, `videos/mixamo_skeleton.mp4`, `videos/mixamo_character.mp4`, `videos/compare.mp4` (2x2: original / mixamo skeleton / human skeleton / character)
 - Photo in: the same four views as PNG under `images/`, plus `images/before_after_360_compare.mp4` (left original / right 10° orbit of the rig)
 
@@ -123,7 +123,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `motion2mixamorig/mixamo/foot_lock.py` — pins planted feet (ball first, else heel) with two-bone leg IK, shifting the hips when a straight leg cannot reach; summary in `run.json` → `foot_lock`
 - `motion2mixamorig/mixamo/ground.py` — shifts the hips so the planted sole sits on y = 0; summary in `run.json` → `ground`
 - `motion2mixamorig/diagnose.py` — self-intersection check on the GLB -> `diagnostics.json`
-- `motion2mixamorig/diagnose_report.py` — `diagnostics.html` (`--visualize`)
+- `motion2mixamorig/diagnose_report.py` — `diagnostics.html` (`--visualize`); amber review lane and Download notes (`m2mr-review-v1`)
 - `motion2mixamorig/pipeline.py` — one run end to end
 - `motion2mixamorig/cli.py` — `m2mr doctor` / `m2mr run`
 - `blender_extension/motion2mixamorig_blender/` — Blender 4.2+ Extension (UI + external process)

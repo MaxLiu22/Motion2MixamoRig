@@ -55,7 +55,10 @@ Run this on a clean user state: move `~/Motion2MixamoRig` aside first
     stays under the current cell. **Open HTML Report** builds the report on the
     first click (Blender opened from the Dock, so the source video is embedded
     via Homebrew `ffmpeg`) and opens it at once on the second. The report's
-    3D view shows fixed 0.5 m floor crosses.
+    3D view shows fixed 0.5 m floor crosses. The amber lane above the
+    intersection tracks takes a dragged range or In / Out. The Notes list on
+    the right shows those notes, and **Download notes** saves them with the
+    intersection list.
 12. Start a second job and click **Cancel**. Only that job should stop.
 13. Disable and re-enable the add-on without a crash.
 
