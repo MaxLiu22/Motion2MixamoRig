@@ -4,8 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Self-intersection diagnostics: every `m2mr run` checks the finished `mixamo_character.glb` for one body part going into another and writes `diagnostics.json` (body-part pairs, frame ranges, worst frame, depth in cm) plus a one-line summary; the summary also goes into `run.json`. A failed check does not fail the run. `m2mr diagnose <run>` re-checks a run; `--visualize` also writes `diagnostics.html` with the source video beside the character, a timeline, and a clickable issue list; `--threshold-cm` sets the reporting depth (default 1 cm). Parts joined at a joint are not compared, and stretches of one pair at most 3 frames apart are reported as one range. The floor is not checked.
+- Blender add-on: a **Diagnostics** box under Progress shows the job's self-intersections as a 48-cell frame bar (red = intersecting; click a cell to go there), the parts intersecting on the current frame with their depth, and Previous / Next buttons that jump between problem ranges. **Open HTML Report** opens the interactive report in the browser; the first click builds it in the background (`m2mr diagnose --visualize`, about 15 s). Results generated before this version show a note to update the runtime and generate again.
+
 ### Fixed
 
+- Blender add-on: after import the timeline covers the clip as frames 0 to n-1 (was 1 to n), the frame numbers the glTF importer and `diagnostics.json` use.
+- Blender add-on: the external Python now finds Homebrew tools such as `ffmpeg` (`/opt/homebrew/bin`, `/usr/local/bin`) when Blender was opened from the Dock or Finder, whose PATH leaves them out. Before, the HTML report could not embed the source video.
 - A subject who turned away and back could stay facing away in the recovered 3D motion for the rest of the clip. The 2D left/right stabilizer decided "real turn or label flip" at the single transition frame (it required four consecutive side-view frames after the first turn) and never revisited the decision, so one mislabelled frame or one fast spin locked the wrong facing in. `motion2mixamorig/stabilize_kp2d.py` now cuts the clip into segments at side-view frames and takes the majority of RTMPose's labels inside each segment; only runs of the opposite sign shorter than ~0.33 s count as flips. No facial keypoints are used (hats and masks do not matter) and each person track is handled on its own. On a dance clip with a fast half-second turn, wrong-facing frames went from 320 of 642 to 3. Re-running on an existing cache re-stabilizes from the `vitpose_raw.pt` backup, not from the previous rule's output.
 
 ## [0.1.7] - 2026-10-17

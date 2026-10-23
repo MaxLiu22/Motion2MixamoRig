@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` with no path uses the file most recently added to `assets/image/`.
 
+### 6. Check for self-intersection
+
+Every run also checks the finished character for **self-intersection** — one body part going into another, like a hand inside the head — and writes `diagnostics.json`. The terminal prints one line, e.g. `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. The floor is not checked.
+
+To re-check a run, or to see the problems:
+
+```bash
+m2mr diagnose outputs/<run>                  # rewrite diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # also diagnostics.html: source video beside the character, timeline, clickable issue list
+m2mr diagnose outputs/<run> --threshold-cm 2 # report only penetrations deeper than 2 cm (default 1)
+```
+
+Each issue in `diagnostics.json` is a pair of body parts with the frame ranges where they intersect, the worst frame, and its depth. Frame numbers count from 0, as the Blender timeline does after a glTF import. Parts joined at a joint (upper arm and forearm, torso and thigh, …) are not compared: their skins overlap around the joint in any pose. `diagnostics.html` embeds the source video (needs `ffmpeg`) and loads three.js from a CDN, so its 3D view needs an internet connection.
+
 ## Outputs
 
-Each `m2mr run` creates a directory named by **the time the command started**. The four files at the root are the same for video and still; only the preview folder changes.
+Each `m2mr run` creates a directory named by **the time the command started**. The files at the root are the same for video and still; only the preview folder changes.
 
 ```
 outputs/20260829_193205_dance/          # or …_pose/ for a still
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # or …_pose/ for a still
 ├── skeleton_motion.npz                 # 3D human skeleton (reuse with --skeleton)
 ├── mixamo_rotations.npz                # per-bone Mixamo rotations
 ├── mixamo_character.glb                # skinned character, import into Blender / Unity
+├── diagnostics.json                    # self-intersection report (see Quick Start step 6)
+├── diagnostics.html                    # only after `m2mr diagnose <run> --visualize`
 └── videos/   or   images/              # previews — which one depends on the input
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # right: 10° orbit of the rig (one full turn)
 ```
 
-Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character mesh and use View → Frame Selected. The cluster of spheres on the head and hands is bone display, not the mesh: in the Outliner, hide **Icosphere** and the **armature**; leave the skinned mesh visible. Set scene FPS and the timeline end frame from `run.json` (`fps`, `n_frames`) so playback matches the source. Compare a video run against `videos/mixamo_character.mp4`, a still run against `images/mixamo_character.png` or the orbit clip.
+Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). If the camera is framed on empty space, select the character mesh and use View → Frame Selected. The cluster of spheres on the head and hands is bone display, not the mesh: in the Outliner, hide **Icosphere** and the **armature**; leave the skinned mesh visible. Set scene FPS from `run.json` (`fps`) and the timeline to frames 0 to `n_frames` − 1 so playback matches the source and frame numbers match `diagnostics.json`. Compare a video run against `videos/mixamo_character.mp4`, a still run against `images/mixamo_character.png` or the orbit clip.
 
 ## License
 

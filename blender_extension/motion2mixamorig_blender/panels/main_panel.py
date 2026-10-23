@@ -48,6 +48,8 @@ class M2MR_PT_main(Panel):
             self._draw_setup(layout, prefs, props, busy)
         self._draw_input(layout, prefs, props, busy)
         self._draw_progress(layout, props, busy)
+        if not busy and props.job_output_dir:
+            _draw_diagnostics(layout, context.scene)
 
     def _draw_setup(self, layout, prefs, props, busy: bool) -> None:
         box = layout.box()
@@ -170,6 +172,93 @@ class M2MR_PT_main(Panel):
             return
 
         box.label(text=t("no_job_yet"))
+
+
+_CELLS = 48
+
+
+def _draw_playhead(box, cells, now: int) -> None:
+    """Triangle under the bar cell that holds the current frame."""
+    # Same buttons as the bar so the cells line up. The icon has to be on a
+    # button too: an icon label keeps its full width and pushes the row right.
+    row = box.row(align=True)
+    row.scale_y = 0.6
+    for cell in cells:
+        here = cell.start <= now <= cell.end
+        slot = row.row(align=True)
+        slot.operator(
+            "m2mr.diag_jump", text="", icon="TRIA_UP" if here else "NONE", emboss=False
+        ).frame = cell.target
+
+
+def _draw_diagnostics(layout, scene) -> None:
+    """Frame bar of the job's self-intersections: red cells are frames to fix."""
+    from ..operators.diagnostics import pair_label
+    from ..services.diagnostics_reader import frame_cells, issues_at, load_diagnostics
+
+    report = load_diagnostics(scene.m2mr.job_output_dir)
+    box = layout.box()
+    box.label(text=t("section_diagnostics"))
+    if report is None:
+        box.label(text=t("diag_missing"), icon="INFO")
+        return
+    summary = report["summary"]["self_intersection"]
+    if not report["issues"]:
+        box.label(text=t("diag_clean", cm=f"{report['threshold_cm']:g}"), icon="CHECKMARK")
+        _draw_report_button(box, scene.m2mr.job_output_dir)
+        return
+    box.label(text=t("diag_summary", n=summary["issue_count"], cm=f"{summary['max_depth_cm']:g}"), icon="ERROR")
+
+    # Frame bar: one button per cell, red where any frame in it intersects.
+    # Click a cell to go there.
+    now = scene.frame_current
+    cells = frame_cells(report, _CELLS)
+    bar = box.row(align=True)
+    bar.scale_y = 1.5
+    for cell in cells:
+        slot = bar.row(align=True)
+        slot.alert = cell.hit
+        slot.operator("m2mr.diag_jump", text="", depress=cell.start <= now <= cell.end).frame = cell.target
+    _draw_playhead(box, cells, now)
+
+    n = int(report["frame_count"])
+    # Thirds of the bar width, so the middle tick sits at the centre.
+    axis = box.split(factor=1 / 3)
+    axis.scale_y = 0.6
+    axis.label(text="0")
+    rest = axis.split(factor=0.5)
+    for value, align in (((n - 1) // 2, "CENTER"), (n - 1, "RIGHT")):
+        c = rest.row()
+        c.alignment = align
+        c.label(text=str(value))
+
+    here = issues_at(report, now)
+    status = box.column(align=True)
+    if here:
+        status.alert = True
+        status.label(text=t("diag_frame_bad", f=now), icon="ERROR")
+        for issue in sorted(here, key=lambda i: -i["max_depth_cm"]):
+            status.label(text=f"    {pair_label(issue)}  {issue['max_depth_cm']:.1f} cm")
+    else:
+        status.label(text=t("diag_frame_ok", f=now), icon="CHECKMARK")
+    nav = box.row(align=True)
+    nav.operator("m2mr.diag_step", text=t("diag_prev"), icon="TRIA_LEFT").direction = -1
+    nav.operator("m2mr.diag_step", text=t("diag_next"), icon="TRIA_RIGHT").direction = 1
+    _draw_report_button(box, scene.m2mr.job_output_dir)
+
+
+def _draw_report_button(box, run_dir: str) -> None:
+    from ..operators.diagnostics import report_state
+
+    state = report_state(run_dir)
+    row = box.row()
+    if state == "building":
+        row.enabled = False
+        row.operator("m2mr.diag_report", text=t("diag_report_building"), icon="SORTTIME")
+        return
+    row.operator("m2mr.diag_report", text=t("diag_report"), icon="URL")
+    if state == "failed":
+        box.label(text=t("diag_report_failed"), icon="ERROR")
 
 
 def _first_run(prefs) -> bool:

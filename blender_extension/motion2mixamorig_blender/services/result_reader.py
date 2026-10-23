@@ -31,7 +31,11 @@ def resolve_run_path(run_dir: Path, value: object) -> Path | None:
 
 
 def blender_frame_settings(fps: float, n_frames: int) -> dict[str, float | int]:
-    """Map a fractional fps onto Blender's integer `fps` + `fps_base`."""
+    """Map a fractional fps onto Blender's integer `fps` + `fps_base`.
+
+    The glTF importer keys animation frame k at Blender frame k (time x fps),
+    so the clip spans frames 0 .. n-1; the timeline matches that exactly.
+    """
     rate = float(fps)
     frames = max(1, int(n_frames))
     if abs(rate - round(rate)) < 1e-6:
@@ -43,8 +47,8 @@ def blender_frame_settings(fps: float, n_frames: int) -> dict[str, float | int]:
     return {
         "fps": fps_int,
         "fps_base": float(fps_base),
-        "frame_start": 1,
-        "frame_end": frames,
+        "frame_start": 0,
+        "frame_end": frames - 1,
     }
 
 

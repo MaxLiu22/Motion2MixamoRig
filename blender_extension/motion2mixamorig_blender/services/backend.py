@@ -39,6 +39,18 @@ def build_doctor_argv(python: str | Path) -> list[str]:
     return [os.fspath(as_user_path(python)), "-m", "motion2mixamorig.cli", "doctor"]
 
 
+def build_diagnose_argv(python: str | Path, run_dir: str | Path) -> list[str]:
+    """`m2mr diagnose <run> --visualize`: rewrites diagnostics.json and writes diagnostics.html."""
+    return [
+        os.fspath(as_user_path(python)),
+        "-m",
+        "motion2mixamorig.cli",
+        "diagnose",
+        os.fspath(as_user_path(run_dir)),
+        "--visualize",
+    ]
+
+
 def build_run_argv(
     python: str | Path,
     *,
@@ -92,6 +104,9 @@ _BLENDER_ENV_DROP = (
 )
 
 
+_EXTRA_TOOL_DIRS = ("/opt/homebrew/bin", "/usr/local/bin") if sys.platform != "win32" else ()
+
+
 def subprocess_env(project_dir: str | Path) -> dict[str, str]:
     """Build an env for External Python that does not inherit Blender's interpreter."""
     env = os.environ.copy()
@@ -103,6 +118,14 @@ def subprocess_env(project_dir: str | Path) -> dict[str, str]:
             for part in env["PATH"].split(os.pathsep)
             if "Blender.app" not in part and "Blender/" not in part
         )
+    # Blender started from the Dock / Finder gets launchd's PATH
+    # (/usr/bin:/bin:/usr/sbin:/sbin), not the shell's, so Homebrew tools such
+    # as ffmpeg would be missing.
+    parts = [p for p in env.get("PATH", "").split(os.pathsep) if p]
+    for extra in _EXTRA_TOOL_DIRS:
+        if extra not in parts and os.path.isdir(extra):
+            parts.append(extra)
+    env["PATH"] = os.pathsep.join(parts)
     if "LD_LIBRARY_PATH" in env:
         env["LD_LIBRARY_PATH"] = os.pathsep.join(
             part

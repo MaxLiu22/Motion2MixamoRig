@@ -36,6 +36,7 @@ m2mr run --video assets/video/dance.mp4 --rig assets/mixamo/Vampire.fbx
 m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Y_Bot.fbx
 m2mr run --skeleton outputs/<run>/skeleton_motion.npz --rig ...   # reuse extraction, swap rig
 m2mr run --output-dir DIR --progress-jsonl FILE --no-preview      # Blender Extension / automation
+m2mr diagnose outputs/<run> [--visualize] [--threshold-cm N]      # re-check self-intersection -> diagnostics.json (+ .html)
 ```
 
 `--video` / `--image` and `--rig` combine freely (not `--video` with `--image`).
@@ -85,7 +86,10 @@ When helping a user:
 6. Jobs write `<project>/outputs/blender_jobs/<job-id>/`. After import, hide
    **Icosphere** and the **armature** in the Outliner; leave the
    **skinned_mesh_…** objects (one per FBX geometry) visible. FPS must match the source clip duration (a 60 fps video tagged as
-   30 fps plays at half speed).
+ 30 fps plays at half speed). The timeline runs 0..n-1, the frames
+ `diagnostics.json` uses; the **Diagnostics** box under Progress reads it
+ (frame bar, Previous / Next, **Open HTML Report** builds `diagnostics.html`
+ on first click).
 
 Smoke-test checklist: [`docs/blender-extension.md`](docs/blender-extension.md).
 
@@ -97,6 +101,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `skeleton_motion.npz` — 3D human skeleton (24 SMPL joints, Y-up meters)
 - `mixamo_rotations.npz` — per-bone animation rotations (quaternion wxyz; convention string inside)
 - `mixamo_character.glb` — skinned character + clip (glTF 2.0; Blender: File → Import → glTF 2.0)
+- `diagnostics.json` — self-intersection report on the GLB (body-part pairs, frame ranges, depth in cm; frames counted from 0); summary also in `run.json`. Parts joined at a joint are not compared. No floor check. `m2mr diagnose <run> [--visualize] [--threshold-cm N]` re-checks a run; `--visualize` adds `diagnostics.html`.
 - Video in: `videos/human_skeleton.mp4`, `videos/mixamo_skeleton.mp4`, `videos/mixamo_character.mp4`, `videos/compare.mp4` (2x2: original / mixamo skeleton / human skeleton / character)
 - Photo in: the same four views as PNG under `images/`, plus `images/before_after_360_compare.mp4` (left original / right 10° orbit of the rig)
 
@@ -105,6 +110,8 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 - `motion2mixamorig/paths.py` — all filesystem locations
 - `motion2mixamorig/extract.py` — video or still -> 3D human skeleton (GVHMR)
 - `motion2mixamorig/mixamo/` — FBX parsing, FK, retargeting, skinning, rendering
+- `motion2mixamorig/diagnose.py` — self-intersection check on the GLB -> `diagnostics.json`
+- `motion2mixamorig/diagnose_report.py` — `diagnostics.html` (`--visualize`)
 - `motion2mixamorig/pipeline.py` — one run end to end
 - `motion2mixamorig/cli.py` — `m2mr doctor` / `m2mr run`
 - `blender_extension/motion2mixamorig_blender/` — Blender 4.2+ Extension (UI + external process)

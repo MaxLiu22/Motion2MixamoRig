@@ -7,6 +7,7 @@ dependencies = [
     "numpy",
     "opencv-python",
     "einops",
+    "scipy",  # nearest-surface search in `m2mr diagnose` (also pulled in by gvhmr)
     # Video -> 3D human skeleton. `preproc` = person detection/tracking,
     # `rtmpose` = the ungated 2D-pose backend the pipeline uses.
     "gvhmr[preproc,rtmpose]>=1.6",

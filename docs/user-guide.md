@@ -127,6 +127,13 @@ shown next to the add-on in **Get Extensions**.
 - **Input**: what to animate.
 - **Progress / Result**: progress, recent log, and after a job
   **Import Generated Character**, **Open Output Folder**, **View Full Log**.
+- **Diagnostics**: where the character's body parts go into each other (a
+  hand inside the head, crossed arms). Red cells in the bar are frames with a
+  problem; click one to go there. The triangle under the bar follows the
+  current frame, and below it are the parts that intersect and how deep.
+  **Previous** / **Next** jump between problems. **Open HTML Report** opens a
+  report in your web browser with the source video beside the character (the
+  first time it takes about 15 seconds to build).
 
 The add-on speaks 18 languages. **Auto** follows Blender's language; change it
 in the Setup box under **UI Language**.

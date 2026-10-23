@@ -22,6 +22,7 @@ import numpy as np
 
 from . import paths
 from .errors import classify_error
+from .diagnose import DIAGNOSTICS_JSON, diagnose_run, summary_line
 from .human_motion import HumanMotion, load_human_motion
 from .mixamo.animation import build_animation
 from .mixamo.gltf import write_glb
@@ -179,6 +180,18 @@ def run_pipeline(
             "mixamo_rotations": rotations_npz.name,
             "mixamo_character_glb": glb_path.name,
         }
+
+        # Diagnostics are a report, not a product: a failure here must not fail the run.
+        print("diagnosing self-intersection")
+        diagnostics = None
+        try:
+            diag = diagnose_run(run_dir, verbose=False)
+            diagnostics = diag["summary"]
+            outputs["diagnostics"] = DIAGNOSTICS_JSON
+            print(summary_line(diag))
+        except Exception as exc:  # noqa: BLE001
+            print(f"diagnostics skipped: {exc}")
+
         if not no_preview:
             stage = "preview"
             writer.emit("preview", 0.90, "Rendering previews")
@@ -218,6 +231,7 @@ def run_pipeline(
             "rest_skin_error_cm": skin_err,
             "twist_events": len(anim.twist_events),
             "quat_sign_flips": len(anim.sign_events),
+            "diagnostics": diagnostics,
             "outputs": outputs,
         }
         write_run_json(run_dir, report)
