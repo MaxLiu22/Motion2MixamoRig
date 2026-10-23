@@ -128,6 +128,14 @@ Je geïnstalleerde versie staat naast de add-on in **Get Extensions**.
 - **Voortgang / Resultaat** (Progress / Result): voortgang, recent log en na een taak
   **Gegenereerd personage importeren** (Import Generated Character), **Uitvoermap openen** (Open Output Folder),
   **Volledig log bekijken** (View Full Log).
+- **Diagnose** (Diagnostics): plekken waar lichaamsdelen van het personage in
+  elkaar zitten (een hand in het hoofd, gekruiste armen). Rode cellen in de
+  balk zijn frames met een probleem; klik erop om erheen te gaan. Het
+  driehoekje onder de balk volgt het huidige frame, en daaronder staat welke
+  delen elkaar doorsnijden en hoe diep. **Vorige** / **Volgende** (Previous /
+  Next) springen tussen problemen. **HTML-rapport openen** (Open HTML Report)
+  opent in de webbrowser een rapport met de bronvideo naast het personage (de
+  eerste keer duurt het maken ongeveer 15 seconden).
 
 De add-on spreekt 18 talen. **Automatisch (Blender / Systeem)** (Auto) volgt de taal van Blender;
 je wijzigt dit in het vak Instellen onder **Interfacetaal** (UI Language).

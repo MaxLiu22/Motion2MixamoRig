@@ -126,6 +126,13 @@ hiển thị bên cạnh add-on trong **Get Extensions**.
 - **Tiến trình / Kết quả** (Progress / Result): tiến trình, nhật ký gần đây, và
   sau mỗi tác vụ là **Nhập nhân vật đã tạo** (Import Generated Character),
   **Mở thư mục đầu ra** (Open Output Folder), **Xem toàn bộ nhật ký** (View Full Log).
+- **Chẩn đoán** (Diagnostics): những chỗ các bộ phận cơ thể của nhân vật đâm
+  vào nhau (tay nằm trong đầu, hai tay khoanh lại). Ô đỏ trên thanh là khung
+  hình có vấn đề; bấm vào để nhảy tới đó. Tam giác dưới thanh đi theo khung
+  hình hiện tại, bên dưới là các bộ phận đang giao cắt và độ sâu. **Trước** /
+  **Tiếp** (Previous / Next) nhảy giữa các vấn đề. **Mở báo cáo HTML** (Open
+  HTML Report) mở trong trình duyệt một báo cáo có video nguồn bên cạnh nhân
+  vật (lần đầu mất khoảng 15 giây để tạo).
 
 Add-on hỗ trợ 18 ngôn ngữ. **Tự động (theo Blender / hệ thống)** (Auto (Blender / System))
 đi theo ngôn ngữ của Blender; bạn có thể đổi trong khung **Thiết lập**, tại

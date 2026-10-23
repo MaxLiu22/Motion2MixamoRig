@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 パスなしの `--image` は、`assets/image/` に最後に入れたファイルを使います。
 
+### 6. 自己交差（めり込み）をチェック
+
+各実行では、完成したキャラクターの**自己交差**（ある体の部位が別の部位にめり込むこと。例：手が頭に入り込む）もチェックし、`diagnostics.json` を書き出します。ターミナルには `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm` のような 1 行が表示されます。床とのめり込みはチェックしません。
+
+実行を再チェックする、または問題を目で確認するには：
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json を書き直す
+m2mr diagnose outputs/<run> --visualize      # diagnostics.html も出力：元動画とキャラクターを並べて表示、タイムライン、クリックできる問題一覧
+m2mr diagnose outputs/<run> --threshold-cm 2 # 2 cm より深いめり込みだけを報告（既定 1）
+```
+
+`diagnostics.json` の各問題は体の部位のペアで、交差しているフレーム範囲、最もひどいフレームとその深さを含みます。フレーム番号は glTF を Blender にインポートしたときのタイムラインと同じく 0 から数えます。関節でつながった部位（上腕と前腕、胴体と太ももなど）は比較しません。どんなポーズでも関節まわりで皮膚が重なるためです。`diagnostics.html` は元動画を埋め込み（`ffmpeg` が必要）、three.js を CDN から読み込むため、3D ビューにはインターネット接続が必要です。
+
 ## 出力
 
-各 `m2mr run` は**コマンド開始時刻**でディレクトリを作ります。ルートの 4 ファイルは動画も写真も同じで、プレビューフォルダだけが変わります。
+各 `m2mr run` は**コマンド開始時刻**でディレクトリを作ります。ルートのファイルは動画も写真も同じで、プレビューフォルダだけが変わります。
 
 ```
 outputs/20260829_193205_dance/          # 写真実行は …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # 写真実行は …_pose/
 ├── skeleton_motion.npz                 # 人体 3D スケルトン（--skeleton で再利用）
 ├── mixamo_rotations.npz                # Mixamo ボーンごとの回転
 ├── mixamo_character.glb                # スキン付きキャラクター、Blender / Unity にインポート
+├── diagnostics.json                    # 自己交差レポート（クイックスタートの手順 6 を参照）
+├── diagnostics.html                    # `m2mr diagnose <run> --visualize` の実行後のみ
 └── videos/   または   images/          # プレビュー — 入力によって決まる
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # 右：10° で一周する周回
 ```
 
-`mixamo_character.glb` は Blender で File → Import → glTF 2.0 (.glb/.gltf) で開きます。カメラが空を向いているときはキャラクターのメッシュを選び、View → Frame Selected。頭と手の球の塊はメッシュではなくボーン表示です。Outliner で **Icosphere** と **armature** を非表示にし、スキン付きメッシュは残してください。再生を原寸に合わせるには、`run.json` の `fps` / `n_frames` でシーンの FPS とタイムライン終了フレームを設定します。動画実行は `videos/mixamo_character.mp4`、写真実行は `images/mixamo_character.png` または周回クリップと見比べてください。
+`mixamo_character.glb` は Blender で File → Import → glTF 2.0 (.glb/.gltf) で開きます。カメラが空を向いているときはキャラクターのメッシュを選び、View → Frame Selected。頭と手の球の塊はメッシュではなくボーン表示です。Outliner で **Icosphere** と **armature** を非表示にし、スキン付きメッシュは残してください。再生を元の長さに合わせ、フレーム番号を `diagnostics.json` とそろえるには、シーンの FPS を `run.json` の `fps` に、タイムラインを 0 〜 `n_frames` − 1 フレームに設定します。動画実行は `videos/mixamo_character.mp4`、写真実行は `images/mixamo_character.png` または周回クリップと見比べてください。
 
 ## ライセンス
 
@@ -190,3 +206,13 @@ images/
 
 ご不明点がある場合、ローカル環境の構築でお手伝いが必要な場合、または協業をご相談したい場合は、メールでご連絡ください：
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

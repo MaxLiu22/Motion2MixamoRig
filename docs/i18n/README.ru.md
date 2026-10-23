@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` без пути берёт файл, последним положенный в `assets/image/`.
 
+### 6. Проверка самопересечений
+
+Каждый запуск также проверяет готового персонажа на **самопересечения** — когда одна часть тела входит в другую, например рука в голову, — и записывает `diagnostics.json`. В терминал выводится одна строка, например `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Пол не проверяется.
+
+Чтобы перепроверить запуск или посмотреть на проблемы:
+
+```bash
+m2mr diagnose outputs/<run>                  # перезаписать diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # плюс diagnostics.html: исходное видео рядом с персонажем, таймлайн, кликабельный список проблем
+m2mr diagnose outputs/<run> --threshold-cm 2 # сообщать только о проникновениях глубже 2 см (по умолчанию 1)
+```
+
+Каждая проблема в `diagnostics.json` — это пара частей тела с диапазонами кадров, где они пересекаются, худшим кадром и его глубиной. Кадры нумеруются с 0, как на таймлайне Blender после импорта glTF. Части, соединённые суставом (плечо и предплечье, торс и бедро, …), не сравниваются: их кожа у сустава перекрывается в любой позе. `diagnostics.html` встраивает исходное видео (нужен `ffmpeg`) и загружает three.js с CDN, поэтому для 3D-вида нужен интернет.
+
 ## Результаты
 
-Каждый `m2mr run` создаёт каталог по **времени старта команды**. Четыре файла в корне одинаковы для видео и фото; меняется только папка превью.
+Каждый `m2mr run` создаёт каталог по **времени старта команды**. Файлы в корне одинаковы для видео и фото; меняется только папка превью.
 
 ```
 outputs/20260829_193205_dance/          # для фото: …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # для фото: …_pose/
 ├── skeleton_motion.npz                 # 3D-скелет человека (повторно с --skeleton)
 ├── mixamo_rotations.npz                # вращения костей Mixamo
 ├── mixamo_character.glb                # персонаж со скином, импорт в Blender / Unity
+├── diagnostics.json                    # отчёт о самопересечениях (см. шаг 6 «Быстрого старта»)
+├── diagnostics.html                    # только после `m2mr diagnose <run> --visualize`
 └── videos/   или   images/             # превью — зависит от входа
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # справа: орбита 10° вокруг рига (полный оборот)
 ```
 
-`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите меш персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: в Outliner спрячьте **Icosphere** и **armature**, оставьте видимым меш со скином. FPS сцены и конечный кадр таймлайна возьмите из `run.json` (`fps`, `n_frames`), чтобы длительность совпала с исходником. Видео-запуск сверяйте с `videos/mixamo_character.mp4`, фото-запуск — с `images/mixamo_character.png` или клипом орбиты.
+`mixamo_character.glb` в Blender: File → Import → glTF 2.0 (.glb/.gltf). Если камера смотрит в пустоту, выберите меш персонажа и View → Frame Selected. Скопление сфер на голове и руках — отображение костей, не меш: в Outliner спрячьте **Icosphere** и **armature**, оставьте видимым меш со скином. FPS сцены возьмите из `run.json` (`fps`), а таймлайн задайте с кадра 0 по `n_frames` − 1, чтобы длительность совпала с исходником, а номера кадров — с `diagnostics.json`. Видео-запуск сверяйте с `videos/mixamo_character.mp4`, фото-запуск — с `images/mixamo_character.png` или клипом орбиты.
 
 ## Лицензия
 
@@ -190,3 +206,13 @@ images/
 
 Если возникла проблема, нужна помощь с локальной установкой или вы хотите обсудить сотрудничество, напишите на:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

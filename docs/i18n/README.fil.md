@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 Kapag walang path ang `--image`, ang file na pinakahuling idinagdag sa `assets/image/` ang gagamitin.
 
+### 6. Suriin ang self-intersection
+
+Sinusuri rin ng bawat run ang natapos na character para sa **self-intersection** — isang bahagi ng katawan na pumapasok sa isa pa, gaya ng kamay sa loob ng ulo — at isinusulat ang `diagnostics.json`. Nagpi-print ang terminal ng isang linya, hal. `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Hindi sinusuri ang sahig.
+
+Para suriin muli ang isang run, o para makita ang mga problema:
+
+```bash
+m2mr diagnose outputs/<run>                  # isulat muli ang diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # pati diagnostics.html: source video katabi ng character, timeline, listahan ng problema na puwedeng i-click
+m2mr diagnose outputs/<run> --threshold-cm 2 # iulat lang ang pagpasok na mas malalim sa 2 cm (default 1)
+```
+
+Ang bawat problema sa `diagnostics.json` ay isang pares ng bahagi ng katawan, kasama ang mga frame range kung saan sila nagsasalubong, ang pinakamalalang frame, at ang lalim nito. Nagsisimula sa 0 ang bilang ng frame, gaya ng timeline ng Blender pagkatapos mag-import ng glTF. Hindi pinaghahambing ang mga bahaging pinagdugtong ng kasukasuan (upper arm at forearm, torso at hita, …): nagpapatong ang balat nila sa paligid ng kasukasuan sa anumang pose. Ini-embed ng `diagnostics.html` ang source video (kailangan ng `ffmpeg`) at nilo-load ang three.js mula sa CDN, kaya kailangan ng internet ang 3D view nito.
+
 ## Mga Output
 
-Bawat `m2mr run` ay gumagawa ng directory na pinangalanan ayon sa **oras ng pagsisimula ng command**. Pareho para sa video at still ang apat na file sa root; ang preview folder lang ang nagbabago.
+Bawat `m2mr run` ay gumagawa ng directory na pinangalanan ayon sa **oras ng pagsisimula ng command**. Pareho para sa video at still ang mga file sa root; ang preview folder lang ang nagbabago.
 
 ```
 outputs/20260829_193205_dance/          # o …_pose/ para sa still
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # o …_pose/ para sa still
 ├── skeleton_motion.npz                 # 3D skeleton ng tao (gamitin muli sa --skeleton)
 ├── mixamo_rotations.npz                # Mixamo rotation ng bawat buto
 ├── mixamo_character.glb                # skinned na character, i-import sa Blender / Unity
+├── diagnostics.json                    # ulat ng self-intersection (tingnan ang hakbang 6 ng Mabilis na Pagsisimula)
+├── diagnostics.html                    # pagkatapos lang ng `m2mr diagnose <run> --visualize`
 └── videos/   o   images/               # mga preview — depende sa input
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # kanan: 10° na orbit ng rig (isang buong ikot)
 ```
 
-Buksan ang `mixamo_character.glb` sa Blender: File → Import → glTF 2.0 (.glb/.gltf). Kung nakatutok ang camera sa bakanteng espasyo, piliin ang character mesh at gamitin ang View → Frame Selected. Ang kumpol ng mga sphere sa ulo at mga kamay ay display ng buto, hindi ang mesh: sa Outliner, itago ang **Icosphere** at ang **armature**; hayaang nakikita ang skinned na mesh. Itakda ang FPS ng scene at ang huling frame ng timeline mula sa `run.json` (`fps`, `n_frames`) para tumugma ang playback sa source. Ikumpara ang video run sa `videos/mixamo_character.mp4`, at ang still run sa `images/mixamo_character.png` o sa orbit clip.
+Buksan ang `mixamo_character.glb` sa Blender: File → Import → glTF 2.0 (.glb/.gltf). Kung nakatutok ang camera sa bakanteng espasyo, piliin ang character mesh at gamitin ang View → Frame Selected. Ang kumpol ng mga sphere sa ulo at mga kamay ay display ng buto, hindi ang mesh: sa Outliner, itago ang **Icosphere** at ang **armature**; hayaang nakikita ang skinned na mesh. Itakda ang FPS ng scene mula sa `run.json` (`fps`) at ang timeline sa mga frame 0 hanggang `n_frames` − 1 para tumugma ang playback sa source at ang mga numero ng frame sa `diagnostics.json`. Ikumpara ang video run sa `videos/mixamo_character.mp4`, at ang still run sa `images/mixamo_character.png` o sa orbit clip.
 
 ## Lisensya
 
@@ -190,3 +206,13 @@ Apache-2.0 ang code ng repository na ito. May sariling mga tuntunin ang mga asse
 
 Kung may problema ka, kailangan mo ng tulong para matapos ang local setup, o gusto mong pag-usapan ang pakikipagtulungan, mag-email sa:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

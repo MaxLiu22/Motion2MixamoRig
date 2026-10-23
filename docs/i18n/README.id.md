@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` tanpa path akan memakai file yang paling terakhir ditambahkan ke `assets/image/`.
 
+### 6. Periksa self-intersection
+
+Setiap run juga memeriksa karakter yang sudah jadi untuk **self-intersection** — satu bagian tubuh masuk ke bagian lain, misalnya tangan di dalam kepala — dan menulis `diagnostics.json`. Terminal mencetak satu baris, misalnya `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Lantai tidak diperiksa.
+
+Untuk memeriksa ulang sebuah run, atau melihat masalahnya:
+
+```bash
+m2mr diagnose outputs/<run>                  # tulis ulang diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # juga diagnostics.html: video sumber di samping karakter, timeline, daftar masalah yang bisa diklik
+m2mr diagnose outputs/<run> --threshold-cm 2 # laporkan hanya tembusan yang lebih dalam dari 2 cm (default 1)
+```
+
+Setiap masalah di `diagnostics.json` adalah sepasang bagian tubuh beserta rentang frame saat keduanya saling tembus, frame terparah, dan kedalamannya. Nomor frame dihitung dari 0, sama seperti timeline Blender setelah impor glTF. Bagian yang tersambung oleh sendi (lengan atas dan lengan bawah, torso dan paha, …) tidak dibandingkan: kulitnya tumpang tindih di sekitar sendi dalam pose apa pun. `diagnostics.html` menyematkan video sumber (perlu `ffmpeg`) dan memuat three.js dari CDN, jadi tampilan 3D-nya perlu koneksi internet.
+
 ## Keluaran
 
-Setiap `m2mr run` membuat direktori yang dinamai berdasarkan **waktu perintah dimulai**. Empat file di root sama untuk video dan foto; hanya folder pratinjaunya yang berbeda.
+Setiap `m2mr run` membuat direktori yang dinamai berdasarkan **waktu perintah dimulai**. File di root sama untuk video dan foto; hanya folder pratinjaunya yang berbeda.
 
 ```
 outputs/20260829_193205_dance/          # atau …_pose/ untuk foto
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # atau …_pose/ untuk foto
 ├── skeleton_motion.npz                 # skeleton manusia 3D (pakai ulang dengan --skeleton)
 ├── mixamo_rotations.npz                # rotasi Mixamo per tulang
 ├── mixamo_character.glb                # karakter yang sudah di-skin, impor ke Blender / Unity
+├── diagnostics.json                    # laporan self-intersection (lihat Mulai Cepat langkah 6)
+├── diagnostics.html                    # hanya setelah `m2mr diagnose <run> --visualize`
 └── videos/   atau   images/            # pratinjau — tergantung input
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # kanan: orbit rig per 10° (satu putaran penuh)
 ```
 
-Buka `mixamo_character.glb` di Blender: File → Import → glTF 2.0 (.glb/.gltf). Jika kamera mengarah ke ruang kosong, pilih mesh karakter lalu gunakan View → Frame Selected. Kumpulan bola di kepala dan tangan adalah tampilan tulang, bukan mesh: di Outliner, sembunyikan **Icosphere** dan **armature**; biarkan mesh yang sudah di-skin tetap terlihat. Atur FPS scene dan frame terakhir timeline sesuai `run.json` (`fps`, `n_frames`) agar pemutaran sesuai dengan sumbernya. Bandingkan run video dengan `videos/mixamo_character.mp4`, dan run foto dengan `images/mixamo_character.png` atau klip orbit.
+Buka `mixamo_character.glb` di Blender: File → Import → glTF 2.0 (.glb/.gltf). Jika kamera mengarah ke ruang kosong, pilih mesh karakter lalu gunakan View → Frame Selected. Kumpulan bola di kepala dan tangan adalah tampilan tulang, bukan mesh: di Outliner, sembunyikan **Icosphere** dan **armature**; biarkan mesh yang sudah di-skin tetap terlihat. Atur FPS scene sesuai `run.json` (`fps`) dan timeline ke frame 0 sampai `n_frames` − 1 agar pemutaran sesuai dengan sumbernya dan nomor frame cocok dengan `diagnostics.json`. Bandingkan run video dengan `videos/mixamo_character.mp4`, dan run foto dengan `images/mixamo_character.png` atau klip orbit.
 
 ## Lisensi
 
@@ -190,3 +206,13 @@ Kode di repositori ini berlisensi Apache-2.0. Aset yang kamu unduh sendiri memil
 
 Jika kamu mengalami masalah, butuh bantuan menyelesaikan instalasi lokal, atau ingin membicarakan kerja sama, kirim email ke:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

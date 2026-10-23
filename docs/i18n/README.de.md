@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` ohne Pfad nimmt die zuletzt nach `assets/image/` gelegte Datei.
 
+### 6. Auf Selbstdurchdringung prüfen
+
+Jeder Lauf prüft den fertigen Charakter außerdem auf **Selbstdurchdringung** — ein Körperteil dringt in ein anderes ein, etwa eine Hand in den Kopf — und schreibt `diagnostics.json`. Das Terminal gibt eine Zeile aus, z. B. `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Der Boden wird nicht geprüft.
+
+Um einen Lauf erneut zu prüfen oder die Probleme anzusehen:
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json neu schreiben
+m2mr diagnose outputs/<run> --visualize      # zusätzlich diagnostics.html: Quellvideo neben dem Charakter, Timeline, anklickbare Problemliste
+m2mr diagnose outputs/<run> --threshold-cm 2 # nur Durchdringungen tiefer als 2 cm melden (Standard 1)
+```
+
+Jedes Problem in `diagnostics.json` ist ein Paar von Körperteilen mit den Frame-Bereichen, in denen sie sich durchdringen, dem schlimmsten Frame und dessen Tiefe. Frame-Nummern zählen ab 0, wie die Blender-Timeline nach einem glTF-Import. Durch ein Gelenk verbundene Teile (Ober- und Unterarm, Rumpf und Oberschenkel, …) werden nicht verglichen: Ihre Haut überlappt am Gelenk in jeder Pose. `diagnostics.html` bettet das Quellvideo ein (braucht `ffmpeg`) und lädt three.js von einem CDN, daher braucht die 3D-Ansicht eine Internetverbindung.
+
 ## Ausgaben
 
-Jeder `m2mr run` legt ein Verzeichnis an, benannt nach **Startzeit des Befehls**. Die vier Dateien im Wurzelverzeichnis sind für Video und Foto gleich; nur der Vorschauordner ändert sich.
+Jeder `m2mr run` legt ein Verzeichnis an, benannt nach **Startzeit des Befehls**. Die Dateien im Wurzelverzeichnis sind für Video und Foto gleich; nur der Vorschauordner ändert sich.
 
 ```
 outputs/20260829_193205_dance/          # Foto-Lauf: …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # Foto-Lauf: …_pose/
 ├── skeleton_motion.npz                 # 3D-Körperskelett (mit --skeleton wiederverwenden)
 ├── mixamo_rotations.npz                # Mixamo-Rotationen pro Bone
 ├── mixamo_character.glb                # Charakter mit Skinning, Import in Blender / Unity
+├── diagnostics.json                    # Bericht zur Selbstdurchdringung (siehe Schnellstart, Schritt 6)
+├── diagnostics.html                    # nur nach `m2mr diagnose <run> --visualize`
 └── videos/   oder   images/            # Vorschauen — je nach Eingabe
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # rechts: 10°-Orbit um den Rig (eine volle Umdrehung)
 ```
 
-`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, das Charakter-Mesh wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: im Outliner **Icosphere** und die **Armature** ausblenden, das Mesh mit Skinning sichtbar lassen. Szene-FPS und letztes Timeline-Frame aus `run.json` (`fps`, `n_frames`) setzen, damit die Wiedergabe zur Quelle passt. Videolauf mit `videos/mixamo_character.mp4` vergleichen, Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip.
+`mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, das Charakter-Mesh wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: im Outliner **Icosphere** und die **Armature** ausblenden, das Mesh mit Skinning sichtbar lassen. Szene-FPS aus `run.json` (`fps`) und die Timeline auf die Frames 0 bis `n_frames` − 1 setzen, damit die Wiedergabe zur Quelle passt und die Frame-Nummern zu `diagnostics.json`. Videolauf mit `videos/mixamo_character.mp4` vergleichen, Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip.
 
 ## Lizenz
 
@@ -190,3 +206,13 @@ Der Code dieses Repositories ist Apache-2.0. Die selbst beschafften Assets haben
 
 Bei Problemen, wenn Hilfe beim lokalen Setup nötig ist oder Sie über eine Zusammenarbeit sprechen möchten, schreiben Sie an:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

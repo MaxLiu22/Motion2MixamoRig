@@ -123,6 +123,7 @@ SMPL-X 是外掛需要的一個免費人體模型。它的授權不允許我們�
 - **進度 / 結果**（Progress / Result）：進度、最近的記錄；工作完成後還有
   **匯入產生的角色**（Import Generated Character）、**開啟輸出資料夾**（Open Output Folder）、
   **檢視完整記錄**（View Full Log）。
+- **診斷**（Diagnostics）：角色身體部位互相穿插的地方（例如手穿進頭裡、雙臂交叉時穿進去）。條上的紅格是有問題的影格，點一下就會跳過去。條下方的三角形跟著目前影格移動，再下方列出這一格有哪些部位穿插、深度多少。**上一個問題** / **下一個問題**（Previous / Next）可在問題之間跳轉。**開啟 HTML 報告**（Open HTML Report）會在瀏覽器中開啟報告，原始影片與角色並排顯示（第一次需要產生，大約 15 秒）。
 
 外掛支援 18 種語言。**自動（跟隨 Blender / 系統）**（Auto (Blender / System)）會跟隨
 Blender 的語言；可以在設定區塊的 **介面語言**（UI Language）中變更。

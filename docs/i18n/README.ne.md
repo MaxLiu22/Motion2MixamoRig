@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 path बिनाको `--image` ले `assets/image/` मा सबैभन्दा पछि थपिएको फाइल प्रयोग गर्छ।
 
+### 6. self-intersection जाँच गर्नुहोस्
+
+हरेक run ले तयार भएको क्यारेक्टरमा **self-intersection** पनि जाँच्छ — शरीरको एउटा भाग अर्को भागभित्र पस्नु, जस्तै हात टाउकोभित्र — र `diagnostics.json` लेख्छ। टर्मिनलले एउटा लाइन देखाउँछ, जस्तै `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`। भुइँ जाँच गरिँदैन।
+
+कुनै run फेरि जाँच्न, वा समस्याहरू हेर्न:
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json फेरि लेख्छ
+m2mr diagnose outputs/<run> --visualize      # diagnostics.html पनि: क्यारेक्टरसँगै स्रोत भिडियो, timeline, क्लिक गर्न मिल्ने समस्या सूची
+m2mr diagnose outputs/<run> --threshold-cm 2 # 2 cm भन्दा गहिरो पसाइ मात्र रिपोर्ट गर्छ (पूर्वनिर्धारित 1)
+```
+
+`diagnostics.json` मा हरेक समस्या शरीरका दुई भागको जोडी हो, साथमा ती भाग एकअर्कामा पसेका frame दायरा, सबैभन्दा खराब frame र त्यसको गहिराइ हुन्छ। frame नम्बर 0 बाट गनिन्छ, glTF import पछि Blender को timeline जस्तै। जोर्नीले जोडिएका भागहरू (पाखुराको माथिल्लो र तल्लो भाग, धड र तिघ्रा, …) तुलना गरिँदैनन्: जुनसुकै पोजमा पनि जोर्नी वरिपरि तिनको छाला खप्टिन्छ। `diagnostics.html` ले स्रोत भिडियो embed गर्छ (`ffmpeg` चाहिन्छ) र three.js CDN बाट लोड गर्छ, त्यसैले यसको 3D दृश्यलाई इन्टरनेट जडान चाहिन्छ।
+
 ## आउटपुट
 
-हरेक `m2mr run` ले **कमान्ड सुरु भएको समय** अनुसार नाम दिइएको डाइरेक्टरी बनाउँछ। root मा रहेका चारवटा फाइल भिडियो र फोटो दुवैका लागि उस्तै हुन्छन्; प्रिभ्यु फोल्डर मात्र फरक हुन्छ।
+हरेक `m2mr run` ले **कमान्ड सुरु भएको समय** अनुसार नाम दिइएको डाइरेक्टरी बनाउँछ। root मा रहेका फाइलहरू भिडियो र फोटो दुवैका लागि उस्तै हुन्छन्; प्रिभ्यु फोल्डर मात्र फरक हुन्छ।
 
 ```
 outputs/20260829_193205_dance/          # फोटोका लागि …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # फोटोका लागि …_po
 ├── skeleton_motion.npz                 # मानिसको 3D skeleton (--skeleton सँग पुनः प्रयोग गर्नुहोस्)
 ├── mixamo_rotations.npz                # हड्डी अनुसार Mixamo rotation
 ├── mixamo_character.glb                # skin गरिएको क्यारेक्टर, Blender / Unity मा import गर्नुहोस्
+├── diagnostics.json                    # self-intersection रिपोर्ट (छिटो सुरुवातको चरण 6 हेर्नुहोस्)
+├── diagnostics.html                    # `m2mr diagnose <run> --visualize` पछि मात्र
 └── videos/   वा   images/              # प्रिभ्यु — इनपुटमा भर पर्छ
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # दायाँ: rig वरिपरि 10° का दरले orbit (एक पूरा फन्को)
 ```
 
-`mixamo_character.glb` लाई Blender मा खोल्नुहोस्: File → Import → glTF 2.0 (.glb/.gltf)। क्यामेरा खाली ठाउँतिर फर्केको छ भने क्यारेक्टरको mesh छानेर View → Frame Selected प्रयोग गर्नुहोस्। टाउको र हातमा देखिने गोलाहरूको झुप्पा हड्डीको display हो, mesh होइन: Outliner मा **Icosphere** र **armature** लुकाउनुहोस्; skin गरिएको mesh देखिने नै राख्नुहोस्। playback स्रोतसँग मिलोस् भनेर scene को FPS र timeline को अन्तिम frame `run.json` (`fps`, `n_frames`) अनुसार सेट गर्नुहोस्। भिडियो run लाई `videos/mixamo_character.mp4` सँग, र फोटो run लाई `images/mixamo_character.png` वा orbit क्लिपसँग तुलना गर्नुहोस्।
+`mixamo_character.glb` लाई Blender मा खोल्नुहोस्: File → Import → glTF 2.0 (.glb/.gltf)। क्यामेरा खाली ठाउँतिर फर्केको छ भने क्यारेक्टरको mesh छानेर View → Frame Selected प्रयोग गर्नुहोस्। टाउको र हातमा देखिने गोलाहरूको झुप्पा हड्डीको display हो, mesh होइन: Outliner मा **Icosphere** र **armature** लुकाउनुहोस्; skin गरिएको mesh देखिने नै राख्नुहोस्। playback स्रोतसँग र frame नम्बर `diagnostics.json` सँग मिलोस् भनेर scene को FPS `run.json` (`fps`) अनुसार र timeline लाई frame 0 देखि `n_frames` − 1 सम्म सेट गर्नुहोस्। भिडियो run लाई `videos/mixamo_character.mp4` सँग, र फोटो run लाई `images/mixamo_character.png` वा orbit क्लिपसँग तुलना गर्नुहोस्।
 
 ## लाइसेन्स
 
@@ -190,3 +206,13 @@ images/
 
 कुनै समस्या आएमा, स्थानीय सेटअप पूरा गर्न सहयोग चाहिएमा, वा सहकार्यबारे कुरा गर्न चाहनुहुन्छ भने यो ठेगानामा इमेल गर्नुहोस्:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

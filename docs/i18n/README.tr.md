@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 Yol verilmeden kullanılan `--image`, `assets/image/` içine en son eklenen dosyayı kullanır.
 
+### 6. Kendi içine geçmeyi kontrol edin
+
+Her çalıştırma, bitmiş karakterde **kendi içine geçme** olup olmadığını da kontrol eder — bir vücut parçasının diğerinin içine girmesi, örneğin elin başın içine girmesi — ve `diagnostics.json` yazar. Terminal tek bir satır yazdırır, örn. `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Zemin kontrol edilmez.
+
+Bir çalıştırmayı yeniden kontrol etmek veya sorunları görmek için:
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json'u yeniden yazar
+m2mr diagnose outputs/<run> --visualize      # ayrıca diagnostics.html: karakterin yanında kaynak video, timeline, tıklanabilir sorun listesi
+m2mr diagnose outputs/<run> --threshold-cm 2 # yalnızca 2 cm'den derin geçmeleri raporlar (varsayılan 1)
+```
+
+`diagnostics.json` içindeki her sorun bir vücut parçası çiftidir; iç içe geçtikleri kare aralıklarını, en kötü kareyi ve onun derinliğini içerir. Kare numaraları, glTF içe aktarımından sonraki Blender timeline'ı gibi 0'dan başlar. Bir eklemle bağlı parçalar (üst kol ve ön kol, gövde ve uyluk, …) karşılaştırılmaz: derileri her pozda eklem çevresinde üst üste biner. `diagnostics.html` kaynak videoyu gömer (`ffmpeg` gerekir) ve three.js'i bir CDN'den yükler; bu yüzden 3D görünümü internet bağlantısı ister.
+
 ## Çıktılar
 
-Her `m2mr run`, **komutun başladığı zamana** göre adlandırılmış bir dizin oluşturur. Kök dizindeki dört dosya video ve fotoğraf için aynıdır; yalnızca önizleme klasörü değişir.
+Her `m2mr run`, **komutun başladığı zamana** göre adlandırılmış bir dizin oluşturur. Kök dizindeki dosyalar video ve fotoğraf için aynıdır; yalnızca önizleme klasörü değişir.
 
 ```
 outputs/20260829_193205_dance/          # fotoğraf için …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # fotoğraf için …_pose/
 ├── skeleton_motion.npz                 # 3D insan iskeleti (--skeleton ile yeniden kullanın)
 ├── mixamo_rotations.npz                # kemik başına Mixamo rotasyonları
 ├── mixamo_character.glb                # skin'lenmiş karakter, Blender / Unity'ye aktarın
+├── diagnostics.json                    # kendi içine geçme raporu (Hızlı Başlangıç adım 6'ya bakın)
+├── diagnostics.html                    # yalnızca `m2mr diagnose <run> --visualize` sonrasında
 └── videos/   veya   images/            # önizlemeler — girdiye göre
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # sağ: rig etrafında 10°'lik adımlarla yörünge (tam bir tur)
 ```
 
-`mixamo_character.glb` dosyasını Blender'da açın: File → Import → glTF 2.0 (.glb/.gltf). Kamera boş bir alana bakıyorsa karakter mesh'ini seçip View → Frame Selected kullanın. Baş ve ellerdeki küre kümesi kemik gösterimidir, mesh değildir: Outliner'da **Icosphere** ve **armature**'ü gizleyin; skin'lenmiş mesh'i görünür bırakın. Oynatmanın kaynakla eşleşmesi için sahnenin FPS'ini ve timeline'ın son karesini `run.json` (`fps`, `n_frames`) değerlerine göre ayarlayın. Bir video çalıştırmasını `videos/mixamo_character.mp4` ile, bir fotoğraf çalıştırmasını `images/mixamo_character.png` ya da yörünge klibiyle karşılaştırın.
+`mixamo_character.glb` dosyasını Blender'da açın: File → Import → glTF 2.0 (.glb/.gltf). Kamera boş bir alana bakıyorsa karakter mesh'ini seçip View → Frame Selected kullanın. Baş ve ellerdeki küre kümesi kemik gösterimidir, mesh değildir: Outliner'da **Icosphere** ve **armature**'ü gizleyin; skin'lenmiş mesh'i görünür bırakın. Oynatmanın kaynakla, kare numaralarının da `diagnostics.json` ile eşleşmesi için sahnenin FPS'ini `run.json` (`fps`) değerine, timeline'ı da 0 ile `n_frames` − 1 arasındaki karelere ayarlayın. Bir video çalıştırmasını `videos/mixamo_character.mp4` ile, bir fotoğraf çalıştırmasını `images/mixamo_character.png` ya da yörünge klibiyle karşılaştırın.
 
 ## Lisans
 
@@ -190,3 +206,13 @@ Bu deponun kodu Apache-2.0 lisanslıdır. Kendi indirdiğiniz varlıkların kend
 
 Bir sorunla karşılaşırsanız, yerel kurulumu tamamlamak için yardıma ihtiyacınız olursa ya da iş birliği hakkında konuşmak isterseniz şu adrese e-posta gönderin:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

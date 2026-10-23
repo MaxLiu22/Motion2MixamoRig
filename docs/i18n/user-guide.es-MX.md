@@ -130,6 +130,14 @@ instalada aparece junto al complemento en **Get Extensions**.
 - **Progreso / Resultado** (Progress / Result): progreso, registro reciente y, al
   terminar un trabajo, **Importar personaje generado** (Import Generated Character),
   **Abrir carpeta de salida** (Open Output Folder) y **Ver registro completo** (View Full Log).
+- **Diagnóstico** (Diagnostics): dónde las partes del cuerpo del personaje se
+  meten unas en otras (una mano dentro de la cabeza, brazos cruzados). Las
+  celdas rojas de la barra son frames con un problema; haz clic en una para ir
+  ahí. El triángulo bajo la barra sigue el frame actual, y debajo aparecen las
+  partes que se intersectan y qué tan profundo. **Anterior** / **Siguiente**
+  (Previous / Next) saltan entre problemas. **Abrir reporte HTML** (Open HTML
+  Report) abre en el navegador un reporte con el video fuente junto al
+  personaje (la primera vez tarda unos 15 segundos en generarse).
 
 El complemento está disponible en 18 idiomas. **Automático (Blender / Sistema)**
 (Auto (Blender / System)) sigue el idioma de Blender; cámbialo en la sección

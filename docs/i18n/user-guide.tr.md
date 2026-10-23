@@ -130,6 +130,14 @@ Güncelleme, indirilmiş modelleri korur; bu yüzden hızlıdır. Kurulu sürüm
 - **İlerleme / Sonuç** (Progress / Result): ilerleme, son günlük kayıtları ve bir iş
   bittikten sonra **Üretilen Karakteri İçe Aktar** (Import Generated Character),
   **Çıktı Klasörünü Aç** (Open Output Folder), **Tüm Günlüğü Göster** (View Full Log).
+- **Tanılama** (Diagnostics): karakterin vücut parçalarının birbirinin içine
+  girdiği yerler (başın içindeki el, kavuşturulmuş kollar). Çubuktaki kırmızı
+  hücreler sorunlu karelerdir; birine tıklayınca oraya gidilir. Çubuğun
+  altındaki üçgen geçerli kareyi izler; altında da hangi parçaların iç içe
+  geçtiği ve ne kadar derin olduğu görünür. **Önceki** / **Sonraki** (Previous
+  / Next) sorunlar arasında geçiş yapar. **HTML Raporunu Aç** (Open HTML
+  Report), kaynak videonun karakterin yanında gösterildiği bir raporu web
+  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer).
 
 Eklenti 18 dili destekler. **Otomatik (Blender / Sistem)** (Auto (Blender / System))
 Blender'ın dilini izler; bunu Kurulum kutusundaki **Arayüz Dili** (UI Language)

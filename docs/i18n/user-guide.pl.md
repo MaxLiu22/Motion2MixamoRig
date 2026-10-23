@@ -127,6 +127,14 @@ jest widoczna obok dodatku w **Get Extensions**.
 - **Postęp / wynik** (Progress / Result): postęp, ostatnie wpisy logu, a po
   zakończeniu zadania **Importuj wygenerowaną postać** (Import Generated Character),
   **Otwórz folder wyjściowy** (Open Output Folder) i **Pokaż pełny log** (View Full Log).
+- **Diagnostyka** (Diagnostics): miejsca, w których części ciała postaci
+  wchodzą w siebie (dłoń w głowie, skrzyżowane ręce). Czerwone komórki na
+  pasku to klatki z problemem; kliknij jedną, aby tam przejść. Trójkąt pod
+  paskiem podąża za bieżącą klatką, a pod nim widać, które części się
+  przenikają i jak głęboko. **Poprzedni** / **Następny** (Previous / Next)
+  przechodzą między problemami. **Otwórz raport HTML** (Open HTML Report)
+  otwiera w przeglądarce raport z wideo źródłowym obok postaci (za pierwszym
+  razem tworzenie trwa około 15 sekund).
 
 Dodatek mówi w 18 językach. **Automatycznie (Blender / system)**
 (Auto (Blender / System)) podąża za językiem Blendera; zmienisz to w sekcji

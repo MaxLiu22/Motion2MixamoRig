@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` không kèm đường dẫn sẽ dùng tệp được thêm vào gần nhất trong `assets/image/`.
 
+### 6. Kiểm tra tự giao cắt
+
+Mỗi lần chạy còn kiểm tra nhân vật hoàn chỉnh xem có **tự giao cắt** không — một bộ phận cơ thể đi vào bộ phận khác, như tay nằm trong đầu — và ghi `diagnostics.json`. Terminal in ra một dòng, ví dụ `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. Sàn không được kiểm tra.
+
+Để kiểm tra lại một lần chạy, hoặc để xem các vấn đề:
+
+```bash
+m2mr diagnose outputs/<run>                  # ghi lại diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # thêm diagnostics.html: video nguồn cạnh nhân vật, timeline, danh sách vấn đề có thể bấm
+m2mr diagnose outputs/<run> --threshold-cm 2 # chỉ báo các chỗ xuyên sâu hơn 2 cm (mặc định 1)
+```
+
+Mỗi vấn đề trong `diagnostics.json` là một cặp bộ phận cơ thể, kèm các khoảng khung hình mà chúng giao cắt, khung hình tệ nhất và độ sâu của nó. Số khung hình đếm từ 0, giống timeline của Blender sau khi nhập glTF. Các bộ phận nối với nhau bằng khớp (cánh tay trên và cẳng tay, thân và đùi, …) không được so sánh: da của chúng chồng lên nhau quanh khớp ở mọi tư thế. `diagnostics.html` nhúng video nguồn (cần `ffmpeg`) và tải three.js từ CDN, nên chế độ xem 3D cần kết nối internet.
+
 ## Đầu ra
 
-Mỗi lần `m2mr run` tạo một thư mục được đặt tên theo **thời điểm lệnh bắt đầu**. Bốn tệp ở thư mục gốc giống nhau cho video và ảnh tĩnh; chỉ thư mục xem trước là khác.
+Mỗi lần `m2mr run` tạo một thư mục được đặt tên theo **thời điểm lệnh bắt đầu**. Các tệp ở thư mục gốc giống nhau cho video và ảnh tĩnh; chỉ thư mục xem trước là khác.
 
 ```
 outputs/20260829_193205_dance/          # hoặc …_pose/ với ảnh tĩnh
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # hoặc …_pose/ với ảnh tĩnh
 ├── skeleton_motion.npz                 # khung xương người 3D (dùng lại với --skeleton)
 ├── mixamo_rotations.npz                # góc xoay Mixamo theo từng xương
 ├── mixamo_character.glb                # nhân vật đã skin, nhập vào Blender / Unity
+├── diagnostics.json                    # báo cáo tự giao cắt (xem bước 6 của Bắt đầu nhanh)
+├── diagnostics.html                    # chỉ có sau `m2mr diagnose <run> --visualize`
 └── videos/   hoặc   images/            # bản xem trước — tùy theo đầu vào
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # phải: quay quanh rig mỗi bước 10° (trọn một vòng)
 ```
 
-Mở `mixamo_character.glb` trong Blender: File → Import → glTF 2.0 (.glb/.gltf). Nếu camera đang hướng vào khoảng trống, hãy chọn mesh nhân vật rồi dùng View → Frame Selected. Cụm hình cầu trên đầu và tay là phần hiển thị xương, không phải mesh: trong Outliner, ẩn **Icosphere** và **armature**; giữ mesh đã skin ở trạng thái hiển thị. Đặt FPS của scene và khung hình cuối của timeline theo `run.json` (`fps`, `n_frames`) để phát lại khớp với nguồn. So sánh lần chạy video với `videos/mixamo_character.mp4`, lần chạy ảnh tĩnh với `images/mixamo_character.png` hoặc đoạn quay quanh.
+Mở `mixamo_character.glb` trong Blender: File → Import → glTF 2.0 (.glb/.gltf). Nếu camera đang hướng vào khoảng trống, hãy chọn mesh nhân vật rồi dùng View → Frame Selected. Cụm hình cầu trên đầu và tay là phần hiển thị xương, không phải mesh: trong Outliner, ẩn **Icosphere** và **armature**; giữ mesh đã skin ở trạng thái hiển thị. Đặt FPS của scene theo `run.json` (`fps`) và timeline từ khung hình 0 đến `n_frames` − 1 để phát lại khớp với nguồn và số khung hình khớp với `diagnostics.json`. So sánh lần chạy video với `videos/mixamo_character.mp4`, lần chạy ảnh tĩnh với `images/mixamo_character.png` hoặc đoạn quay quanh.
 
 ## Giấy phép
 
@@ -190,3 +206,13 @@ Mã nguồn của kho này theo giấy phép Apache-2.0. Các tài nguyên bạn
 
 Nếu bạn gặp vấn đề, cần hỗ trợ hoàn tất cài đặt cục bộ, hoặc muốn trao đổi về hợp tác, hãy gửi email tới:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

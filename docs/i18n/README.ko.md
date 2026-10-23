@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 경로 없이 `--image`만 쓰면 `assets/image/`에 가장 최근에 넣은 파일을 씁니다.
 
+### 6. 자기 교차(파고듦) 확인
+
+모든 실행은 완성된 캐릭터의 **자기 교차**(한 신체 부위가 다른 부위로 파고드는 것, 예: 손이 머리 안으로 들어감)도 확인하고 `diagnostics.json`을 씁니다. 터미널에는 `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm` 같은 한 줄이 출력됩니다. 바닥은 확인하지 않습니다.
+
+실행을 다시 확인하거나 문제를 눈으로 보려면:
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json 다시 쓰기
+m2mr diagnose outputs/<run> --visualize      # diagnostics.html도 생성: 원본 영상과 캐릭터 나란히, 타임라인, 클릭 가능한 문제 목록
+m2mr diagnose outputs/<run> --threshold-cm 2 # 2 cm보다 깊은 파고듦만 보고 (기본값 1)
+```
+
+`diagnostics.json`의 각 문제는 신체 부위 한 쌍과, 두 부위가 교차하는 프레임 범위, 가장 심한 프레임과 그 깊이입니다. 프레임 번호는 glTF를 Blender로 임포트한 뒤의 타임라인처럼 0부터 셉니다. 관절로 이어진 부위(위팔과 아래팔, 몸통과 허벅지 등)는 비교하지 않습니다. 어떤 자세에서도 관절 주변의 피부가 겹치기 때문입니다. `diagnostics.html`은 원본 영상을 포함하고(`ffmpeg` 필요) three.js를 CDN에서 불러오므로, 3D 뷰에는 인터넷 연결이 필요합니다.
+
 ## 출력
 
-각 `m2mr run`은 **명령이 시작된 시각**으로 디렉터리를 만듭니다. 루트의 네 파일은 영상과 사진이 같고, 미리보기 폴더만 달라집니다.
+각 `m2mr run`은 **명령이 시작된 시각**으로 디렉터리를 만듭니다. 루트의 파일은 영상과 사진이 같고, 미리보기 폴더만 달라집니다.
 
 ```
 outputs/20260829_193205_dance/          # 사진 실행은 …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # 사진 실행은 …_pose/
 ├── skeleton_motion.npz                 # 인체 3D 스켈레톤 (--skeleton으로 재사용)
 ├── mixamo_rotations.npz                # Mixamo 본별 회전
 ├── mixamo_character.glb                # 스키닝된 캐릭터, Blender / Unity에 임포트
+├── diagnostics.json                    # 자기 교차 보고서 (빠른 시작 6단계 참고)
+├── diagnostics.html                    # `m2mr diagnose <run> --visualize` 실행 후에만
 └── videos/   또는   images/            # 미리보기 — 입력에 따라 결정
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # 오른쪽: 10° 궤도(한 바퀴)
 ```
 
-`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터 메시를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Outliner에서 **Icosphere**와 **armature**를 숨기고, 스키닝된 메시는 그대로 두세요. 재생이 원본과 같아지려면 `run.json`의 `fps` / `n_frames`로 장면 FPS와 타임라인 끝 프레임을 맞추세요. 영상 실행은 `videos/mixamo_character.mp4`와, 사진 실행은 `images/mixamo_character.png` 또는 궤도 클립과 비교하세요.
+`mixamo_character.glb`는 Blender에서 File → Import → glTF 2.0 (.glb/.gltf)로 엽니다. 카메라가 빈 곳을 보고 있으면 캐릭터 메시를 선택한 뒤 View → Frame Selected. 머리와 손의 구체들은 메시가 아니라 본 표시입니다. Outliner에서 **Icosphere**와 **armature**를 숨기고, 스키닝된 메시는 그대로 두세요. 재생이 원본과 같고 프레임 번호가 `diagnostics.json`과 맞으려면, 장면 FPS는 `run.json`의 `fps`로, 타임라인은 0부터 `n_frames` − 1 프레임까지로 맞추세요. 영상 실행은 `videos/mixamo_character.mp4`와, 사진 실행은 `images/mixamo_character.png` 또는 궤도 클립과 비교하세요.
 
 ## 라이선스
 
@@ -190,3 +206,13 @@ images/
 
 문제가 있으시거나, 로컬 설치에 도움이 필요하시거나, 협업을 논의하고 싶으시면 이메일로 연락해 주세요:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

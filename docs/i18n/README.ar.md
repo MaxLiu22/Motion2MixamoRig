@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` دون مسار يستخدم آخر ملف أُضيف إلى `assets/image/`.
 
+### 6. فحص التداخل الذاتي
+
+كل تشغيل يفحص أيضًا الشخصية الناتجة بحثًا عن **التداخل الذاتي** — دخول جزء من الجسم في جزء آخر، مثل يد داخل الرأس — ويكتب `diagnostics.json`. تطبع الطرفية سطرًا واحدًا، مثل `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. لا يُفحص التداخل مع الأرضية.
+
+لإعادة فحص تشغيل ما، أو لرؤية المشكلات:
+
+```bash
+m2mr diagnose outputs/<run>                  # يعيد كتابة diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # وأيضًا diagnostics.html: الفيديو المصدر بجانب الشخصية، خط زمني، قائمة مشكلات قابلة للنقر
+m2mr diagnose outputs/<run> --threshold-cm 2 # يبلّغ فقط عن التداخلات الأعمق من 2 cm (الافتراضي 1)
+```
+
+كل مشكلة في `diagnostics.json` هي زوج من أجزاء الجسم مع نطاقات الإطارات التي يتداخلان فيها، وأسوأ إطار، وعمقه. تبدأ أرقام الإطارات من 0، كما في الخط الزمني لـ Blender بعد استيراد glTF. لا تُقارَن الأجزاء المتصلة بمفصل (العضد والساعد، الجذع والفخذ، …): جلدها يتداخل حول المفصل في أي وضعية. يضمّن `diagnostics.html` الفيديو المصدر (يتطلب `ffmpeg`) ويحمّل three.js من CDN، لذا يحتاج العرض ثلاثي الأبعاد إلى اتصال بالإنترنت.
+
 ## المخرجات
 
-كل `m2mr run` ينشئ مجلدًا باسم **وقت بدء الأمر**. الملفات الأربعة في الجذر واحدة للفيديو والصورة؛ يتغيّر مجلد المعاينة فقط.
+كل `m2mr run` ينشئ مجلدًا باسم **وقت بدء الأمر**. الملفات في الجذر واحدة للفيديو والصورة؛ يتغيّر مجلد المعاينة فقط.
 
 ```
 outputs/20260829_193205_dance/          # تشغيل الصورة: …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # تشغيل الصورة: …_pose/
 ├── skeleton_motion.npz                 # هيكل إنسان ثلاثي الأبعاد (إعادة استخدام بـ --skeleton)
 ├── mixamo_rotations.npz                # دورانات عظام Mixamo لكل عظم
 ├── mixamo_character.glb                # شخصية مكسوّة، استيراد إلى Blender / Unity
+├── diagnostics.json                    # تقرير التداخل الذاتي (انظر الخطوة 6 في البدء السريع)
+├── diagnostics.html                    # فقط بعد `m2mr diagnose <run> --visualize`
 └── videos/   أو   images/              # المعاينات — حسب المدخل
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # اليمين: مدار 10° حول الهيكل (دورة كاملة)
 ```
 
-افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد شبكة الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: في Outliner أخفِ **Icosphere** و**armature** واترك الشبكة المكسوّة ظاهرة. اضبط FPS المشهد وإطار نهاية الخط الزمني من `run.json` (`fps` و`n_frames`) حتى تطابق مدة المصدر. في تشغيل الفيديو قارن مع `videos/mixamo_character.mp4`، وفي تشغيل الصورة مع `images/mixamo_character.png` أو مقطع المدار.
+افتح `mixamo_character.glb` في Blender: File → Import → glTF 2.0 (.glb/.gltf). إن وُجّهت الكاميرا إلى فراغ، حدّد شبكة الشخصية ثم View → Frame Selected. مجموعة الكرات على الرأس واليدين هي عرض للعظام وليست الشبكة: في Outliner أخفِ **Icosphere** و**armature** واترك الشبكة المكسوّة ظاهرة. اضبط FPS المشهد من `run.json` (`fps`) والخط الزمني على الإطارات من 0 إلى `n_frames` − 1 حتى يطابق التشغيل المصدر وتطابق أرقام الإطارات `diagnostics.json`. في تشغيل الفيديو قارن مع `videos/mixamo_character.mp4`، وفي تشغيل الصورة مع `images/mixamo_character.png` أو مقطع المدار.
 
 ## الرخصة
 
@@ -190,3 +206,13 @@ images/
 
 إن واجهت مشكلة، أو احتجت إلى مساعدة لإكمال الإعداد المحلي، أو رغبت في الحديث عن التعاون، يُرجى المراسلة على:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

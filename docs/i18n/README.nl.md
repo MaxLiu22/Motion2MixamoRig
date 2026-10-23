@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` zonder pad gebruikt het bestand dat het laatst is toegevoegd aan `assets/image/`.
 
+### 6. Controleren op zelfdoorsnijding
+
+Elke run controleert het afgewerkte personage ook op **zelfdoorsnijding** — een lichaamsdeel dat in een ander gaat, zoals een hand in het hoofd — en schrijft `diagnostics.json`. De terminal toont één regel, bijv. `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. De vloer wordt niet gecontroleerd.
+
+Om een run opnieuw te controleren, of om de problemen te bekijken:
+
+```bash
+m2mr diagnose outputs/<run>                  # diagnostics.json opnieuw schrijven
+m2mr diagnose outputs/<run> --visualize      # ook diagnostics.html: bronvideo naast het personage, tijdlijn, klikbare lijst met problemen
+m2mr diagnose outputs/<run> --threshold-cm 2 # alleen doordringingen dieper dan 2 cm melden (standaard 1)
+```
+
+Elk probleem in `diagnostics.json` is een paar lichaamsdelen met de framebereiken waarin ze elkaar doorsnijden, het ergste frame en de diepte daarvan. Framenummers tellen vanaf 0, zoals de tijdlijn van Blender na een glTF-import. Delen die via een gewricht verbonden zijn (bovenarm en onderarm, romp en dij, …) worden niet vergeleken: hun huid overlapt rond het gewricht in elke pose. `diagnostics.html` bevat de bronvideo (vereist `ffmpeg`) en laadt three.js van een CDN, dus de 3D-weergave heeft een internetverbinding nodig.
+
 ## Uitvoer
 
-Elke `m2mr run` maakt een map aan die is genoemd naar **het tijdstip waarop het commando startte**. De vier bestanden in de hoofdmap zijn hetzelfde voor video en foto; alleen de previewmap verschilt.
+Elke `m2mr run` maakt een map aan die is genoemd naar **het tijdstip waarop het commando startte**. De bestanden in de hoofdmap zijn hetzelfde voor video en foto; alleen de previewmap verschilt.
 
 ```
 outputs/20260829_193205_dance/          # of …_pose/ voor een foto
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # of …_pose/ voor een foto
 ├── skeleton_motion.npz                 # 3D-skelet van de persoon (hergebruik met --skeleton)
 ├── mixamo_rotations.npz                # Mixamo-rotaties per bot
 ├── mixamo_character.glb                # geskind personage, te importeren in Blender / Unity
+├── diagnostics.json                    # rapport over zelfdoorsnijding (zie Snel aan de slag, stap 6)
+├── diagnostics.html                    # alleen na `m2mr diagnose <run> --visualize`
 └── videos/   of   images/              # previews — afhankelijk van de invoer
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # rechts: orbit rond de rig in stappen van 10° (één volledige rondgang)
 ```
 
-Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). Als de camera op een lege ruimte gericht is, selecteer dan de mesh van het personage en gebruik View → Frame Selected. Het cluster bollen op het hoofd en de handen is de weergave van de botten, niet de mesh: verberg in de Outliner **Icosphere** en de **armature**; laat de geskinde mesh zichtbaar. Stel de FPS van de scène en het laatste frame van de tijdlijn in op basis van `run.json` (`fps`, `n_frames`), zodat het afspelen overeenkomt met de bron. Vergelijk een videorun met `videos/mixamo_character.mp4`, een fotorun met `images/mixamo_character.png` of de orbitclip.
+Open `mixamo_character.glb` in Blender: File → Import → glTF 2.0 (.glb/.gltf). Als de camera op een lege ruimte gericht is, selecteer dan de mesh van het personage en gebruik View → Frame Selected. Het cluster bollen op het hoofd en de handen is de weergave van de botten, niet de mesh: verberg in de Outliner **Icosphere** en de **armature**; laat de geskinde mesh zichtbaar. Stel de FPS van de scène in op basis van `run.json` (`fps`) en de tijdlijn op frames 0 tot en met `n_frames` − 1, zodat het afspelen overeenkomt met de bron en de framenummers met `diagnostics.json`. Vergelijk een videorun met `videos/mixamo_character.mp4`, een fotorun met `images/mixamo_character.png` of de orbitclip.
 
 ## Licentie
 
@@ -190,3 +206,13 @@ De code van deze repository valt onder Apache-2.0. De assets die je zelf downloa
 
 Loop je tegen een probleem aan, heb je hulp nodig bij een lokale installatie of wil je praten over samenwerking, stuur dan een e-mail naar:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

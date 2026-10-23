@@ -129,6 +129,14 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
 - **Fortschritt / Ergebnis** (Progress / Result): Fortschritt, aktuelles Log und nach einem Auftrag
   **Erzeugten Charakter importieren** (Import Generated Character), **Ausgabeordner öffnen** (Open Output Folder),
   **Vollständiges Protokoll** (View Full Log).
+- **Diagnose** (Diagnostics): Stellen, an denen Körperteile des Charakters
+  ineinander stecken (eine Hand im Kopf, verschränkte Arme). Rote Zellen im
+  Balken sind Frames mit einem Problem; ein Klick springt dorthin. Das Dreieck
+  unter dem Balken folgt dem aktuellen Frame, darunter stehen die betroffenen
+  Teile und wie tief sie ineinander stecken. **Zurück** / **Weiter** (Previous
+  / Next) springen zwischen den Problemen. **HTML-Bericht öffnen** (Open HTML
+  Report) öffnet im Webbrowser einen Bericht mit dem Quellvideo neben dem
+  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden).
 
 Das Add-on spricht 18 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
 ändern kannst du das im Bereich Einrichtung unter **UI-Sprache** (UI Language).

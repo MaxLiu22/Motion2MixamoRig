@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` sin ruta usa el archivo agregado más recientemente a `assets/image/`.
 
+### 6. Revisar autointersecciones
+
+Cada ejecución también revisa el personaje terminado en busca de **autointersecciones** — una parte del cuerpo que entra en otra, como una mano dentro de la cabeza — y escribe `diagnostics.json`. La terminal imprime una línea, por ejemplo `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`. No se revisa el piso.
+
+Para volver a revisar una ejecución, o para ver los problemas:
+
+```bash
+m2mr diagnose outputs/<run>                  # reescribe diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # además diagnostics.html: video fuente junto al personaje, timeline, lista de problemas en la que puedes hacer clic
+m2mr diagnose outputs/<run> --threshold-cm 2 # reporta solo penetraciones de más de 2 cm (por defecto 1)
+```
+
+Cada problema en `diagnostics.json` es un par de partes del cuerpo con los rangos de frames en que se intersectan, el peor frame y su profundidad. Los números de frame empiezan en 0, como la timeline de Blender después de importar un glTF. Las partes unidas por una articulación (brazo y antebrazo, torso y muslo, …) no se comparan: su piel se traslapa alrededor de la articulación en cualquier pose. `diagnostics.html` incrusta el video fuente (requiere `ffmpeg`) y carga three.js desde un CDN, así que su vista 3D necesita conexión a internet.
+
 ## Salidas
 
-Cada `m2mr run` crea un directorio con el nombre de **la hora en que inició el comando**. Los cuatro archivos de la raíz son iguales para video y foto; solo cambia la carpeta de vistas previas.
+Cada `m2mr run` crea un directorio con el nombre de **la hora en que inició el comando**. Los archivos de la raíz son iguales para video y foto; solo cambia la carpeta de vistas previas.
 
 ```
 outputs/20260829_193205_dance/          # o …_pose/ para una foto
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # o …_pose/ para una foto
 ├── skeleton_motion.npz                 # esqueleto humano 3D (reutilízalo con --skeleton)
 ├── mixamo_rotations.npz                # rotaciones de Mixamo por hueso
 ├── mixamo_character.glb                # personaje con skinning, impórtalo en Blender / Unity
+├── diagnostics.json                    # reporte de autointersecciones (ver el paso 6 de Inicio rápido)
+├── diagnostics.html                    # solo después de `m2mr diagnose <run> --visualize`
 └── videos/   o   images/               # vistas previas — según la entrada
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # derecha: órbita del rig en pasos de 10° (una vuelta completa)
 ```
 
-Abre `mixamo_character.glb` en Blender: File → Import → glTF 2.0 (.glb/.gltf). Si la cámara apunta a un espacio vacío, selecciona el mesh del personaje y usa View → Frame Selected. El grupo de esferas en la cabeza y las manos es la visualización de los huesos, no el mesh: en el Outliner, oculta **Icosphere** y la **armature**; deja visible el mesh con skinning. Ajusta los FPS de la escena y el último frame de la timeline según `run.json` (`fps`, `n_frames`) para que la reproducción coincida con la fuente. Compara una ejecución con video contra `videos/mixamo_character.mp4`, y una con foto contra `images/mixamo_character.png` o el clip orbital.
+Abre `mixamo_character.glb` en Blender: File → Import → glTF 2.0 (.glb/.gltf). Si la cámara apunta a un espacio vacío, selecciona el mesh del personaje y usa View → Frame Selected. El grupo de esferas en la cabeza y las manos es la visualización de los huesos, no el mesh: en el Outliner, oculta **Icosphere** y la **armature**; deja visible el mesh con skinning. Ajusta los FPS de la escena según `run.json` (`fps`) y la timeline a los frames 0 a `n_frames` − 1 para que la reproducción coincida con la fuente y los números de frame con `diagnostics.json`. Compara una ejecución con video contra `videos/mixamo_character.mp4`, y una con foto contra `images/mixamo_character.png` o el clip orbital.
 
 ## Licencia
 
@@ -190,3 +206,13 @@ El código de este repositorio es Apache-2.0. Los recursos que descargues tienen
 
 Si tienes algún problema, necesitas ayuda para terminar una instalación local o quieres platicar sobre una colaboración, escribe a:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

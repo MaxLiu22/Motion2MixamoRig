@@ -129,6 +129,15 @@ version installée est indiquée à côté du module dans **Get Extensions**.
 - **Progression / Résultat** (Progress / Result) : progression, journal récent et, après une tâche,
   **Importer le personnage généré** (Import Generated Character), **Ouvrir le dossier de sortie** (Open Output Folder),
   **Voir le journal complet** (View Full Log).
+- **Diagnostic** (Diagnostics) : les endroits où des parties du corps du
+  personnage entrent l’une dans l’autre (une main dans la tête, des bras
+  croisés). Les cases rouges de la barre sont des images avec un problème ;
+  cliquez sur l’une d’elles pour y aller. Le triangle sous la barre suit
+  l’image courante, et en dessous s’affichent les parties qui se chevauchent
+  et leur profondeur. **Précédent** / **Suivant** (Previous / Next) passent
+  d’un problème à l’autre. **Ouvrir le rapport HTML** (Open HTML Report) ouvre
+  dans le navigateur un rapport avec la vidéo source à côté du personnage (la
+  première fois, sa création prend environ 15 secondes).
 
 Le module parle 18 langues. **Automatique (Blender / Système)** (Auto) suit la langue de Blender ;
 vous pouvez la changer dans la zone Configuration, sous **Langue de l’interface** (UI Language).

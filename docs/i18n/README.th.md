@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 ถ้าใส่ `--image` โดยไม่ระบุพาธ จะใช้ไฟล์ที่เพิ่มล่าสุดใน `assets/image/`
 
+### 6. ตรวจการทะลุกันเอง
+
+ทุกการรันจะตรวจตัวละครที่ได้ว่ามี **การทะลุกันเอง** หรือไม่ — คือส่วนหนึ่งของร่างกายเข้าไปอยู่ในอีกส่วน เช่น มืออยู่ในหัว — แล้วเขียน `diagnostics.json` เทอร์มินัลจะพิมพ์หนึ่งบรรทัด เช่น `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm` ไม่ได้ตรวจพื้น
+
+หากต้องการตรวจการรันซ้ำ หรือดูว่าปัญหาอยู่ตรงไหน:
+
+```bash
+m2mr diagnose outputs/<run>                  # เขียน diagnostics.json ใหม่
+m2mr diagnose outputs/<run> --visualize      # สร้าง diagnostics.html ด้วย: วิดีโอต้นฉบับข้างตัวละคร, timeline, รายการปัญหาที่คลิกได้
+m2mr diagnose outputs/<run> --threshold-cm 2 # รายงานเฉพาะการทะลุที่ลึกกว่า 2 cm (ค่าเริ่มต้น 1)
+```
+
+แต่ละปัญหาใน `diagnostics.json` คือคู่ส่วนของร่างกาย พร้อมช่วงเฟรมที่ทะลุกัน เฟรมที่หนักที่สุด และความลึก หมายเลขเฟรมนับจาก 0 เหมือน timeline ของ Blender หลังนำเข้า glTF ส่วนที่ต่อกันด้วยข้อต่อ (ต้นแขนกับปลายแขน ลำตัวกับต้นขา …) จะไม่ถูกเปรียบเทียบ เพราะผิวบริเวณข้อต่อซ้อนกันในทุกท่า `diagnostics.html` ฝังวิดีโอต้นฉบับไว้ (ต้องมี `ffmpeg`) และโหลด three.js จาก CDN ดังนั้นมุมมอง 3D ต้องเชื่อมต่ออินเทอร์เน็ต
+
 ## ผลลัพธ์
 
-การรัน `m2mr run` แต่ละครั้งจะสร้างไดเรกทอรีที่ตั้งชื่อตาม **เวลาที่คำสั่งเริ่มทำงาน** ไฟล์สี่ไฟล์ที่ระดับบนสุดเหมือนกันทั้งวิดีโอและภาพนิ่ง มีเพียงโฟลเดอร์พรีวิวที่ต่างกัน
+การรัน `m2mr run` แต่ละครั้งจะสร้างไดเรกทอรีที่ตั้งชื่อตาม **เวลาที่คำสั่งเริ่มทำงาน** ไฟล์ที่ระดับบนสุดเหมือนกันทั้งวิดีโอและภาพนิ่ง มีเพียงโฟลเดอร์พรีวิวที่ต่างกัน
 
 ```
 outputs/20260829_193205_dance/          # หรือ …_pose/ สำหรับภาพนิ่ง
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # หรือ …_pose/ สำหรั
 ├── skeleton_motion.npz                 # skeleton 3D ของคน (ใช้ซ้ำด้วย --skeleton)
 ├── mixamo_rotations.npz                # การหมุนของ Mixamo แยกตามกระดูก
 ├── mixamo_character.glb                # ตัวละครที่ skin แล้ว นำเข้า Blender / Unity
+├── diagnostics.json                    # รายงานการทะลุกันเอง (ดูขั้นตอนที่ 6 ในเริ่มต้นอย่างรวดเร็ว)
+├── diagnostics.html                    # มีเฉพาะหลัง `m2mr diagnose <run> --visualize`
 └── videos/   หรือ   images/            # พรีวิว — ขึ้นกับอินพุต
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # ขวา: หมุนรอบ rig ทีละ 10° (ครบหนึ่งรอบ)
 ```
 
-เปิด `mixamo_character.glb` ใน Blender: File → Import → glTF 2.0 (.glb/.gltf) ถ้ากล้องหันไปที่พื้นที่ว่าง ให้เลือก mesh ของตัวละครแล้วใช้ View → Frame Selected กลุ่มทรงกลมที่หัวและมือคือการแสดงกระดูก ไม่ใช่ mesh: ใน Outliner ให้ซ่อน **Icosphere** และ **armature** แล้วปล่อยให้ mesh ที่ skin แล้วยังมองเห็นอยู่ ตั้งค่า FPS ของ scene และเฟรมสุดท้ายของ timeline ตาม `run.json` (`fps`, `n_frames`) เพื่อให้การเล่นตรงกับต้นฉบับ เปรียบเทียบการรันด้วยวิดีโอกับ `videos/mixamo_character.mp4` และการรันด้วยภาพนิ่งกับ `images/mixamo_character.png` หรือคลิปหมุนรอบ
+เปิด `mixamo_character.glb` ใน Blender: File → Import → glTF 2.0 (.glb/.gltf) ถ้ากล้องหันไปที่พื้นที่ว่าง ให้เลือก mesh ของตัวละครแล้วใช้ View → Frame Selected กลุ่มทรงกลมที่หัวและมือคือการแสดงกระดูก ไม่ใช่ mesh: ใน Outliner ให้ซ่อน **Icosphere** และ **armature** แล้วปล่อยให้ mesh ที่ skin แล้วยังมองเห็นอยู่ ตั้งค่า FPS ของ scene ตาม `run.json` (`fps`) และตั้ง timeline เป็นเฟรม 0 ถึง `n_frames` − 1 เพื่อให้การเล่นตรงกับต้นฉบับและหมายเลขเฟรมตรงกับ `diagnostics.json` เปรียบเทียบการรันด้วยวิดีโอกับ `videos/mixamo_character.mp4` และการรันด้วยภาพนิ่งกับ `images/mixamo_character.png` หรือคลิปหมุนรอบ
 
 ## สัญญาอนุญาต
 
@@ -190,3 +206,13 @@ images/
 
 หากพบปัญหา ต้องการความช่วยเหลือในการตั้งค่าบนเครื่อง หรืออยากพูดคุยเรื่องความร่วมมือ ส่งอีเมลมาที่:
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

@@ -139,9 +139,23 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Vampire.fbx
 
 `--image` 不加路徑時，會使用 `assets/image/` 中最後放進去的那一張。
 
+### 6. 檢查穿模
+
+每次執行還會檢查產生的角色有沒有**穿模**——一個身體部位穿進另一個部位，例如手穿進頭裡——並寫出 `diagnostics.json`。終端機會印出一行，例如 `diagnostics: 14 self-intersection(s) over 116 of 719 frames, deepest 7.87 cm`。不檢查與地面的穿插。
+
+想重新檢查某次執行，或直接看問題在哪裡：
+
+```bash
+m2mr diagnose outputs/<run>                  # 重寫 diagnostics.json
+m2mr diagnose outputs/<run> --visualize      # 另外產生 diagnostics.html：原始影片與角色並排、時間軸、可點選的問題清單
+m2mr diagnose outputs/<run> --threshold-cm 2 # 只回報深度超過 2 cm 的穿插（預設 1）
+```
+
+`diagnostics.json` 中每個問題是一對身體部位，附上兩者穿插的影格範圍、最嚴重的影格及其深度。影格編號從 0 開始，與 glTF 匯入 Blender 後的時間軸一致。以關節相連的部位（上臂與前臂、軀幹與大腿……）不互相比較：不論什麼姿勢，關節附近的皮膚都會重疊。`diagnostics.html` 會嵌入原始影片（需要 `ffmpeg`），並從 CDN 載入 three.js，因此 3D 檢視需要網路連線。
+
 ## 輸出
 
-每次執行 `m2mr run` 都會依**指令開始執行的時間**建立一個新目錄。根目錄的四個檔案在影片和照片輸入時都相同，只有預覽資料夾會不同。
+每次執行 `m2mr run` 都會依**指令開始執行的時間**建立一個新目錄。根目錄的檔案在影片和照片輸入時都相同，只有預覽資料夾會不同。
 
 ```
 outputs/20260829_193205_dance/          # 照片執行則是 …_pose/
@@ -149,6 +163,8 @@ outputs/20260829_193205_dance/          # 照片執行則是 …_pose/
 ├── skeleton_motion.npz                 # 人體 3D 骨架（可用 --skeleton 重複利用）
 ├── mixamo_rotations.npz                # Mixamo 每根骨骼的旋轉
 ├── mixamo_character.glb                # 已蒙皮角色，可匯入 Blender / Unity
+├── diagnostics.json                    # 穿模報告（見快速開始第 6 步）
+├── diagnostics.html                    # 只有執行 `m2mr diagnose <run> --visualize` 之後才有
 └── videos/   或   images/              # 預覽 — 取決於這次輸入的是影片還是照片
 ```
 
@@ -176,7 +192,7 @@ images/
                                         # 右：每 10° 環繞角色一圈
 ```
 
-用 Blender 開啟 `mixamo_character.glb`：File → Import → glTF 2.0 (.glb/.gltf)。匯入後如果鏡頭沒有對準角色，請選取角色網格，再使用 View → Frame Selected。頭部和手上那一堆球是骨骼的顯示形狀，不是模型本身：在 Outliner 中隱藏 **Icosphere** 和骨架（armature），保留已蒙皮的網格。時間軸的 FPS 和結束影格請依照 `run.json` 中的 `fps` / `n_frames` 設定，播放長度才會和原始影片一致。影片執行請對照 `videos/mixamo_character.mp4`，照片執行請對照 `images/mixamo_character.png` 或那段環繞影片。
+用 Blender 開啟 `mixamo_character.glb`：File → Import → glTF 2.0 (.glb/.gltf)。匯入後如果鏡頭沒有對準角色，請選取角色網格，再使用 View → Frame Selected。頭部和手上那一堆球是骨骼的顯示形狀，不是模型本身：在 Outliner 中隱藏 **Icosphere** 和骨架（armature），保留已蒙皮的網格。場景 FPS 請依照 `run.json` 中的 `fps` 設定，時間軸設為第 0 影格到第 `n_frames` − 1 影格，播放長度才會和原始影片一致，影格編號也才會和 `diagnostics.json` 對得上。影片執行請對照 `videos/mixamo_character.mp4`，照片執行請對照 `images/mixamo_character.png` 或那段環繞影片。
 
 ## 授權
 
@@ -190,3 +206,13 @@ images/
 
 如果在使用中遇到問題、需要協助完成本機環境建置，或希望洽談合作，歡迎透過電子郵件與我聯絡：
 [maxliu2022sz@gmail.com](mailto:maxliu2022sz@gmail.com)
+
+## Star History
+
+<a href="https://star-history.com/#MaxLiu22/Motion2MixamoRig&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaxLiu22/Motion2MixamoRig&type=Date" />
+  </picture>
+</a>

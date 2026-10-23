@@ -126,6 +126,14 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
 - **Progres / Hasil** (Progress / Result): progres, log terbaru, dan setelah proses selesai
   **Impor Karakter Hasil** (Import Generated Character), **Buka Folder Output**
   (Open Output Folder), **Lihat Log Lengkap** (View Full Log).
+- **Diagnostik** (Diagnostics): tempat bagian tubuh karakter saling masuk
+  (tangan di dalam kepala, lengan bersilang). Sel merah di bilah adalah frame
+  yang bermasalah; klik salah satunya untuk pergi ke sana. Segitiga di bawah
+  bilah mengikuti frame saat ini, dan di bawahnya tampil bagian yang saling
+  tembus serta seberapa dalam. **Sebelumnya** / **Berikutnya** (Previous /
+  Next) melompat antarmasalah. **Buka Laporan HTML** (Open HTML Report)
+  membuka laporan di browser dengan video sumber di samping karakter (pertama
+  kali butuh sekitar 15 detik untuk membuatnya).
 
 Add-on ini tersedia dalam 18 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
 mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI Language).

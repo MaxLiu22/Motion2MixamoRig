@@ -129,6 +129,15 @@ Makikita ang naka-install mong bersyon sa tabi ng add-on sa **Get Extensions**.
 - **Progreso / Resulta** (Progress / Result): progress, recent log, at pagkatapos ng job,
   **I-import ang Nagawang Character** (Import Generated Character), **Buksan ang
   Output Folder** (Open Output Folder), **Tingnan ang Buong Log** (View Full Log).
+- **Diagnostics**: kung saan pumapasok sa isa't isa ang mga bahagi ng katawan
+  ng character (kamay sa loob ng ulo, nakakrus na braso). Ang mga pulang cell
+  sa bar ay mga frame na may problema; i-click ang isa para pumunta roon.
+  Sinusundan ng tatsulok sa ilalim ng bar ang kasalukuyang frame, at sa ibaba
+  nito ang mga bahaging nagsasalubong at kung gaano kalalim. Lumilipat sa
+  pagitan ng mga problema ang **Nauna** / **Susunod** (Previous / Next).
+  Binubuksan ng **Buksan ang HTML Report** (Open HTML Report) ang isang report
+  sa web browser na katabi ng character ang source video (sa unang beses, mga
+  15 segundo bago ito mabuo).
 
 Available ang add-on sa 18 wika. Sinusunod ng **Auto (sundan ang Blender / system)**
 ang wika ng Blender; palitan ito sa Setup box sa **Wika ng UI** (UI Language).
