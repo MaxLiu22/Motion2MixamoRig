@@ -64,7 +64,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-推論權重（GVHMR 等）不會在這一步下載，第一次執行 `m2mr run` 時會自動下載到 `weights/`（約 5 GB，只需下載一次）。
+推論權重（GVHMR 等）不會在這一步下載，第一次執行 `m2mr run` 時會自動下載到 `weights/`（約 5 GB，只需下載一次）。第一次執行 `m2mr run --detect-hands` 時，還會把 HaMeR 手部權重下載到 `weights/hamer/`（約 2.7 GB，只需下載一次）。
 
 建議另外安裝 ffmpeg（macOS：`brew install ffmpeg`，Ubuntu：`apt install ffmpeg`）。
 沒有它也能執行，但輸出的影片會**沒有聲音**，編碼格式也無法直接在瀏覽器中播放。
@@ -79,6 +79,7 @@ pip install --upgrade pip setuptools wheel \
 | Mixamo 角色 FBX | `assets/mixamo/Y_Bot.fbx` | 用 Adobe 帳號從 [Mixamo](https://www.mixamo.com) 下載 Y Bot（或其他用 Mixamo rig 好的角色） |
 | 動作影片 | `assets/video/<your_clip>.mp4` | **只有一個人**、人物清楚可見、**從頭到腳全程都在畫面內**（可以放多個檔案，每次執行會使用最新加入的那一個） |
 | 姿勢照片（選用） | `assets/image/<your_photo>.jpg` | **只有一個人**、人物清楚可見、**從頭到腳都在畫面內**。搭配 `--image` 使用 |
+| MANO 右手模型（只有 `--detect-hands` 才需要） | `assets/body_models/mano/MANO_RIGHT.pkl` | 在 [MANO](https://mano.is.tue.mpg.de/) 註冊後下載 **Models & Code**。只跑身體時不需要這個檔案 |
 
 注意：從 Mixamo 下載的檔名是 `Y Bot.fbx`（中間是**空格**），和上表的 `Y_Bot.fbx`（**底線**）差一個字元。
 改成底線後它就是預設 rig，`m2mr run` 不加 `--rig` 時會自動使用它；不改名也可以——找不到 `Y_Bot.fbx` 時，
@@ -99,6 +100,12 @@ pip install --upgrade pip setuptools wheel \
 m2mr doctor
 ```
 
+`m2mr doctor` 檢查的是身體這一路，不要求 MANO 手部模型。要連手指偵測用的檔案和 Python 套件一起查：
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. 第一次執行：先得到一個看得到的結果
 
 不加任何參數時，會使用**最後放進 `assets/video/` 的影片** + `assets/mixamo/Y_Bot.fbx`。
@@ -110,6 +117,8 @@ m2mr run
 這一步最慢。第一次執行會先下載約 5 GB 的推論權重（只需一次），接著從影片中擷取人體動作。
 一段約 30 秒的影片，在 CPU 上擷取大約需要 8–15 分鐘；權重下載完成後，再處理類似長度的影片大約需要 3–5 分鐘。
 後面的重定向與算繪通常只需一兩分鐘。使用下一節的 `--skeleton` 重複利用骨架時，會完全跳過擷取，幾十秒就能得到結果。
+
+踩實的腳預設會釘住：腳掌著地時鎖腳掌，只有腳尖抬起來才鎖腳跟。腿伸直還夠不到時，髖部會跟著挪。然後腳底板會被放到地面上（y = 0）。`--no-foot-lock` 保留原始重定向，腳可能會滑；腳底板仍然會放到地面上。
 
 ### 3. 同一段動作，換一個角色
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # 另外產生 diagnostics.html：�
 m2mr diagnose outputs/<run> --threshold-cm 2 # 只回報深度超過 2 cm 的穿插（預設 1）
 ```
 
-`diagnostics.json` 中每個問題是一對身體部位，附上兩者穿插的影格範圍、最嚴重的影格及其深度。影格編號從 0 開始，與 glTF 匯入 Blender 後的時間軸一致。以關節相連的部位（上臂與前臂、軀幹與大腿……）不互相比較：不論什麼姿勢，關節附近的皮膚都會重疊。`diagnostics.html` 會嵌入原始影片（需要 `ffmpeg`），並從 CDN 載入 three.js，因此 3D 檢視需要網路連線。
+`diagnostics.json` 中每個問題是一對身體部位，附上兩者穿插的影格範圍、最嚴重的影格及其深度。影格編號從 0 開始，與 glTF 匯入 Blender 後的時間軸一致。以關節相連的部位（上臂與前臂、軀幹與大腿……）不互相比較：不論什麼姿勢，關節附近的皮膚都會重疊。`diagnostics.html` 會嵌入原始影片（需要 `ffmpeg`），並從 CDN 載入 three.js，因此 3D 檢視需要網路連線。這個 3D 檢視在 y = 0 上畫著固定的地面標記：每 0.5 公尺一個十字，整公尺的更大，原點是綠色，用來判斷角色有沒有在動。
+
+### 7. 手指（`--detect-hands`）
+
+一般的 `m2mr run` 只動身體，Mixamo 的手指骨停在靜息姿勢。`--detect-hands` 打開和身體擷取器配套的手部模型。預設擷取器 GVHMR 用的是 [HaMeR](https://github.com/geopavlakos/hamer)。HaMeR 用 GVHMR 已經選定的人和影格去裁手腕，不會再在片子裡另找一個人。
+
+**耗時大約翻倍。** 不加這個開關幾分鐘能跑完的片段，加上之後大約要兩倍時間，因為手部是在身體擷取之上再跑一遍。長影片開跑之前先把這段時間算進去。
+
+按上面的表放好 `MANO_RIGHT.pkl`，然後：
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+第一次帶 `--detect-hands` 會把 HaMeR 權重下載到 `weights/hamer/`（約 2.7 GB，只這一次）。手指旋轉寫進 `skeleton_motion.npz`，並驅動帶皮角色上的 30 根 Mixamo 手指骨。身體那一步沒看清的那隻手腕，這隻手就保持靜息。
+
+`--hand-smooth` 是這些旋轉要平滑多少秒。預設 `0.08`。`0` 保留原始估計。只要骨架檔案裡已經有手部動作，平滑就會做，包括後來只重複利用這個檔案的那次執行。
+
+重複利用以前的骨架時：
+
+- 檔案裡已經有手部動作：`--skeleton` 自己就會驅動手指，不必再加 `--detect-hands`。
+- 沒有，但這邊還留著那次的身體快取（`cache/<clip>/0_input_video.mp4`，以及 `preprocess/vitpose.pt` 和 `preprocess/bbx.pt`）：`--skeleton ... --detect-hands` 可以補上手指，不用重新擷取身體。
+- 快取已經沒了：用 `--detect-hands` 把影片或照片再跑一遍。
 
 ## 輸出
 
@@ -192,6 +225,8 @@ images/
                                         # 右：每 10° 環繞角色一圈
 ```
 
+帶上 `--detect-hands` 時，`skeleton_motion.npz` 裡還有手指旋轉，`mixamo_rotations.npz` 和 `mixamo_character.glb` 會包含那 30 根手指骨。沒有這個開關、重複利用的骨架裡也沒有手部動作時，這些骨頭停在靜息姿勢。
+
 用 Blender 開啟 `mixamo_character.glb`：File → Import → glTF 2.0 (.glb/.gltf)。匯入後如果鏡頭沒有對準角色，請選取角色網格，再使用 View → Frame Selected。頭部和手上那一堆球是骨骼的顯示形狀，不是模型本身：在 Outliner 中隱藏 **Icosphere** 和骨架（armature），保留已蒙皮的網格。場景 FPS 請依照 `run.json` 中的 `fps` 設定，時間軸設為第 0 影格到第 `n_frames` − 1 影格，播放長度才會和原始影片一致，影格編號也才會和 `diagnostics.json` 對得上。影片執行請對照 `videos/mixamo_character.mp4`，照片執行請對照 `images/mixamo_character.png` 或那段環繞影片。
 
 ## 授權
@@ -199,8 +234,10 @@ images/
 本儲存庫的程式碼採用 Apache-2.0 授權。你自行取得的資源各有其條款，不可隨本儲存庫重新散布：
 
 - **SMPL-X**：需經 MPI 授權取得，預設僅限非商業的研究 / 教育 / 藝術用途；商業使用需另行洽談
+- **MANO**（只有用 `--detect-hands` 時）：同樣需經 MPI 授權，下載方式和 SMPL-X 一樣；把 `MANO_RIGHT.pkl` 放在本機，不要再散布
 - **Mixamo FBX**：可以用在發行的產品中，但不可將原始 FBX 當成素材包散布
 - **GVHMR 等推論權重**：第一次執行 `m2mr run` 時會自動下載到 `weights/`，並遵循各自上游專案的授權
+- **HaMeR**：本儲存庫裡的推論程式碼是 MIT；權重在第一次 `m2mr run --detect-hands` 時下載到 `weights/hamer/`，遵循上游發布條款
 
 ## 聯絡方式
 

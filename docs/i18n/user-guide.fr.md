@@ -86,10 +86,17 @@ Dans la zone **Entrée** (Input) :
 2. **Fichier source** (Source File) : votre clip. Il doit montrer **exactement une
    personne, entièrement cadrée de la tête aux pieds pendant toute la durée**.
 3. **FBX du rig Mixamo** (Mixamo Rig FBX) : le personnage de l’étape 5
-4. Cliquez sur **Générer le mouvement** (Generate Motion)
+4. **Détecter les mains** (Detect Hands) est désactivé. Activez-le seulement si les
+   doigts doivent bouger. Cliquez ensuite sur **Choisir le modèle de main MANO…**
+   (Choose MANO Hand Model…) et sélectionnez `MANO_RIGHT.pkl`. Récupérez ce fichier
+   comme SMPL-X : inscrivez-vous sur
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), téléchargez **Models & Code**
+   et décompressez-le. Le premier passage des mains télécharge environ **2,7 Go** de
+   plus, une seule fois, et dure environ deux fois plus longtemps qu’un passage du corps seul.
+5. Cliquez sur **Générer le mouvement** (Generate Motion)
 
 Une fois le traitement terminé, le personnage animé est automatiquement importé
-dans votre scène.
+dans votre scène. Un pied posé reste là où il s’est posé, et la plante est placée sur le sol de Blender. Un mesh **Repères au sol** (Floor Markers) est ajouté sur ce sol (une croix tous les 0,5 m). La case **Repères au sol** (Floor Markers) sous Progression / Résultat l’affiche ou le masque.
 
 ### Le premier lancement est plus long — c’est normal
 
@@ -125,9 +132,9 @@ version installée est indiquée à côté du module dans **Get Extensions**.
 - **⚙ à côté du titre** affiche ou masque la zone **Configuration** (Setup).
 - **Configuration** : langue, environnement, SMPL-X, **Appareil** (Device ; le CPU
   est le choix le plus sûr) et **Vérifier l’environnement** (Check Environment).
-- **Entrée** : ce qu’il faut animer.
+- **Entrée** : ce qu’il faut animer, le **Modèle du corps** (Body Model, GVHMR) et **Détecter les mains** (Detect Hands).
 - **Progression / Résultat** (Progress / Result) : progression, journal récent et, après une tâche,
-  **Importer le personnage généré** (Import Generated Character), **Ouvrir le dossier de sortie** (Open Output Folder),
+  **Importer le personnage généré** (Import Generated Character), **Repères au sol** (Floor Markers), **Ouvrir le dossier de sortie** (Open Output Folder),
   **Voir le journal complet** (View Full Log).
 - **Diagnostic** (Diagnostics) : les endroits où des parties du corps du
   personnage entrent l’une dans l’autre (une main dans la tête, des bras
@@ -137,7 +144,7 @@ version installée est indiquée à côté du module dans **Get Extensions**.
   et leur profondeur. **Précédent** / **Suivant** (Previous / Next) passent
   d’un problème à l’autre. **Ouvrir le rapport HTML** (Open HTML Report) ouvre
   dans le navigateur un rapport avec la vidéo source à côté du personnage (la
-  première fois, sa création prend environ 15 secondes).
+  première fois, sa création prend environ 15 secondes). Le personnage se tient sur des croix de sol fixes, une tous les 0,5 m, pour voir s’il glisse.
 
 Le module parle 19 langues. **Automatique (Blender / Système)** (Auto) suit la langue de Blender ;
 vous pouvez la changer dans la zone Configuration, sous **Langue de l’interface** (UI Language).
@@ -148,6 +155,7 @@ vous pouvez la changer dans la zone Configuration, sous **Langue de l’interfac
 | --- | --- |
 | **Échec de l’installation de l’environnement** (Runtime installation failed) | Vérifiez votre connexion Internet et cliquez à nouveau sur le bouton. Journal : `~/Motion2MixamoRig/logs/setup.log` |
 | **Modèle SMPL-X : manquant** (SMPL-X model: missing) | Refaites l’étape 4 et sélectionnez `SMPLX_NEUTRAL.npz` |
+| **Modèle de main MANO : manquant** (MANO hand model: missing) | Activez **Détecter les mains**, puis **Choisir le modèle de main MANO…** et sélectionnez `MANO_RIGHT.pkl` |
 | **FBX Mixamo non valide** (Mixamo FBX invalid) | Téléchargez à nouveau le personnage en **FBX Binary**, **T-pose** |
 | **L’entrée contient plusieurs personnes** (Input contains multiple people) | Utilisez un clip avec une seule personne |
 | **Aucune personne détectée dans l’entrée** (No person was detected in the input) | Vérifiez que le corps entier est visible et bien éclairé |

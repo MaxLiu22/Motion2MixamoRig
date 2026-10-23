@@ -85,9 +85,15 @@ Di kotak **Input**:
 2. **File Sumber** (Source File): klipmu. Klip harus menampilkan **tepat satu
    orang, dari kepala sampai kaki masuk frame sepanjang waktu**.
 3. **Mixamo Rig FBX**: karakter dari langkah 5
-4. Klik **Buat Gerakan** (Generate Motion)
+4. **Deteksi tangan** (Detect Hands) mati. Nyalakan hanya jika jari harus bergerak.
+   Lalu klik **Pilih model tangan MANO…** (Choose MANO Hand Model…) dan pilih
+   `MANO_RIGHT.pkl`. Berkas itu diambil seperti SMPL-X: daftar di
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), unduh **Models & Code**, lalu
+   ekstrak. Proses tangan yang pertama mengunduh sekitar **2,7 GB** lagi, sekali, dan
+   makan waktu kira-kira dua kali proses tubuh saja.
+5. Klik **Buat Gerakan** (Generate Motion)
 
-Setelah selesai, karakter yang sudah beranimasi otomatis diimpor ke scene-mu.
+Setelah selesai, karakter yang sudah beranimasi otomatis diimpor ke scene-mu. Kaki yang menapak tetap di tempat ia mendarat, dan telapak kaki diletakkan di lantai Blender. Di lantai itu ditambahkan mesh **Penanda lantai** (Floor Markers) (satu silang setiap 0,5 m). Kotak **Penanda lantai** (Floor Markers) di Progres / Hasil menampilkan atau menyembunyikannya.
 
 ### Proses pertama butuh waktu lebih lama — ini normal
 
@@ -122,9 +128,9 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
 - **⚙ di samping judul** menampilkan atau menyembunyikan kotak **Penyiapan** (Setup).
 - **Penyiapan**: bahasa, runtime, SMPL-X, **Perangkat** (Device) (CPU adalah
   pilihan yang aman), dan **Periksa Lingkungan** (Check Environment).
-- **Input**: apa yang mau dianimasikan.
+- **Input**: apa yang mau dianimasikan, **Model tubuh** (Body Model, GVHMR), dan **Deteksi tangan** (Detect Hands).
 - **Progres / Hasil** (Progress / Result): progres, log terbaru, dan setelah proses selesai
-  **Impor Karakter Hasil** (Import Generated Character), **Buka Folder Output**
+  **Impor Karakter Hasil** (Import Generated Character), **Penanda lantai** (Floor Markers), **Buka Folder Output**
   (Open Output Folder), **Lihat Log Lengkap** (View Full Log).
 - **Diagnostik** (Diagnostics): tempat bagian tubuh karakter saling masuk
   (tangan di dalam kepala, lengan bersilang). Sel merah di bilah adalah frame
@@ -133,7 +139,7 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
   tembus serta seberapa dalam. **Sebelumnya** / **Berikutnya** (Previous /
   Next) melompat antarmasalah. **Buka Laporan HTML** (Open HTML Report)
   membuka laporan di browser dengan video sumber di samping karakter (pertama
-  kali butuh sekitar 15 detik untuk membuatnya).
+  kali butuh sekitar 15 detik untuk membuatnya). Karakter berdiri di atas silang lantai yang tetap, satu setiap 0,5 m, supaya terlihat apakah ia meluncur.
 
 Add-on ini tersedia dalam 19 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
 mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI Language).
@@ -144,6 +150,7 @@ mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI 
 | --- | --- |
 | **Pemasangan runtime gagal** (Runtime installation failed) | Periksa koneksi internetmu lalu klik tombolnya lagi. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | **Model SMPL-X: tidak ada** (SMPL-X model: missing) | Ulangi langkah 4 dan pilih `SMPLX_NEUTRAL.npz` |
+| **Model tangan MANO: tidak ada** (MANO hand model: missing) | Nyalakan **Deteksi tangan**, lalu **Pilih model tangan MANO…** dan pilih `MANO_RIGHT.pkl` |
 | **Mixamo FBX tidak valid** (Mixamo FBX invalid) | Unduh lagi karakternya sebagai **FBX Binary**, **T-pose** |
 | **Input berisi lebih dari satu orang** (Input contains multiple people) | Pakai klip yang hanya berisi satu orang |
 | **Tidak ada orang yang terdeteksi di input** (No person was detected in the input) | Pastikan seluruh tubuh terlihat dan pencahayaannya cukup |

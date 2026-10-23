@@ -15,6 +15,10 @@ All notable changes to this project will be documented in this file.
 - `--hand-smooth SECONDS` smooths the finger rotations (default `0.08`; `0` keeps the raw estimate). It applies whenever the skeleton file already contains hand motion, including a later `--skeleton` reuse. A reused skeleton that already has hand motion drives the fingers without `--detect-hands`. If it does not, `--detect-hands` can add them only while that run's body cache is still beside the file; otherwise run the video or still again with the flag.
 - The README quick start documents `--detect-hands`, the MANO file, the extra runtime, and how reuse behaves.
 - Blender add-on: the Input section has a **Body Model** menu (`--set-extractor`, currently GVHMR) and **Detect Hands** (`--detect-hands`, off by default). Turning hands on shows the about-twice runtime, finger smoothing, and **Choose MANO Hand Model…**. **Check Environment** runs `m2mr doctor` with the same two choices.
+- Planted feet are pinned by default. GVHMR's foot contact chooses the supporting part: the ball when the ball is down, the heel only when the toes are up. When a straight leg cannot reach, the hips shift. `--no-foot-lock` keeps the raw retarget, so the feet may slide. The summary is in `run.json` under `foot_lock`.
+- After that pin, the hips shift vertically so the lowest frame of each plant sits on y = 0. The summary is in `run.json` under `ground`. This shift still runs with `--no-foot-lock`.
+- `diagnostics.html` draws fixed floor markers on y = 0 (0.5 m crosses, larger marks each metre, green origin) so movement can be judged against the floor. Suggested by [Eddie (@_____eddie_____)](https://x.com/_____eddie_____) in [this reply](https://x.com/_____eddie_____/status/2113685850907123736).
+- Blender import adds a **Floor Markers** mesh on the viewport floor (z = 0), covering the hips' travel. The **Floor Markers** checkbox under Progress / Result shows or hides it. The next import into that collection replaces the mesh. Suggested by [Eddie (@_____eddie_____)](https://x.com/_____eddie_____) in [this reply](https://x.com/_____eddie_____/status/2113685850907123736).
 
 ### Fixed
 

@@ -85,9 +85,15 @@ Trong khung **Đầu vào** (Input):
 2. **Tệp nguồn** (Source File): clip của bạn. Clip phải có **đúng một người, lọt
    khung từ đầu đến chân trong suốt thời gian**.
 3. **Mixamo Rig FBX**: nhân vật từ bước 5
-4. Nhấp **Tạo chuyển động** (Generate Motion)
+4. **Nhận dạng bàn tay** (Detect Hands) đang tắt. Chỉ bật khi bạn muốn các ngón
+   cử động. Rồi nhấp **Chọn mô hình bàn tay MANO…** (Choose MANO Hand Model…) và
+   chọn `MANO_RIGHT.pkl`. Lấy tệp này giống SMPL-X: đăng ký tại
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), tải **Models & Code** và giải nén.
+   Lần chạy bàn tay đầu tiên tải thêm khoảng **2.7 GB**, một lần, và mất khoảng gấp đôi
+   thời gian so với lần chỉ chạy thân người.
+5. Nhấp **Tạo chuyển động** (Generate Motion)
 
-Khi hoàn tất, nhân vật có hoạt ảnh sẽ tự động được nhập vào cảnh của bạn.
+Khi hoàn tất, nhân vật có hoạt ảnh sẽ tự động được nhập vào cảnh của bạn. Bàn chân đã đặt xuống đứng yên tại chỗ đáp, và lòng bàn chân nằm trên sàn của Blender. Trên sàn đó có thêm một mesh **Mốc sàn** (Floor Markers) (một dấu cộng mỗi 0,5 m). Ô **Mốc sàn** (Floor Markers) trong Tiến trình / Kết quả dùng để hiện hoặc ẩn nó.
 
 ### Lần chạy đầu tiên lâu hơn — điều này là bình thường
 
@@ -122,9 +128,9 @@ hiển thị bên cạnh add-on trong **Get Extensions**.
 - **⚙ cạnh tiêu đề** hiện hoặc ẩn khung **Thiết lập** (Setup).
 - **Thiết lập**: ngôn ngữ, runtime, SMPL-X, **Thiết bị** (Device) (CPU là lựa
   chọn an toàn), và **Kiểm tra môi trường** (Check Environment).
-- **Đầu vào**: thứ cần tạo hoạt ảnh.
+- **Đầu vào**: thứ cần tạo hoạt ảnh, **Mô hình cơ thể** (Body Model, GVHMR) và **Nhận dạng bàn tay** (Detect Hands).
 - **Tiến trình / Kết quả** (Progress / Result): tiến trình, nhật ký gần đây, và
-  sau mỗi tác vụ là **Nhập nhân vật đã tạo** (Import Generated Character),
+  sau mỗi tác vụ là **Nhập nhân vật đã tạo** (Import Generated Character), **Mốc sàn** (Floor Markers),
   **Mở thư mục đầu ra** (Open Output Folder), **Xem toàn bộ nhật ký** (View Full Log).
 - **Chẩn đoán** (Diagnostics): những chỗ các bộ phận cơ thể của nhân vật đâm
   vào nhau (tay nằm trong đầu, hai tay khoanh lại). Ô đỏ trên thanh là khung
@@ -132,7 +138,7 @@ hiển thị bên cạnh add-on trong **Get Extensions**.
   hình hiện tại, bên dưới là các bộ phận đang giao cắt và độ sâu. **Trước** /
   **Tiếp** (Previous / Next) nhảy giữa các vấn đề. **Mở báo cáo HTML** (Open
   HTML Report) mở trong trình duyệt một báo cáo có video nguồn bên cạnh nhân
-  vật (lần đầu mất khoảng 15 giây để tạo).
+  vật (lần đầu mất khoảng 15 giây để tạo). Nhân vật đứng trên các dấu cộng sàn cố định, mỗi 0,5 m một dấu, để xem nó có đang trượt hay không.
 
 Add-on hỗ trợ 19 ngôn ngữ. **Tự động (theo Blender / hệ thống)** (Auto (Blender / System))
 đi theo ngôn ngữ của Blender; bạn có thể đổi trong khung **Thiết lập**, tại
@@ -144,6 +150,7 @@ Add-on hỗ trợ 19 ngôn ngữ. **Tự động (theo Blender / hệ thống)**
 | --- | --- |
 | **Cài runtime thất bại** (Runtime installation failed) | Kiểm tra kết nối internet và nhấp lại nút. Nhật ký: `~/Motion2MixamoRig/logs/setup.log` |
 | **Mô hình SMPL-X: thiếu** (SMPL-X model: missing) | Làm lại bước 4 và chọn `SMPLX_NEUTRAL.npz` |
+| **Mô hình bàn tay MANO: thiếu** (MANO hand model: missing) | Bật **Nhận dạng bàn tay**, rồi **Chọn mô hình bàn tay MANO…** và chọn `MANO_RIGHT.pkl` |
 | **Mixamo FBX không hợp lệ** (Mixamo FBX invalid) | Tải lại nhân vật dưới dạng **FBX Binary**, **T-pose** |
 | **Đầu vào có nhiều người** (Input contains multiple people) | Dùng clip chỉ có một người |
 | **Không phát hiện người nào trong đầu vào** (No person was detected in the input) | Đảm bảo toàn thân hiện rõ và đủ sáng |

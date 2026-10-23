@@ -88,10 +88,16 @@ indirmeniz gerekir:
 2. **Kaynak Dosya** (Source File): klibiniz. Klipte **tam olarak bir kişi
    bulunmalı ve kişi baştan ayağa, sürekli kadrede olmalıdır**.
 3. **Mixamo Karakter FBX** (Mixamo Rig FBX): 5. adımdaki karakter
-4. **Hareket Üret** (Generate Motion) düğmesine tıklayın
+4. **Elleri algıla** (Detect Hands) kapalıdır. Yalnızca parmaklar hareket etsin
+   istiyorsanız açın. Ardından **MANO el modelini seç…** (Choose MANO Hand Model…)
+   düğmesine tıklayıp `MANO_RIGHT.pkl` dosyasını seçin. Bu dosyayı SMPL-X gibi alırsınız:
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/) adresine kaydolun, **Models & Code**
+   indirin ve açın. İlk el geçişi bir kez yaklaşık **2,7 GB** daha indirir ve yalnızca
+   gövde çalıştırmasının yaklaşık iki katı sürer.
+5. **Hareket Üret** (Generate Motion) düğmesine tıklayın
 
 İşlem bittiğinde animasyonlu karakter sahnenize otomatik olarak içe
-aktarılır.
+aktarılır. Yere basan ayak indiği yerde kalır ve taban Blender'ın zeminine oturtulur. O zemine bir **Zemin işaretleri** (Floor Markers) mesh'i eklenir (her 0,5 m'de bir çarpı). İlerleme / Sonuç altındaki **Zemin işaretleri** (Floor Markers) kutusu onu gösterir ya da gizler.
 
 ### İlk çalıştırma daha uzun sürer — bu normaldir
 
@@ -126,9 +132,9 @@ Güncelleme, indirilmiş modelleri korur; bu yüzden hızlıdır. Kurulu sürüm
 - **Başlığın yanındaki ⚙** simgesi **Kurulum** (Setup) kutusunu gösterir veya gizler.
 - **Kurulum**: dil, çalışma ortamı, SMPL-X, cihaz (**Cihaz** (Device); güvenli
   seçim CPU'dur) ve **Ortamı Denetle** (Check Environment).
-- **Girdi**: neyin canlandırılacağı.
+- **Girdi**: neyin canlandırılacağı, **Vücut modeli** (Body Model, GVHMR) ve **Elleri algıla** (Detect Hands).
 - **İlerleme / Sonuç** (Progress / Result): ilerleme, son günlük kayıtları ve bir iş
-  bittikten sonra **Üretilen Karakteri İçe Aktar** (Import Generated Character),
+  bittikten sonra **Üretilen Karakteri İçe Aktar** (Import Generated Character), **Zemin işaretleri** (Floor Markers),
   **Çıktı Klasörünü Aç** (Open Output Folder), **Tüm Günlüğü Göster** (View Full Log).
 - **Tanılama** (Diagnostics): karakterin vücut parçalarının birbirinin içine
   girdiği yerler (başın içindeki el, kavuşturulmuş kollar). Çubuktaki kırmızı
@@ -137,7 +143,7 @@ Güncelleme, indirilmiş modelleri korur; bu yüzden hızlıdır. Kurulu sürüm
   geçtiği ve ne kadar derin olduğu görünür. **Önceki** / **Sonraki** (Previous
   / Next) sorunlar arasında geçiş yapar. **HTML Raporunu Aç** (Open HTML
   Report), kaynak videonun karakterin yanında gösterildiği bir raporu web
-  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer).
+  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer). Karakter, kayıp kaymadığı görülsün diye her 0,5 m'de bir sabit zemin çarpısının üzerinde durur.
 
 Eklenti 19 dili destekler. **Otomatik (Blender / Sistem)** (Auto (Blender / System))
 Blender'ın dilini izler; bunu Kurulum kutusundaki **Arayüz Dili** (UI Language)
@@ -149,6 +155,7 @@ ayarından değiştirebilirsiniz.
 | --- | --- |
 | **Çalışma ortamı kurulumu başarısız** (Runtime installation failed) | İnternet bağlantınızı kontrol edin ve düğmeye yeniden tıklayın. Günlük: `~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X modeli: eksik** (SMPL-X model: missing) | 4. adımı tekrarlayın ve `SMPLX_NEUTRAL.npz` dosyasını seçin |
+| **MANO el modeli: eksik** (MANO hand model: missing) | **Elleri algıla** seçeneğini açın, sonra **MANO el modelini seç…** ile `MANO_RIGHT.pkl` dosyasını seçin |
 | **Mixamo FBX geçersiz** (Mixamo FBX invalid) | Karakteri **FBX Binary**, **T-pose** olarak yeniden indirin |
 | **Girdide birden fazla kişi var** (Input contains multiple people) | Yalnızca bir kişinin olduğu bir klip kullanın |
 | **Girdide kişi algılanmadı** (No person was detected in the input) | Tüm vücudun görünür ve iyi aydınlatılmış olduğundan emin olun |

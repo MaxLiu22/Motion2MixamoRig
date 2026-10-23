@@ -85,10 +85,16 @@ W sekcji **Dane wejściowe** (Input):
 2. **Plik źródłowy** (Source File): twój klip. Musi pokazywać **dokładnie jedną
    osobę, od stóp do głów w kadrze przez cały czas**.
 3. **Postać Mixamo FBX** (Mixamo Rig FBX): postać z kroku 5
-4. Kliknij **Generuj ruch** (Generate Motion)
+4. **Wykrywaj dłonie** (Detect Hands) jest wyłączone. Włącz je tylko wtedy, gdy
+   palce mają się ruszać. Potem kliknij **Wybierz model dłoni MANO…** (Choose MANO
+   Hand Model…) i wskaż `MANO_RIGHT.pkl`. Plik bierzesz tak jak SMPL-X: zarejestruj
+   się na [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), pobierz **Models & Code**
+   i rozpakuj. Pierwsze przejście dłoni dociąga jednorazowo około **2,7 GB** i trwa
+   mniej więcej dwa razy dłużej niż przebieg samego ciała.
+5. Kliknij **Generuj ruch** (Generate Motion)
 
 Po zakończeniu animowana postać zostanie automatycznie zaimportowana do
-twojej sceny.
+twojej sceny. Postawiona stopa zostaje tam, gdzie stanęła, a podeszwa leży na podłodze Blendera. Na tej podłodze dochodzi mesh **Znaczniki podłogi** (Floor Markers) (krzyż co 0,5 m). Pole **Znaczniki podłogi** (Floor Markers) w sekcji Postęp / wynik pokazuje je albo ukrywa.
 
 ### Pierwsze uruchomienie trwa dłużej — to normalne
 
@@ -123,9 +129,9 @@ jest widoczna obok dodatku w **Get Extensions**.
 - **⚙ obok tytułu** pokazuje lub ukrywa sekcję **Konfiguracja** (Setup).
 - **Konfiguracja**: język, środowisko, SMPL-X, urządzenie (**Urządzenie** (Device);
   CPU to bezpieczny wybór) oraz **Sprawdź środowisko** (Check Environment).
-- **Dane wejściowe**: co ma zostać animowane.
+- **Dane wejściowe**: co ma zostać animowane, **Model ciała** (Body Model, GVHMR) i **Wykrywaj dłonie** (Detect Hands).
 - **Postęp / wynik** (Progress / Result): postęp, ostatnie wpisy logu, a po
-  zakończeniu zadania **Importuj wygenerowaną postać** (Import Generated Character),
+  zakończeniu zadania **Importuj wygenerowaną postać** (Import Generated Character), **Znaczniki podłogi** (Floor Markers),
   **Otwórz folder wyjściowy** (Open Output Folder) i **Pokaż pełny log** (View Full Log).
 - **Diagnostyka** (Diagnostics): miejsca, w których części ciała postaci
   wchodzą w siebie (dłoń w głowie, skrzyżowane ręce). Czerwone komórki na
@@ -134,7 +140,7 @@ jest widoczna obok dodatku w **Get Extensions**.
   przenikają i jak głęboko. **Poprzedni** / **Następny** (Previous / Next)
   przechodzą między problemami. **Otwórz raport HTML** (Open HTML Report)
   otwiera w przeglądarce raport z wideo źródłowym obok postaci (za pierwszym
-  razem tworzenie trwa około 15 sekund).
+  razem tworzenie trwa około 15 sekund). Postać stoi na stałych krzyżach podłogi, co 0,5 m, żeby było widać, czy się ślizga.
 
 Dodatek mówi w 19 językach. **Automatycznie (Blender / system)**
 (Auto (Blender / System)) podąża za językiem Blendera; zmienisz to w sekcji
@@ -146,6 +152,7 @@ Konfiguracja w polu **Język interfejsu** (UI Language).
 | --- | --- |
 | **Instalacja środowiska nie powiodła się** (Runtime installation failed) | Sprawdź połączenie z internetem i kliknij przycisk jeszcze raz. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | **Model SMPL-X: brak** (SMPL-X model: missing) | Powtórz krok 4 i wskaż `SMPLX_NEUTRAL.npz` |
+| **Model dłoni MANO: brak** (MANO hand model: missing) | Włącz **Wykrywaj dłonie**, potem **Wybierz model dłoni MANO…** i wskaż `MANO_RIGHT.pkl` |
 | **Nieprawidłowy plik Mixamo FBX** (Mixamo FBX invalid) | Pobierz postać ponownie jako **FBX Binary**, **T-pose** |
 | **Na nagraniu jest więcej niż jedna osoba** (Input contains multiple people) | Użyj klipu z tylko jedną osobą |
 | **Nie wykryto żadnej osoby** (No person was detected in the input) | Upewnij się, że widać całe ciało i jest dobrze oświetlone |

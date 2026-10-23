@@ -86,10 +86,16 @@ Im Bereich **Eingabe** (Input):
 2. **Quelldatei** (Source File): dein Clip. Er muss **genau eine Person zeigen,
    die die ganze Zeit von Kopf bis Fuß im Bild ist**.
 3. **Mixamo-Rig FBX** (Mixamo Rig FBX): der Charakter aus Schritt 5
-4. Klicke auf **Motion erzeugen** (Generate Motion)
+4. **Hände erkennen** (Detect Hands) ist aus. Schalte es nur ein, wenn sich die
+   Finger bewegen sollen. Klicke dann auf **MANO-Handmodell wählen…** (Choose MANO
+   Hand Model…) und wähle `MANO_RIGHT.pkl`. Die Datei holst du wie SMPL-X: registriere
+   dich auf [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), lade **Models & Code**
+   und entpacke es. Der erste Handlauf lädt einmalig etwa **2,7 GB** zusätzlich und
+   dauert ungefähr doppelt so lang wie ein reiner Körperlauf.
+5. Klicke auf **Motion erzeugen** (Generate Motion)
 
 Wenn der Vorgang fertig ist, wird der animierte Charakter automatisch in deine
-Szene importiert.
+Szene importiert. Ein aufgesetzter Fuß bleibt, wo er gelandet ist, und die Sohle liegt auf dem Boden von Blender. Auf diesem Boden kommt ein Mesh **Bodenmarkierungen** (Floor Markers) dazu (ein Kreuz alle 0,5 m). Das Kontrollkästchen **Bodenmarkierungen** (Floor Markers) unter Fortschritt / Ergebnis blendet es ein oder aus.
 
 ### Der erste Lauf dauert länger — das ist normal
 
@@ -125,9 +131,9 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
 - **⚙ neben dem Titel** blendet den Bereich **Einrichtung** (Setup) ein oder aus.
 - **Einrichtung**: Sprache, Laufzeitumgebung, SMPL-X, **Gerät** (Device; CPU ist
   die sichere Wahl) und **Umgebung prüfen** (Check Environment).
-- **Eingabe**: was animiert werden soll.
+- **Eingabe**: was animiert werden soll, **Körpermodell** (Body Model, GVHMR) und **Hände erkennen** (Detect Hands).
 - **Fortschritt / Ergebnis** (Progress / Result): Fortschritt, aktuelles Log und nach einem Auftrag
-  **Erzeugten Charakter importieren** (Import Generated Character), **Ausgabeordner öffnen** (Open Output Folder),
+  **Erzeugten Charakter importieren** (Import Generated Character), **Bodenmarkierungen** (Floor Markers), **Ausgabeordner öffnen** (Open Output Folder),
   **Vollständiges Protokoll** (View Full Log).
 - **Diagnose** (Diagnostics): Stellen, an denen Körperteile des Charakters
   ineinander stecken (eine Hand im Kopf, verschränkte Arme). Rote Zellen im
@@ -136,7 +142,7 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
   Teile und wie tief sie ineinander stecken. **Zurück** / **Weiter** (Previous
   / Next) springen zwischen den Problemen. **HTML-Bericht öffnen** (Open HTML
   Report) öffnet im Webbrowser einen Bericht mit dem Quellvideo neben dem
-  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden).
+  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden). Der Charakter steht auf festen Bodenkreuzen, alle 0,5 m eines, damit zu sehen ist, ob er rutscht.
 
 Das Add-on spricht 19 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
 ändern kannst du das im Bereich Einrichtung unter **UI-Sprache** (UI Language).
@@ -147,6 +153,7 @@ Das Add-on spricht 19 Sprachen. **Automatisch (Blender / System)** (Auto) folgt 
 | --- | --- |
 | **Installation der Laufzeitumgebung fehlgeschlagen** (Runtime installation failed) | Prüfe deine Internetverbindung und klicke erneut auf den Button. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X-Modell: fehlt** (SMPL-X model: missing) | Wiederhole Schritt 4 und wähle `SMPLX_NEUTRAL.npz` |
+| **MANO-Handmodell: fehlt** (MANO hand model: missing) | Schalte **Hände erkennen** ein, dann **MANO-Handmodell wählen…** und `MANO_RIGHT.pkl` wählen |
 | **Mixamo-FBX ungültig** (Mixamo FBX invalid) | Lade den Charakter erneut als **FBX Binary**, **T-pose** herunter |
 | **Die Quelle enthält mehrere Personen** (Input contains multiple people) | Verwende einen Clip mit nur einer Person |
 | **Keine Person in der Quelle erkannt** (No person was detected in the input) | Achte darauf, dass der ganze Körper sichtbar und gut beleuchtet ist |

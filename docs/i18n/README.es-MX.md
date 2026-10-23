@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Los pesos de inferencia (GVHMR, etc.) no se descargan aquí. El primer `m2mr run` los descarga en `weights/` (~5 GB, solo una vez).
+Los pesos de inferencia (GVHMR, etc.) no se descargan aquí. El primer `m2mr run` los descarga en `weights/` (~5 GB, solo una vez). El primer `m2mr run --detect-hands` también descarga los pesos de mano de HaMeR en `weights/hamer/` (~2.7 GB, solo una vez).
 
 Se recomienda instalar ffmpeg (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 El pipeline funciona sin él, pero los videos de salida quedarán **sin audio** y no se podrán reproducir en el navegador.
@@ -80,6 +80,7 @@ Este repositorio no incluye estos archivos; tienes que conseguirlos tú. El nomb
 | FBX del personaje de Mixamo | `assets/mixamo/Y_Bot.fbx` | Con una cuenta de Adobe, descarga Y Bot (o cualquier otro personaje riggeado con Mixamo) desde [Mixamo](https://www.mixamo.com) |
 | Video de acción | `assets/video/<your_clip>.mp4` | Un clip con **exactamente una** persona bien visible, **de pies a cabeza dentro del cuadro todo el tiempo** (puedes guardar varios archivos; cada ejecución usa el que se agregó más recientemente) |
 | Foto de pose (opcional) | `assets/image/<your_photo>.jpg` | Una foto con **exactamente una** persona bien visible, **de pies a cabeza dentro del cuadro**. Úsala con `--image` |
+| Mano derecha MANO (solo para `--detect-hands`) | `assets/body_models/mano/MANO_RIGHT.pkl` | Regístrate en [MANO](https://mano.is.tue.mpg.de/) y descarga **Models & Code**. Una ejecución solo del cuerpo no necesita este archivo |
 
 Nota: el archivo que descargas de Mixamo se llama `Y Bot.fbx` (**con espacio**), un carácter distinto de `Y_Bot.fbx` (**con guion bajo**) en la tabla.
 Cámbiale el nombre a la forma con guion bajo y se convertirá en el rig predeterminado (`m2mr run` sin `--rig`). Dejar el espacio también funciona — si no existe `Y_Bot.fbx`, se usa el primer `.fbx` de `assets/mixamo/`.
@@ -99,6 +100,12 @@ Todo lo que falte se muestra junto con dónde descargarlo y dónde colocarlo.
 m2mr doctor
 ```
 
+`m2mr doctor` revisa la ejecución del cuerpo. No exige el modelo de mano MANO. Para revisar también el archivo extra y los paquetes de Python que usa la detección de dedos:
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. Primera ejecución: ver algo en pantalla
 
 Sin opciones, usa **el archivo más reciente de `assets/video/`** y `assets/mixamo/Y_Bot.fbx`.
@@ -110,6 +117,8 @@ m2mr run
 Este es el paso lento. La primera ejecución descarga ~5 GB de pesos de inferencia (solo una vez) y luego extrae el movimiento humano del video.
 En CPU, la extracción de un clip de ~30 segundos tarda unos 8–15 minutos; las ejecuciones posteriores de duración similar, con los pesos ya descargados, tardan unos 3–5 minutos.
 El retargeting y el render suelen tardar uno o dos minutos. Reutilizar un esqueleto con `--skeleton` en la siguiente sección se salta por completo la extracción y termina en unas decenas de segundos.
+
+Un pie apoyado se fija de forma predeterminada: el metatarso cuando el metatarso está abajo, el talón solo cuando los dedos están arriba. Si una pierna estirada no alcanza ese punto, la cadera se mueve. Después la planta queda sobre el piso (y = 0). `--no-foot-lock` conserva el retarget en bruto, así que los pies pueden deslizarse; la planta igual se coloca sobre el piso.
 
 ### 3. El mismo movimiento, otro personaje
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # además diagnostics.html: video f
 m2mr diagnose outputs/<run> --threshold-cm 2 # reporta solo penetraciones de más de 2 cm (por defecto 1)
 ```
 
-Cada problema en `diagnostics.json` es un par de partes del cuerpo con los rangos de frames en que se intersectan, el peor frame y su profundidad. Los números de frame empiezan en 0, como la timeline de Blender después de importar un glTF. Las partes unidas por una articulación (brazo y antebrazo, torso y muslo, …) no se comparan: su piel se traslapa alrededor de la articulación en cualquier pose. `diagnostics.html` incrusta el video fuente (requiere `ffmpeg`) y carga three.js desde un CDN, así que su vista 3D necesita conexión a internet.
+Cada problema en `diagnostics.json` es un par de partes del cuerpo con los rangos de frames en que se intersectan, el peor frame y su profundidad. Los números de frame empiezan en 0, como la timeline de Blender después de importar un glTF. Las partes unidas por una articulación (brazo y antebrazo, torso y muslo, …) no se comparan: su piel se traslapa alrededor de la articulación en cualquier pose. `diagnostics.html` incrusta el video fuente (requiere `ffmpeg`) y carga three.js desde un CDN, así que su vista 3D necesita conexión a internet. Esa vista dibuja marcas de piso fijas en y = 0: una cruz cada 0.5 m, una más grande cada metro y una cruz verde en el origen, para ver si el personaje se está moviendo.
+
+### 7. Dedos (`--detect-hands`)
+
+Un `m2mr run` normal mueve el cuerpo y deja los huesos de los dedos de Mixamo en reposo. `--detect-hands` enciende el modelo de mano que acompaña al extractor del cuerpo. Con el extractor predeterminado, GVHMR, ese modelo es [HaMeR](https://github.com/geopavlakos/hamer). HaMeR recorta las muñecas a partir de la persona y los frames que GVHMR ya eligió. No busca a otra persona en el clip.
+
+**Esto casi duplica el tiempo.** Un clip que termina en unos minutos sin la opción tarda aproximadamente el doble con `--detect-hands`, porque el pase de las manos corre encima de la extracción del cuerpo. En un video largo, toma en cuenta ese tiempo antes de empezar.
+
+Coloca `MANO_RIGHT.pkl` como en la tabla de arriba y luego:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+La primera ejecución con `--detect-hands` descarga los pesos de HaMeR en `weights/hamer/` (~2.7 GB, una vez). Las rotaciones de los dedos se escriben en `skeleton_motion.npz` y mueven los 30 huesos de los dedos de Mixamo del personaje con skin. Una muñeca que el pase del cuerpo no vio con claridad se queda en reposo en esa mano.
+
+`--hand-smooth` es cuántos segundos de suavizado se aplican a esas rotaciones. El valor predeterminado es `0.08`. `0` conserva la estimación en bruto. El suavizado corre siempre que el archivo del esqueleto ya contiene movimiento de manos, incluso en una ejecución posterior que solo reutiliza ese archivo.
+
+Al reutilizar un esqueleto anterior:
+
+- El archivo ya contiene movimiento de manos: `--skeleton` mueve los dedos por sí solo. `--detect-hands` no hace falta otra vez.
+- No lo contiene, pero el caché del cuerpo de esa ejecución sigue al lado (`cache/<clip>/0_input_video.mp4`, más `preprocess/vitpose.pt` y `preprocess/bbx.pt`): `--skeleton ... --detect-hands` agrega los dedos sin extraer el cuerpo de nuevo.
+- Ese caché ya no está: vuelve a correr el video o la foto con `--detect-hands`.
 
 ## Salidas
 
@@ -192,6 +225,8 @@ images/
                                         # derecha: órbita del rig en pasos de 10° (una vuelta completa)
 ```
 
+Con `--detect-hands`, `skeleton_motion.npz` también guarda las rotaciones de los dedos, y `mixamo_rotations.npz` y `mixamo_character.glb` incluyen los 30 huesos de los dedos. Sin esa opción, y sin movimiento de manos ya guardado en un esqueleto reutilizado, esos huesos se quedan en reposo.
+
 Abre `mixamo_character.glb` en Blender: File → Import → glTF 2.0 (.glb/.gltf). Si la cámara apunta a un espacio vacío, selecciona el mesh del personaje y usa View → Frame Selected. El grupo de esferas en la cabeza y las manos es la visualización de los huesos, no el mesh: en el Outliner, oculta **Icosphere** y la **armature**; deja visible el mesh con skinning. Ajusta los FPS de la escena según `run.json` (`fps`) y la timeline a los frames 0 a `n_frames` − 1 para que la reproducción coincida con la fuente y los números de frame con `diagnostics.json`. Compara una ejecución con video contra `videos/mixamo_character.mp4`, y una con foto contra `images/mixamo_character.png` o el clip orbital.
 
 ## Licencia
@@ -199,8 +234,10 @@ Abre `mixamo_character.glb` en Blender: File → Import → glTF 2.0 (.glb/.gltf
 El código de este repositorio es Apache-2.0. Los recursos que descargues tienen sus propios términos y no deben redistribuirse junto con este repositorio:
 
 - **SMPL-X**: acceso controlado por el MPI; por defecto, investigación / educación / arte sin fines comerciales; el uso comercial requiere un acuerdo aparte
+- **MANO** (solo si usas `--detect-hands`): acceso controlado por el MPI, el mismo tipo de descarga que SMPL-X; deja `MANO_RIGHT.pkl` en local y no lo redistribuyas
 - **Mixamo FBX**: se puede usar en un producto publicado; no redistribuyas el FBX original como paquete de recursos
 - **GVHMR y otros pesos de inferencia**: se descargan automáticamente en `weights/` en el primer `m2mr run`, bajo la licencia de cada proyecto original
+- **HaMeR**: el código de inferencia de este repositorio es MIT; los pesos se descargan en `weights/hamer/` en el primer `m2mr run --detect-hands`, bajo las condiciones de publicación del proyecto original
 
 ## Contacto
 

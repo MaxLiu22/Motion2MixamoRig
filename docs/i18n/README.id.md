@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Bobot inferensi (GVHMR, dll.) tidak diunduh pada langkah ini. `m2mr run` pertama akan mengunduhnya ke `weights/` (~5 GB, sekali saja).
+Bobot inferensi (GVHMR, dll.) tidak diunduh pada langkah ini. `m2mr run` pertama akan mengunduhnya ke `weights/` (~5 GB, sekali saja). `m2mr run --detect-hands` pertama juga mengunduh bobot tangan HaMeR ke `weights/hamer/` (~2,7 GB, sekali saja).
 
 Disarankan memasang ffmpeg (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 Pipeline tetap berjalan tanpanya, tetapi video hasilnya akan **tanpa suara** dan tidak bisa diputar di browser.
@@ -80,6 +80,7 @@ Repositori ini tidak menyertakan file-file berikut; kamu harus mengambilnya send
 | FBX karakter Mixamo | `assets/mixamo/Y_Bot.fbx` | Dengan akun Adobe, unduh Y Bot (atau karakter lain yang sudah di-rig Mixamo) dari [Mixamo](https://www.mixamo.com) |
 | Video aksi | `assets/video/<your_clip>.mp4` | Klip dengan **tepat satu** orang yang terlihat jelas, **dari kepala sampai kaki selalu berada di dalam frame** (boleh menyimpan beberapa file; setiap run memakai yang paling terakhir ditambahkan) |
 | Foto pose (opsional) | `assets/image/<your_photo>.jpg` | Foto dengan **tepat satu** orang yang terlihat jelas, **dari kepala sampai kaki berada di dalam frame**. Gunakan dengan `--image` |
+| Tangan kanan MANO (hanya untuk `--detect-hands`) | `assets/body_models/mano/MANO_RIGHT.pkl` | Daftar di [MANO](https://mano.is.tue.mpg.de/) lalu unduh **Models & Code**. Proses tubuh saja tidak membutuhkan berkas ini |
 
 Catatan: file yang diunduh dari Mixamo bernama `Y Bot.fbx` (**dengan spasi**), berbeda satu karakter dari `Y_Bot.fbx` (**dengan garis bawah**) di tabel.
 Ganti namanya ke bentuk garis bawah agar menjadi rig bawaan (`m2mr run` tanpa `--rig`). Membiarkan spasinya juga tidak masalah — jika `Y_Bot.fbx` tidak ada, `.fbx` pertama di `assets/mixamo/` yang akan dipakai.
@@ -99,6 +100,12 @@ Semua yang belum ada akan ditampilkan beserta tempat mengunduhnya dan lokasi pen
 m2mr doctor
 ```
 
+`m2mr doctor` memeriksa proses tubuh. Model tangan MANO tidak diwajibkan. Untuk memeriksa juga berkas tambahan dan paket Python yang dipakai deteksi jari:
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. Run pertama: tampilkan hasil di layar
 
 Tanpa flag apa pun, perintah ini memakai **file terbaru di `assets/video/`** dan `assets/mixamo/Y_Bot.fbx`.
@@ -110,6 +117,8 @@ m2mr run
 Ini langkah yang lambat. Run pertama mengunduh ~5 GB bobot inferensi (sekali saja), lalu mengekstrak gerakan manusia dari video.
 Di CPU, ekstraksi klip ~30 detik memakan waktu sekitar 8–15 menit; run berikutnya dengan durasi serupa, saat bobot sudah tersedia, sekitar 3–5 menit.
 Retargeting dan rendering biasanya memakan satu atau dua menit. Memakai ulang skeleton dengan `--skeleton` di bagian berikutnya akan melewati ekstraksi sepenuhnya dan selesai dalam beberapa puluh detik.
+
+Kaki yang menapak dikunci secara bawaan: telapak depan saat telapak depan di bawah, tumit hanya saat jari-jari terangkat. Jika kaki yang diluruskan tidak mencapai titik itu, pinggul bergeser. Lalu telapak kaki diletakkan di lantai (y = 0). `--no-foot-lock` menyimpan retarget mentah, jadi kaki bisa meluncur; telapak kaki tetap diletakkan di lantai.
 
 ### 3. Gerakan yang sama, karakter berbeda
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # juga diagnostics.html: video sumb
 m2mr diagnose outputs/<run> --threshold-cm 2 # laporkan hanya tembusan yang lebih dalam dari 2 cm (default 1)
 ```
 
-Setiap masalah di `diagnostics.json` adalah sepasang bagian tubuh beserta rentang frame saat keduanya saling tembus, frame terparah, dan kedalamannya. Nomor frame dihitung dari 0, sama seperti timeline Blender setelah impor glTF. Bagian yang tersambung oleh sendi (lengan atas dan lengan bawah, torso dan paha, …) tidak dibandingkan: kulitnya tumpang tindih di sekitar sendi dalam pose apa pun. `diagnostics.html` menyematkan video sumber (perlu `ffmpeg`) dan memuat three.js dari CDN, jadi tampilan 3D-nya perlu koneksi internet.
+Setiap masalah di `diagnostics.json` adalah sepasang bagian tubuh beserta rentang frame saat keduanya saling tembus, frame terparah, dan kedalamannya. Nomor frame dihitung dari 0, sama seperti timeline Blender setelah impor glTF. Bagian yang tersambung oleh sendi (lengan atas dan lengan bawah, torso dan paha, …) tidak dibandingkan: kulitnya tumpang tindih di sekitar sendi dalam pose apa pun. `diagnostics.html` menyematkan video sumber (perlu `ffmpeg`) dan memuat three.js dari CDN, jadi tampilan 3D-nya perlu koneksi internet. Tampilan itu menggambar penanda lantai yang tetap di y = 0: silang setiap 0,5 m, yang lebih besar setiap meter, dan silang hijau di titik asal, supaya bisa dilihat apakah karakter sedang bergerak.
+
+### 7. Jari (`--detect-hands`)
+
+`m2mr run` biasa hanya menggerakkan tubuh dan membiarkan tulang jari Mixamo pada pose istirahat. `--detect-hands` menyalakan model tangan yang menyertai ekstraktor tubuh. Dengan ekstraktor bawaan, GVHMR, model itu adalah [HaMeR](https://github.com/geopavlakos/hamer). HaMeR memotong pergelangan dari orang dan frame yang sudah dipilih GVHMR. Ia tidak mencari orang kedua di dalam klip.
+
+**Waktunya kira-kira menjadi dua kali lipat.** Klip yang tanpa flag selesai dalam beberapa menit akan makan waktu sekitar dua kali lipat dengan `--detect-hands`, karena lintasan tangan berjalan di atas ekstraksi tubuh. Pada video yang panjang, hitung waktu tambahan ini sebelum mulai.
+
+Letakkan `MANO_RIGHT.pkl` seperti pada tabel di atas, lalu:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+Proses `--detect-hands` yang pertama mengunduh bobot HaMeR ke `weights/hamer/` (~2,7 GB, sekali). Rotasi jari ditulis ke `skeleton_motion.npz` dan menggerakkan 30 tulang jari Mixamo pada karakter yang sudah di-skin. Pergelangan yang tidak terlihat jelas pada lintasan tubuh tetap pada pose istirahat untuk tangan itu.
+
+`--hand-smooth` adalah berapa detik penghalusan yang diterapkan pada rotasi itu. Nilai bawaannya `0.08`. `0` menyimpan estimasi mentah. Penghalusan berjalan setiap kali berkas skeleton sudah berisi gerakan tangan, termasuk proses berikutnya yang hanya memakai ulang berkas itu.
+
+Saat memakai ulang skeleton sebelumnya:
+
+- Berkas sudah berisi gerakan tangan: `--skeleton` menggerakkan jari dengan sendirinya. `--detect-hands` tidak diperlukan lagi.
+- Belum ada, tetapi cache tubuh proses itu masih ada di sampingnya (`cache/<clip>/0_input_video.mp4`, plus `preprocess/vitpose.pt` dan `preprocess/bbx.pt`): `--skeleton ... --detect-hands` menambahkan jari tanpa mengekstrak tubuh lagi.
+- Cache itu sudah hilang: jalankan lagi video atau fotonya dengan `--detect-hands`.
 
 ## Keluaran
 
@@ -192,6 +225,8 @@ images/
                                         # kanan: orbit rig per 10° (satu putaran penuh)
 ```
 
+Dengan `--detect-hands`, `skeleton_motion.npz` juga menyimpan rotasi jari, dan `mixamo_rotations.npz` serta `mixamo_character.glb` memuat 30 tulang jari. Tanpa flag itu, dan tanpa gerakan tangan yang sudah tersimpan di skeleton yang dipakai ulang, tulang-tulang itu tetap dalam pose istirahat.
+
 Buka `mixamo_character.glb` di Blender: File → Import → glTF 2.0 (.glb/.gltf). Jika kamera mengarah ke ruang kosong, pilih mesh karakter lalu gunakan View → Frame Selected. Kumpulan bola di kepala dan tangan adalah tampilan tulang, bukan mesh: di Outliner, sembunyikan **Icosphere** dan **armature**; biarkan mesh yang sudah di-skin tetap terlihat. Atur FPS scene sesuai `run.json` (`fps`) dan timeline ke frame 0 sampai `n_frames` − 1 agar pemutaran sesuai dengan sumbernya dan nomor frame cocok dengan `diagnostics.json`. Bandingkan run video dengan `videos/mixamo_character.mp4`, dan run foto dengan `images/mixamo_character.png` atau klip orbit.
 
 ## Lisensi
@@ -199,8 +234,10 @@ Buka `mixamo_character.glb` di Blender: File → Import → glTF 2.0 (.glb/.gltf
 Kode di repositori ini berlisensi Apache-2.0. Aset yang kamu unduh sendiri memiliki ketentuannya masing-masing dan tidak boleh didistribusikan ulang bersama repo ini:
 
 - **SMPL-X**: akses dibatasi oleh MPI; secara bawaan hanya untuk riset / pendidikan / seni non-komersial; penggunaan komersial memerlukan perjanjian terpisah
+- **MANO** (hanya jika memakai `--detect-hands`): akses dibatasi oleh MPI, jenis unduhan yang sama dengan SMPL-X; simpan `MANO_RIGHT.pkl` secara lokal dan jangan distribusikan ulang
 - **Mixamo FBX**: boleh dipakai dalam produk yang dirilis; jangan mendistribusikan ulang FBX mentah sebagai paket aset
 - **GVHMR dan bobot inferensi lainnya**: diunduh otomatis ke `weights/` pada `m2mr run` pertama, di bawah lisensi masing-masing proyek asal
+- **HaMeR**: kode inferensi di repositori ini berlisensi MIT; bobot diunduh ke `weights/hamer/` pada `m2mr run --detect-hands` pertama, mengikuti ketentuan rilis proyek asal
 
 ## Kontak
 

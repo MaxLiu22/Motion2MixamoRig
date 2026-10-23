@@ -137,10 +137,12 @@ shows or hides **Setup**; Setup stays visible while the runtime installs.
 - **Setup**: UI Language (19 languages; Auto follows Blender / the system),
   Install / Update Runtime, Choose SMPL-X Model, Device, **Check Environment**,
   and **Advanced** (External Python, Project Directory).
-- **Input**: Source Type, Source File, Mixamo Rig FBX, Generate Preview Videos,
-  **Generate Motion**.
+- **Input**: Source Type, Source File, Mixamo Rig FBX, **Body Model**,
+  **Detect Hands** (off by default; on shows finger smoothing and
+  **Choose MANO Hand Model…**), Generate Preview Videos, **Generate Motion**.
 - **Progress / Result**: stage, a bar, the first-run download, recent log
-  lines, and **Cancel** (only the process this add-on started).
+  lines, and **Cancel** (only the process this add-on started). After a job,
+  **Floor Markers** shows or hides the floor crosses added on import.
 
 ## Generate
 
@@ -149,13 +151,17 @@ In **Input**:
 1. Source Type: Video or Image
 2. Source File: **one** clearly visible person, head to toe
 3. Mixamo Rig FBX
-4. Leave **Generate Preview Videos** off unless you want extra renders
-5. **Generate Motion**
+4. Leave **Detect Hands** off unless the fingers should move. Turning it on
+   needs `MANO_RIGHT.pkl` via **Choose MANO Hand Model…** and about doubles
+   the runtime. The first such run also downloads the HaMeR weights (~2.7 GB).
+5. Leave **Generate Preview Videos** off unless you want extra renders
+6. **Generate Motion**
 
 Blender stays interactive. On success the add-on imports
 `mixamo_character.glb` into a collection `M2MR_<source-name>`, hides the
 joint-bubble objects, frames the visible mesh, and sets timeline FPS / start /
-end from the clip.
+end from the clip. Import also adds a **Floor Markers** mesh on Blender's
+floor (z = 0); the checkbox under Progress / Result shows or hides it.
 
 If import fails, generation still succeeded: use **Import Generated Character**.
 **Open Output Folder** and **View Full Log** are always available after a job.

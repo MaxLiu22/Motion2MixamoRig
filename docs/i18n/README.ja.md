@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-推論ウェイト（GVHMR など）はこの段階ではダウンロードしません。初回の `m2mr run` で `weights/` に入ります（約 5 GB、一度だけ）。
+推論ウェイト（GVHMR など）はこの段階ではダウンロードしません。初回の `m2mr run` で `weights/` に入ります（約 5 GB、一度だけ）。初回の `m2mr run --detect-hands` では、HaMeR の手のウェイトも `weights/hamer/` に入ります（約 2.7 GB、一度だけ）。
 
 ffmpeg も推奨です（macOS: `brew install ffmpeg`、Ubuntu: `apt install ffmpeg`）。
 なくても動きますが、出力動画は**無音**になり、ブラウザでは再生できません。
@@ -80,6 +80,7 @@ ffmpeg も推奨です（macOS: `brew install ffmpeg`、Ubuntu: `apt install ffm
 | Mixamo キャラクター FBX | `assets/mixamo/Y_Bot.fbx` | Adobe アカウントで [Mixamo](https://www.mixamo.com) から Y Bot（または他の Mixamo rig キャラクター）をダウンロード |
 | 動作動画 | `assets/video/<your_clip>.mp4` | **一人だけ**、はっきり見え、**頭から足まで全編フレーム内**（複数可、実行ごとに最後に入れたファイルを使用） |
 | ポーズ写真（任意） | `assets/image/<your_photo>.jpg` | **一人だけ**、はっきり見え、**頭から足までフレーム内**。`--image` と一緒に使う |
+| MANO 右手（`--detect-hands` のときだけ） | `assets/body_models/mano/MANO_RIGHT.pkl` | [MANO](https://mano.is.tue.mpg.de/) で登録し、**Models & Code** をダウンロード。体だけの実行には不要 |
 
 注意：Mixamo のダウンロード名は `Y Bot.fbx`（**スペース**）で、表の `Y_Bot.fbx`（**アンダースコア**）と一字違います。
 アンダースコアにすればデフォルト rig になり、`m2mr run` は `--rig` なしでそれを使います。名前を変えなくても構いません——`Y_Bot.fbx` が無いときは `assets/mixamo/` の最初の `.fbx` を使います。
@@ -99,6 +100,12 @@ ffmpeg も推奨です（macOS: `brew install ffmpeg`、Ubuntu: `apt install ffm
 m2mr doctor
 ```
 
+`m2mr doctor` が確認するのは体の実行です。MANO の手モデルは要求しません。指の検出に使う追加ファイルと Python パッケージも確認するには：
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. 初回実行：まず画面に出す
 
 フラグなしでは **`assets/video/` に最後に入れたファイル** と `assets/mixamo/Y_Bot.fbx` を使います。
@@ -110,6 +117,8 @@ m2mr run
 この段階が最も遅いです。初回は約 5 GB の推論ウェイトをダウンロードしてから（一度だけ）、動画から人体モーションを抽出します。
 約 30 秒のクリップは CPU で抽出にだいたい 8–15 分、ウェイト済みの同程度なら 3–5 分です。
 リターゲットとレンダリングは通常 1–2 分です。次節の `--skeleton` でスケルトンを再利用すると抽出を飛ばし、数十秒で終わります。
+
+着地した足は既定で固定されます。足の裏が地面についているときは足の裏を、つま先が上がっているときだけかかとを固定します。脚を伸ばしても届かないときは腰が動きます。そのあと足の裏が地面（y = 0）に置かれます。`--no-foot-lock` は生のリターゲットを残すので、足が滑ることがあります。足の裏はそれでも地面に置かれます。
 
 ### 3. 同じモーション、別キャラクター
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # diagnostics.html も出力：元�
 m2mr diagnose outputs/<run> --threshold-cm 2 # 2 cm より深いめり込みだけを報告（既定 1）
 ```
 
-`diagnostics.json` の各問題は体の部位のペアで、交差しているフレーム範囲、最もひどいフレームとその深さを含みます。フレーム番号は glTF を Blender にインポートしたときのタイムラインと同じく 0 から数えます。関節でつながった部位（上腕と前腕、胴体と太ももなど）は比較しません。どんなポーズでも関節まわりで皮膚が重なるためです。`diagnostics.html` は元動画を埋め込み（`ffmpeg` が必要）、three.js を CDN から読み込むため、3D ビューにはインターネット接続が必要です。
+`diagnostics.json` の各問題は体の部位のペアで、交差しているフレーム範囲、最もひどいフレームとその深さを含みます。フレーム番号は glTF を Blender にインポートしたときのタイムラインと同じく 0 から数えます。関節でつながった部位（上腕と前腕、胴体と太ももなど）は比較しません。どんなポーズでも関節まわりで皮膚が重なるためです。`diagnostics.html` は元動画を埋め込み（`ffmpeg` が必要）、three.js を CDN から読み込むため、3D ビューにはインターネット接続が必要です。この 3D ビューは y = 0 に固定の床マーカーを描きます。0.5 m ごとに十字、1 m ごとに大きい十字、原点は緑で、キャラクターが動いているかを判断できます。
+
+### 7. 指（`--detect-hands`）
+
+普通の `m2mr run` は体だけを動かし、Mixamo の指のボーンはレストのままです。`--detect-hands` は、体の抽出器と一緒に動く手のモデルをオンにします。既定の抽出器 GVHMR では、そのモデルは [HaMeR](https://github.com/geopavlakos/hamer) です。HaMeR は、GVHMR がすでに選んだ人とフレームから手首を切り出します。クリップの中から別の人を探し直すことはありません。
+
+**所要時間はおよそ 2 倍になります。** フラグなしで数分で終わるクリップは、`--detect-hands` を付けるとおよそその 2 倍かかります。手の処理が体の抽出の上に乗るためです。長い動画では、始める前にこの時間を見込んでください。
+
+上の表のとおり `MANO_RIGHT.pkl` を置いてから：
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+最初の `--detect-hands` 実行は、HaMeR のウェイトを `weights/hamer/` にダウンロードします（約 2.7 GB、一度だけ）。指の回転は `skeleton_motion.npz` に書き込まれ、スキン付きキャラクターの Mixamo 指ボーン 30 本を駆動します。体の処理で手首がはっきり見えなかった手は、レストのままです。
+
+`--hand-smooth` は、これらの回転に何秒分の平滑化をかけるかです。既定は `0.08` です。`0` は生の推定を残します。スケルトンファイルにすでに手の動きが入っていれば平滑化は行われます。後からそのファイルだけを再利用する実行も含みます。
+
+以前のスケルトンを再利用するとき：
+
+- ファイルにすでに手の動きがある：`--skeleton` だけで指が動きます。`--detect-hands` はもう要りません。
+- 手の動きはないが、その実行の体のキャッシュがまだ横にある（`cache/<clip>/0_input_video.mp4` と `preprocess/vitpose.pt`、`preprocess/bbx.pt`）：`--skeleton ... --detect-hands` で、体を再抽出せずに指を足せます。
+- そのキャッシュが無い：動画または写真を `--detect-hands` 付きでもう一度実行します。
 
 ## 出力
 
@@ -192,6 +225,8 @@ images/
                                         # 右：10° で一周する周回
 ```
 
+`--detect-hands` を付けると、`skeleton_motion.npz` に指の回転も入り、`mixamo_rotations.npz` と `mixamo_character.glb` には 30 本の指のボーンが含まれます。このフラグがなく、再利用するスケルトンにも手の動きが無いときは、それらのボーンはレストのままです。
+
 `mixamo_character.glb` は Blender で File → Import → glTF 2.0 (.glb/.gltf) で開きます。カメラが空を向いているときはキャラクターのメッシュを選び、View → Frame Selected。頭と手の球の塊はメッシュではなくボーン表示です。Outliner で **Icosphere** と **armature** を非表示にし、スキン付きメッシュは残してください。再生を元の長さに合わせ、フレーム番号を `diagnostics.json` とそろえるには、シーンの FPS を `run.json` の `fps` に、タイムラインを 0 〜 `n_frames` − 1 フレームに設定します。動画実行は `videos/mixamo_character.mp4`、写真実行は `images/mixamo_character.png` または周回クリップと見比べてください。
 
 ## ライセンス
@@ -199,8 +234,10 @@ images/
 このリポジトリのコードは Apache-2.0 です。自分で取得したアセットにはそれぞれの条件があり、このリポジトリと一緒に再配布してはいけません：
 
 - **SMPL-X**：MPI による提供制限。既定は非商用の研究 / 教育 / 芸術；商用は別契約
+- **MANO**（`--detect-hands` を使うときだけ）：SMPL-X と同じく MPI の提供制限。`MANO_RIGHT.pkl` は手元に置き、再配布しない
 - **Mixamo FBX**：製品に入れてよい；元の FBX をアセットパックとして再配布してはいけない
 - **GVHMR および他の推論ウェイト**：初回 `m2mr run` で `weights/` に自動ダウンロード、各アップストリームのライセンス
+- **HaMeR**：このリポジトリ内の推論コードは MIT。ウェイトは初回の `m2mr run --detect-hands` で `weights/hamer/` に入り、アップストリームの公開条件に従う
 
 ## 連絡先
 

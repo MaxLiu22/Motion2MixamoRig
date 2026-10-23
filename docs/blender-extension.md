@@ -32,6 +32,10 @@ Run this on a clean user state: move `~/Motion2MixamoRig` aside first
     re-downloading the weights.
 12. Switch **UI Language** to a few languages, including ไทย, नेपाली, and
     العربية, and check that the text renders.
+13. **Detect Hands** is off. Turning it on shows the twice-as-long note,
+    finger smoothing, and **Choose MANO Hand Model…**.
+14. After import, a **Floor Markers** mesh sits on the floor. The checkbox
+    under Progress / Result hides it and shows it again.
 
 ### macOS (Apple Silicon): own venv
 
@@ -50,7 +54,8 @@ Run this on a clean user state: move `~/Motion2MixamoRig` aside first
     **Previous** and **Next** move the playhead; during playback the triangle
     stays under the current cell. **Open HTML Report** builds the report on the
     first click (Blender opened from the Dock, so the source video is embedded
-    via Homebrew `ffmpeg`) and opens it at once on the second.
+    via Homebrew `ffmpeg`) and opens it at once on the second. The report's
+    3D view shows fixed 0.5 m floor crosses.
 12. Start a second job and click **Cancel**. Only that job should stop.
 13. Disable and re-enable the add-on without a crash.
 

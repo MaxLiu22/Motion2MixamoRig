@@ -86,10 +86,19 @@ In the **Input** box:
 2. **Source File**: your clip. It must show **exactly one person, head to toe
    in frame the whole time**.
 3. **Mixamo Rig FBX**: the character from step 5
-4. Click **Generate Motion**
+4. **Detect Hands** is off. Turn it on only when you want the fingers to move.
+   Then click **Choose MANO Hand Model…** and pick `MANO_RIGHT.pkl`. Get that
+   file the same way as SMPL-X: register at
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), download **Models & Code**,
+   and unzip it. The first hand run downloads about **2.7 GB** more, once, and
+   takes about twice as long as a body-only run.
+5. Click **Generate Motion**
 
 When it finishes, the animated character is imported into your scene
-automatically.
+automatically. A planted foot stays where it landed, and the sole is set on
+Blender's floor. A **Floor Markers** mesh is added on that floor (a cross
+every 0.5 m). The **Floor Markers** checkbox under Progress / Result shows or
+hides it.
 
 ### The first run takes longer — this is normal
 
@@ -124,16 +133,18 @@ shown next to the add-on in **Get Extensions**.
 - **⚙ next to the title** shows or hides the **Setup** box.
 - **Setup**: language, runtime, SMPL-X, device (CPU is the safe choice), and
   **Check Environment**.
-- **Input**: what to animate.
+- **Input**: what to animate, **Body Model** (GVHMR), and **Detect Hands**.
 - **Progress / Result**: progress, recent log, and after a job
-  **Import Generated Character**, **Open Output Folder**, **View Full Log**.
+  **Import Generated Character**, the **Floor Markers** checkbox,
+  **Open Output Folder**, **View Full Log**.
 - **Diagnostics**: where the character's body parts go into each other (a
   hand inside the head, crossed arms). Red cells in the bar are frames with a
   problem; click one to go there. The triangle under the bar follows the
   current frame, and below it are the parts that intersect and how deep.
   **Previous** / **Next** jump between problems. **Open HTML Report** opens a
   report in your web browser with the source video beside the character (the
-  first time it takes about 15 seconds to build).
+  first time it takes about 15 seconds to build). The character stands on
+  fixed floor crosses, one every 0.5 m, so you can see whether it is sliding.
 
 The add-on speaks 19 languages. **Auto** follows Blender's language; change it
 in the Setup box under **UI Language**.
@@ -144,6 +155,7 @@ in the Setup box under **UI Language**.
 | --- | --- |
 | Runtime installation failed | Check your internet connection and click the button again. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | SMPL-X model: missing | Do step 4 again and pick `SMPLX_NEUTRAL.npz` |
+| MANO hand model: missing | Turn on **Detect Hands**, then **Choose MANO Hand Model…** and pick `MANO_RIGHT.pkl` |
 | Mixamo FBX invalid | Download the character again as **FBX Binary**, **T-pose** |
 | Input contains multiple people | Use a clip with only one person |
 | No person was detected | Make sure the whole body is visible and well lit |

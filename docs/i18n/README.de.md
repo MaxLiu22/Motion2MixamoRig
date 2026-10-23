@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Inferenzgewichte (GVHMR usw.) werden hier nicht geladen. Der erste `m2mr run` zieht sie nach `weights/` (~5 GB, nur einmal).
+Inferenzgewichte (GVHMR usw.) werden hier nicht geladen. Der erste `m2mr run` zieht sie nach `weights/` (~5 GB, nur einmal). Der erste `m2mr run --detect-hands` holt zusätzlich die HaMeR-Handgewichte nach `weights/hamer/` (~2,7 GB, nur einmal).
 
 ffmpeg wird empfohlen (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 Ohne ffmpeg läuft die Pipeline, aber die Ausgabevideos sind **stumm** und spielen im Browser nicht.
@@ -80,6 +80,7 @@ Dieses Repository enthält diese Dateien nicht; sie müssen selbst besorgt werde
 | Mixamo-Charakter-FBX | `assets/mixamo/Y_Bot.fbx` | Mit Adobe-Konto Y Bot (oder einen anderen Mixamo-geriggten Charakter) von [Mixamo](https://www.mixamo.com) laden |
 | Bewegungsvideo | `assets/video/<your_clip>.mp4` | Clip mit **genau einer** klar sichtbaren Person, **Kopf bis Fuß die ganze Zeit im Bild** (mehrere Dateien möglich; jeder Lauf nimmt die zuletzt hinzugefügte) |
 | Pose-Foto (optional) | `assets/image/<your_photo>.jpg` | Foto mit **genau einer** klar sichtbaren Person, **Kopf bis Fuß im Bild**. Mit `--image` |
+| MANO-rechte Hand (nur für `--detect-hands`) | `assets/body_models/mano/MANO_RIGHT.pkl` | Bei [MANO](https://mano.is.tue.mpg.de/) registrieren und **Models & Code** laden. Ein reiner Körperlauf braucht diese Datei nicht |
 
 Hinweis: Der Download von Mixamo heißt `Y Bot.fbx` (**Leerzeichen**) und weicht um ein Zeichen von `Y_Bot.fbx` (**Unterstrich**) in der Tabelle ab.
 Umbenennen zum Unterstrich macht es zum Standard-Rig (`m2mr run` ohne `--rig`). Der Name mit Leerzeichen ist ebenfalls in Ordnung — fehlt `Y_Bot.fbx`, wird die erste `.fbx` in `assets/mixamo/` verwendet.
@@ -99,6 +100,12 @@ Fehlendes wird mit Download-Ort und Zielpfad ausgegeben.
 m2mr doctor
 ```
 
+`m2mr doctor` prüft den Körperlauf. Das MANO-Handmodell verlangt es nicht. So prüfst du die zusätzliche Datei und die Python-Pakete für die Fingererkennung:
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. Erster Lauf: etwas auf dem Bildschirm
 
 Ohne Flags: die **neueste Datei in `assets/video/`** und `assets/mixamo/Y_Bot.fbx`.
@@ -110,6 +117,8 @@ m2mr run
 Das ist der langsame Schritt. Der erste Lauf lädt ~5 GB Inferenzgewichte (nur einmal), dann extrahiert er die menschliche Bewegung.
 Auf CPU dauert ein ~30-Sekunden-Clip etwa 8–15 Minuten; spätere Läufe ähnlicher Länge mit vorhandenen Gewichten etwa 3–5 Minuten.
 Retargeting und Rendering dauern meist ein bis zwei Minuten. Mit `--skeleton` im nächsten Abschnitt entfällt die Extraktion komplett, fertig in wenigen zehn Sekunden.
+
+Ein aufgesetzter Fuß wird standardmäßig festgehalten: der Ballen, wenn der Ballen unten ist, die Ferse nur, wenn die Zehen oben sind. Reicht ein gestrecktes Bein nicht, verschiebt sich die Hüfte. Danach liegt die Sohle auf dem Boden (y = 0). `--no-foot-lock` behält das rohe Retargeting, die Füße können also rutschen; die Sohle wird trotzdem auf den Boden gesetzt.
 
 ### 3. Gleiche Bewegung, anderer Charakter
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # zusätzlich diagnostics.html: Que
 m2mr diagnose outputs/<run> --threshold-cm 2 # nur Durchdringungen tiefer als 2 cm melden (Standard 1)
 ```
 
-Jedes Problem in `diagnostics.json` ist ein Paar von Körperteilen mit den Frame-Bereichen, in denen sie sich durchdringen, dem schlimmsten Frame und dessen Tiefe. Frame-Nummern zählen ab 0, wie die Blender-Timeline nach einem glTF-Import. Durch ein Gelenk verbundene Teile (Ober- und Unterarm, Rumpf und Oberschenkel, …) werden nicht verglichen: Ihre Haut überlappt am Gelenk in jeder Pose. `diagnostics.html` bettet das Quellvideo ein (braucht `ffmpeg`) und lädt three.js von einem CDN, daher braucht die 3D-Ansicht eine Internetverbindung.
+Jedes Problem in `diagnostics.json` ist ein Paar von Körperteilen mit den Frame-Bereichen, in denen sie sich durchdringen, dem schlimmsten Frame und dessen Tiefe. Frame-Nummern zählen ab 0, wie die Blender-Timeline nach einem glTF-Import. Durch ein Gelenk verbundene Teile (Ober- und Unterarm, Rumpf und Oberschenkel, …) werden nicht verglichen: Ihre Haut überlappt am Gelenk in jeder Pose. `diagnostics.html` bettet das Quellvideo ein (braucht `ffmpeg`) und lädt three.js von einem CDN, daher braucht die 3D-Ansicht eine Internetverbindung. Diese Ansicht zeichnet feste Bodenmarkierungen auf y = 0: ein Kreuz alle 0,5 m, ein größeres jeden Meter, am Ursprung ein grünes, damit du sehen kannst, ob sich der Charakter bewegt.
+
+### 7. Finger (`--detect-hands`)
+
+Ein schlichtes `m2mr run` bewegt den Körper und lässt die Mixamo-Fingerknochen in Ruhepose. `--detect-hands` schaltet das Handmodell ein, das zum Körper-Extraktor gehört. Beim Standard-Extraktor GVHMR ist das [HaMeR](https://github.com/geopavlakos/hamer). HaMeR schneidet die Handgelenke aus der Person und den Frames, die GVHMR schon gewählt hat. Es sucht im Clip nicht nach einer zweiten Person.
+
+**Das verdoppelt die Laufzeit ungefähr.** Ein Clip, der ohne das Flag in wenigen Minuten fertig ist, braucht mit `--detect-hands` etwa doppelt so lang, weil der Handdurchlauf auf der Körperextraktion sitzt. Bei einem langen Video plane diese Zeit ein, bevor du startest.
+
+Lege `MANO_RIGHT.pkl` wie in der Tabelle oben ab, dann:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+Der erste Lauf mit `--detect-hands` lädt die HaMeR-Gewichte nach `weights/hamer/` (~2,7 GB, einmal). Die Fingerrotationen landen in `skeleton_motion.npz` und treiben die 30 Mixamo-Fingerknochen am geskinnten Charakter. Ein Handgelenk, das der Körperdurchlauf nicht klar gesehen hat, bleibt für diese Hand in Ruhepose.
+
+`--hand-smooth` ist, wie viele Sekunden Glättung auf diese Rotationen kommen. Der Standard ist `0.08`. `0` behält die rohe Schätzung. Die Glättung läuft, sobald die Skelettdatei schon Handbewegung enthält, auch bei einem späteren Lauf, der nur diese Datei wiederverwendet.
+
+Ein früheres Skelett wiederverwenden:
+
+- Die Datei enthält schon Handbewegung: `--skeleton` treibt die Finger von selbst. `--detect-hands` ist nicht noch einmal nötig.
+- Sie enthält keine, aber der Körper-Cache dieses Laufs liegt noch daneben (`cache/<clip>/0_input_video.mp4` plus `preprocess/vitpose.pt` und `preprocess/bbx.pt`): `--skeleton ... --detect-hands` ergänzt die Finger, ohne den Körper neu zu extrahieren.
+- Dieser Cache ist weg: Video oder Foto noch einmal mit `--detect-hands` laufen lassen.
 
 ## Ausgaben
 
@@ -192,6 +225,8 @@ images/
                                         # rechts: 10°-Orbit um den Rig (eine volle Umdrehung)
 ```
 
+Mit `--detect-hands` stehen in `skeleton_motion.npz` auch die Fingerrotationen, und `mixamo_rotations.npz` sowie `mixamo_character.glb` enthalten die 30 Fingerknochen. Ohne dieses Flag, und ohne schon gespeicherte Handbewegung in einem wiederverwendeten Skelett, bleiben diese Knochen in Ruhepose.
+
 `mixamo_character.glb` in Blender öffnen: File → Import → glTF 2.0 (.glb/.gltf). Zeigt die Kamera ins Leere, das Charakter-Mesh wählen und View → Frame Selected. Die Kugeln an Kopf und Händen sind die Knochenanzeige, nicht das Mesh: im Outliner **Icosphere** und die **Armature** ausblenden, das Mesh mit Skinning sichtbar lassen. Szene-FPS aus `run.json` (`fps`) und die Timeline auf die Frames 0 bis `n_frames` − 1 setzen, damit die Wiedergabe zur Quelle passt und die Frame-Nummern zu `diagnostics.json`. Videolauf mit `videos/mixamo_character.mp4` vergleichen, Fotolauf mit `images/mixamo_character.png` oder dem Orbit-Clip.
 
 ## Lizenz
@@ -199,8 +234,10 @@ images/
 Der Code dieses Repositories ist Apache-2.0. Die selbst beschafften Assets haben eigene Bedingungen und dürfen nicht mit diesem Repo weitergegeben werden:
 
 - **SMPL-X**: MPI-Zugang; Standard nichtkommerziell Forschung / Bildung / Kunst; kommerzielle Nutzung braucht eine eigene Vereinbarung
+- **MANO** (nur mit `--detect-hands`): MPI-Zugang, dieselbe Art Download wie SMPL-X; `MANO_RIGHT.pkl` lokal ablegen und nicht weitergeben
 - **Mixamo FBX**: in einem Produkt erlaubt; das rohe FBX nicht als Asset-Pack weitergeben
 - **GVHMR und andere Inferenzgewichte**: beim ersten `m2mr run` automatisch nach `weights/`, jeweils unter der Upstream-Lizenz
+- **HaMeR**: der Inferenzcode in diesem Repository ist MIT; die Gewichte landen beim ersten `m2mr run --detect-hands` in `weights/hamer/`, unter den Bedingungen der Upstream-Veröffentlichung
 
 ## Kontakt
 

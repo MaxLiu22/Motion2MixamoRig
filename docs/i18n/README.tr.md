@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Çıkarım ağırlıkları (GVHMR vb.) bu adımda indirilmez. İlk `m2mr run` bunları `weights/` klasörüne indirir (~5 GB, yalnızca bir kez).
+Çıkarım ağırlıkları (GVHMR vb.) bu adımda indirilmez. İlk `m2mr run` bunları `weights/` klasörüne indirir (~5 GB, yalnızca bir kez). İlk `m2mr run --detect-hands` HaMeR el ağırlıklarını da `weights/hamer/` içine indirir (~2,7 GB, yalnızca bir kez).
 
 ffmpeg kurmanız önerilir (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 Pipeline onsuz da çalışır, ancak çıktı videoları **sessiz** olur ve tarayıcıda oynatılamaz.
@@ -80,6 +80,7 @@ Bu depo bu dosyaları içermez; kendiniz edinmeniz gerekir. SMPL-X dosya adı ta
 | Mixamo karakter FBX'i | `assets/mixamo/Y_Bot.fbx` | Bir Adobe hesabıyla [Mixamo](https://www.mixamo.com)'dan Y Bot'u (ya da Mixamo ile rig'lenmiş başka bir karakteri) indirin |
 | Aksiyon videosu | `assets/video/<your_clip>.mp4` | **Tam olarak bir** kişinin net göründüğü ve **baştan ayağa sürekli kadrajda** olduğu bir klip (birden fazla dosya tutabilirsiniz; her çalıştırma en son ekleneni kullanır) |
 | Poz fotoğrafı (isteğe bağlı) | `assets/image/<your_photo>.jpg` | **Tam olarak bir** kişinin net göründüğü ve **baştan ayağa kadrajda** olduğu bir fotoğraf. `--image` ile kullanın |
+| MANO sağ el (yalnızca `--detect-hands` için) | `assets/body_models/mano/MANO_RIGHT.pkl` | [MANO](https://mano.is.tue.mpg.de/) adresine kaydolup **Models & Code** indirin. Yalnızca gövde çalıştırması bu dosyaya ihtiyaç duymaz |
 
 Not: Mixamo'dan inen dosyanın adı `Y Bot.fbx`'tir (**boşluklu**); tablodaki `Y_Bot.fbx`'ten (**alt çizgili**) tek bir karakter farklıdır.
 Adını alt çizgili biçime çevirirseniz varsayılan rig olur (`--rig` olmadan `m2mr run`). Boşluğu bırakmak da sorun değildir — `Y_Bot.fbx` yoksa `assets/mixamo/` içindeki ilk `.fbx` kullanılır.
@@ -99,6 +100,12 @@ Eksik olan her şey, nereden indirileceği ve nereye konacağıyla birlikte yazd
 m2mr doctor
 ```
 
+`m2mr doctor` gövde çalıştırmasını denetler. MANO el modelini istemez. Parmak algılamanın kullandığı ek dosyayı ve Python paketlerini de denetlemek için:
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. İlk çalıştırma: ekranda bir sonuç görün
 
 Hiçbir parametre verilmezse **`assets/video/` içindeki en yeni dosya** ve `assets/mixamo/Y_Bot.fbx` kullanılır.
@@ -110,6 +117,8 @@ m2mr run
 Yavaş adım budur. İlk çalıştırma ~5 GB çıkarım ağırlığını indirir (yalnızca bir kez), ardından videodan insan hareketini çıkarır.
 CPU'da ~30 saniyelik bir klibin çıkarımı yaklaşık 8–15 dakika sürer; ağırlıklar hazırken benzer uzunluktaki sonraki çalıştırmalar yaklaşık 3–5 dakika sürer.
 Retargeting ve render genellikle bir iki dakika sürer. Sonraki bölümdeki `--skeleton` ile bir iskeleti yeniden kullanmak çıkarımı tamamen atlar ve birkaç on saniyede biter.
+
+Yere basan ayak varsayılan olarak sabitlenir: tarak yere değiyorsa tarak, parmaklar kalkıksa yalnızca topuk. Düz bacak o noktaya yetişemezse kalça kayar. Ardından taban zemine (y = 0) oturtulur. `--no-foot-lock` ham retarget'i korur, bu yüzden ayaklar kayabilir; taban yine de zemine oturtulur.
 
 ### 3. Aynı hareket, farklı karakter
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # ayrıca diagnostics.html: karakte
 m2mr diagnose outputs/<run> --threshold-cm 2 # yalnızca 2 cm'den derin geçmeleri raporlar (varsayılan 1)
 ```
 
-`diagnostics.json` içindeki her sorun bir vücut parçası çiftidir; iç içe geçtikleri kare aralıklarını, en kötü kareyi ve onun derinliğini içerir. Kare numaraları, glTF içe aktarımından sonraki Blender timeline'ı gibi 0'dan başlar. Bir eklemle bağlı parçalar (üst kol ve ön kol, gövde ve uyluk, …) karşılaştırılmaz: derileri her pozda eklem çevresinde üst üste biner. `diagnostics.html` kaynak videoyu gömer (`ffmpeg` gerekir) ve three.js'i bir CDN'den yükler; bu yüzden 3D görünümü internet bağlantısı ister.
+`diagnostics.json` içindeki her sorun bir vücut parçası çiftidir; iç içe geçtikleri kare aralıklarını, en kötü kareyi ve onun derinliğini içerir. Kare numaraları, glTF içe aktarımından sonraki Blender timeline'ı gibi 0'dan başlar. Bir eklemle bağlı parçalar (üst kol ve ön kol, gövde ve uyluk, …) karşılaştırılmaz: derileri her pozda eklem çevresinde üst üste biner. `diagnostics.html` kaynak videoyu gömer (`ffmpeg` gerekir) ve three.js'i bir CDN'den yükler; bu yüzden 3D görünümü internet bağlantısı ister. Bu görünüm y = 0 üzerine sabit zemin işaretleri çizer: her 0,5 m'de bir çarpı, her metrede daha büyüğü ve başlangıçta yeşil bir çarpı, böylece karakterin hareket edip etmediği anlaşılır.
+
+### 7. Parmaklar (`--detect-hands`)
+
+Düz bir `m2mr run` gövdeyi hareket ettirir ve Mixamo parmak kemiklerini dinlenmede bırakır. `--detect-hands`, gövde çıkarıcısıyla birlikte gelen el modelini açar. Varsayılan çıkarıcı GVHMR ile bu model [HaMeR](https://github.com/geopavlakos/hamer) olur. HaMeR, GVHMR'nin çoktan seçtiği kişiden ve karelerden bilekleri keser. Klipte ikinci bir kişiyi aramaz.
+
+**Süre yaklaşık iki katına çıkar.** Bayrak olmadan birkaç dakikada biten bir klip, `--detect-hands` ile yaklaşık iki kat sürer; el geçişi gövde çıkarımının üstüne biner. Uzun bir videoda başlamadan önce bu süreyi hesaba katın.
+
+`MANO_RIGHT.pkl` dosyasını yukarıdaki tabloya göre koyun, sonra:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+`--detect-hands` ile ilk çalıştırma HaMeR ağırlıklarını `weights/hamer/` içine indirir (~2,7 GB, bir kez). Parmak dönüşleri `skeleton_motion.npz` içine yazılır ve derili karakterdeki 30 Mixamo parmak kemiğini sürer. Gövde geçişinin net görmediği bilek, o el için dinlenmede kalır.
+
+`--hand-smooth`, bu dönüşlere kaç saniyelik yumuşatma uygulanacağını söyler. Varsayılan `0.08` değeridir. `0` ham tahmini korur. İskelet dosyasında zaten el hareketi varsa yumuşatma çalışır; buna yalnızca bu dosyayı yeniden kullanan sonraki bir çalıştırma da dahildir.
+
+Önceki bir iskeleti yeniden kullanırken:
+
+- Dosyada zaten el hareketi vardır: `--skeleton` parmakları kendisi sürer. `--detect-hands` bir daha gerekmez.
+- El hareketi yoktur ama o çalıştırmanın gövde önbelleği hâlâ yanındadır (`cache/<clip>/0_input_video.mp4` ile `preprocess/vitpose.pt` ve `preprocess/bbx.pt`): `--skeleton ... --detect-hands` gövdeyi yeniden çıkarmadan parmakları ekler.
+- O önbellek yoksa: videoyu veya fotoğrafı `--detect-hands` ile yeniden çalıştırın.
 
 ## Çıktılar
 
@@ -192,6 +225,8 @@ images/
                                         # sağ: rig etrafında 10°'lik adımlarla yörünge (tam bir tur)
 ```
 
+`--detect-hands` ile `skeleton_motion.npz` parmak dönüşlerini de saklar; `mixamo_rotations.npz` ve `mixamo_character.glb` 30 parmak kemiğini içerir. Bu bayrak yoksa ve yeniden kullanılan iskelette de el hareketi yoksa bu kemikler dinlenmede kalır.
+
 `mixamo_character.glb` dosyasını Blender'da açın: File → Import → glTF 2.0 (.glb/.gltf). Kamera boş bir alana bakıyorsa karakter mesh'ini seçip View → Frame Selected kullanın. Baş ve ellerdeki küre kümesi kemik gösterimidir, mesh değildir: Outliner'da **Icosphere** ve **armature**'ü gizleyin; skin'lenmiş mesh'i görünür bırakın. Oynatmanın kaynakla, kare numaralarının da `diagnostics.json` ile eşleşmesi için sahnenin FPS'ini `run.json` (`fps`) değerine, timeline'ı da 0 ile `n_frames` − 1 arasındaki karelere ayarlayın. Bir video çalıştırmasını `videos/mixamo_character.mp4` ile, bir fotoğraf çalıştırmasını `images/mixamo_character.png` ya da yörünge klibiyle karşılaştırın.
 
 ## Lisans
@@ -199,8 +234,10 @@ images/
 Bu deponun kodu Apache-2.0 lisanslıdır. Kendi indirdiğiniz varlıkların kendi koşulları vardır ve bu depoyla birlikte yeniden dağıtılmamalıdır:
 
 - **SMPL-X**: MPI erişim kontrollü; varsayılan olarak ticari olmayan araştırma / eğitim / sanat; ticari kullanım için ayrı bir anlaşma gerekir
+- **MANO** (yalnızca `--detect-hands` ile): MPI erişim kontrollü, SMPL-X ile aynı tür indirme; `MANO_RIGHT.pkl` dosyasını yerelde tutun ve yeniden dağıtmayın
 - **Mixamo FBX**: yayınlanan bir üründe kullanılabilir; ham FBX'i bir varlık paketi olarak yeniden dağıtmayın
 - **GVHMR ve diğer çıkarım ağırlıkları**: ilk `m2mr run` sırasında `weights/` içine otomatik indirilir, her birinin kaynak projesinin lisansı altındadır
+- **HaMeR**: bu depodaki çıkarım kodu MIT'tir; ağırlıklar ilk `m2mr run --detect-hands` sırasında `weights/hamer/` içine iner, kaynak yayının koşulları altında
 
 ## İletişim
 

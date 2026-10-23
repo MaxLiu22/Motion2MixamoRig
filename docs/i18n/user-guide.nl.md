@@ -85,10 +85,16 @@ In het vak **Invoer** (Input):
 2. **Bronbestand** (Source File): je clip. Daarin moet **precies één persoon te
    zien zijn, de hele tijd van top tot teen in beeld**.
 3. **Mixamo-rig FBX** (Mixamo Rig FBX): het personage uit stap 5
-4. Klik op **Beweging genereren** (Generate Motion)
+4. **Handen detecteren** (Detect Hands) staat uit. Zet het alleen aan als de vingers
+   moeten bewegen. Klik daarna op **MANO-handmodel kiezen…** (Choose MANO Hand Model…)
+   en kies `MANO_RIGHT.pkl`. Dat bestand haal je op zoals SMPL-X: registreer op
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), download **Models & Code** en pak
+   het uit. De eerste handgang downloadt eenmalig ongeveer **2,7 GB** extra en duurt
+   ongeveer twee keer zo lang als een run met alleen het lichaam.
+5. Klik op **Beweging genereren** (Generate Motion)
 
 Als het klaar is, wordt het geanimeerde personage automatisch in je scène
-geïmporteerd.
+geïmporteerd. Een neergezette voet blijft waar hij neerkwam, en de zool staat op de vloer van Blender. Op die vloer komt een mesh **Vloermarkeringen** (Floor Markers) (een kruis elke 0,5 m). Het vakje **Vloermarkeringen** (Floor Markers) onder Voortgang / Resultaat toont of verbergt het.
 
 ### De eerste run duurt langer — dat is normaal
 
@@ -124,9 +130,9 @@ Je geïnstalleerde versie staat naast de add-on in **Get Extensions**.
 - **⚙ naast de titel** toont of verbergt het vak **Instellen** (Setup).
 - **Instellen**: taal, runtime, SMPL-X, **Apparaat** (Device; CPU is de veilige
   keuze) en **Omgeving controleren** (Check Environment).
-- **Invoer**: wat er geanimeerd moet worden.
+- **Invoer**: wat er geanimeerd moet worden, het **Lichaamsmodel** (Body Model, GVHMR) en **Handen detecteren** (Detect Hands).
 - **Voortgang / Resultaat** (Progress / Result): voortgang, recent log en na een taak
-  **Gegenereerd personage importeren** (Import Generated Character), **Uitvoermap openen** (Open Output Folder),
+  **Gegenereerd personage importeren** (Import Generated Character), **Vloermarkeringen** (Floor Markers), **Uitvoermap openen** (Open Output Folder),
   **Volledig log bekijken** (View Full Log).
 - **Diagnose** (Diagnostics): plekken waar lichaamsdelen van het personage in
   elkaar zitten (een hand in het hoofd, gekruiste armen). Rode cellen in de
@@ -135,7 +141,7 @@ Je geïnstalleerde versie staat naast de add-on in **Get Extensions**.
   delen elkaar doorsnijden en hoe diep. **Vorige** / **Volgende** (Previous /
   Next) springen tussen problemen. **HTML-rapport openen** (Open HTML Report)
   opent in de webbrowser een rapport met de bronvideo naast het personage (de
-  eerste keer duurt het maken ongeveer 15 seconden).
+  eerste keer duurt het maken ongeveer 15 seconden). Het personage staat op vaste vloerkruisen, elke 0,5 m één, zodat te zien is of het schuift.
 
 De add-on spreekt 19 talen. **Automatisch (Blender / Systeem)** (Auto) volgt de taal van Blender;
 je wijzigt dit in het vak Instellen onder **Interfacetaal** (UI Language).
@@ -146,6 +152,7 @@ je wijzigt dit in het vak Instellen onder **Interfacetaal** (UI Language).
 | --- | --- |
 | **Installatie van runtime mislukt** (Runtime installation failed) | Controleer je internetverbinding en klik opnieuw op de knop. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X-model: ontbreekt** (SMPL-X model: missing) | Doe stap 4 opnieuw en kies `SMPLX_NEUTRAL.npz` |
+| **MANO-handmodel: ontbreekt** (MANO hand model: missing) | Zet **Handen detecteren** aan, dan **MANO-handmodel kiezen…** en kies `MANO_RIGHT.pkl` |
 | **Mixamo-FBX ongeldig** (Mixamo FBX invalid) | Download het personage opnieuw als **FBX Binary**, **T-pose** |
 | **Invoer bevat meerdere personen** (Input contains multiple people) | Gebruik een clip met maar één persoon |
 | **Geen persoon gevonden in de invoer** (No person was detected in the input) | Zorg dat het hele lichaam zichtbaar en goed belicht is |

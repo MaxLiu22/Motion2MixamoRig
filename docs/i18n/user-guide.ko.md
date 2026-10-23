@@ -87,9 +87,14 @@ SMPL-X는 애드온에 필요한 무료 바디 모델입니다. 라이선스상 
 2. **소스 파일** (Source File): 사용할 클립. **처음부터 끝까지 정확히 한 사람이,
    머리부터 발끝까지 화면 안에** 나와야 합니다.
 3. **Mixamo 리그 FBX** (Mixamo Rig FBX): 5단계에서 받은 캐릭터
-4. **모션 생성** (Generate Motion) 클릭
+4. **손 검출** (Detect Hands)은 꺼져 있습니다. 손가락을 움직이고 싶을 때만 켭니다.
+   그다음 **MANO 손 모델 선택…** (Choose MANO Hand Model…)을 눌러 `MANO_RIGHT.pkl`을 고릅니다.
+   이 파일은 SMPL-X와 같은 방법으로 받습니다.
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/)에 등록하고 **Models & Code**를 받아 압축을 풉니다.
+   손을 처음 처리할 때는 약 **2.7 GB**를 한 번 더 받으며, 몸만 돌릴 때의 대략 두 배가 걸립니다.
+5. **모션 생성** (Generate Motion) 클릭
 
-작업이 끝나면 애니메이션된 캐릭터가 씬에 자동으로 가져와집니다.
+작업이 끝나면 애니메이션된 캐릭터가 씬에 자동으로 가져와집니다. 바닥에 디딘 발은 그 자리에 남고, 발바닥은 Blender 바닥에 놓입니다. 그 바닥에 **바닥 마커** (Floor Markers) 메시가 추가됩니다(0.5 m마다 십자). 진행 / 결과의 **바닥 마커** (Floor Markers) 체크박스로 보이거나 숨깁니다.
 
 ### 첫 실행은 시간이 더 걸립니다 — 정상입니다
 
@@ -124,15 +129,16 @@ SMPL-X는 애드온에 필요한 무료 바디 모델입니다. 라이선스상 
 - **제목 옆의 ⚙** 버튼으로 **설정** (Setup) 상자를 보이거나 숨깁니다.
 - **설정**: 언어, 런타임, SMPL-X, **장치** (Device) (CPU가 안전한 선택),
   그리고 **환경 확인** (Check Environment).
-- **입력**: 애니메이션할 대상.
+- **입력**: 애니메이션할 대상, **바디 모델** (Body Model, GVHMR), **손 검출** (Detect Hands).
 - **진행 / 결과** (Progress / Result): 진행 상황, 최근 로그, 그리고 작업 후에는
   **생성된 캐릭터 가져오기** (Import Generated Character),
+  **바닥 마커** (Floor Markers) 체크박스,
   **출력 폴더 열기** (Open Output Folder), **전체 로그 보기** (View Full Log).
 - **진단**(Diagnostics): 캐릭터의 신체 부위가 서로 파고든 곳(손이 머리 안으로 들어가거나, 팔짱을 낄 때 팔끼리 겹치는
   경우 등). 막대의 빨간 칸은 문제가 있는 프레임이며, 클릭하면 그곳으로 이동합니다. 막대 아래의 삼각형은 현재 프레임을 따라가고, 그
   아래에 이 프레임에서 파고든 부위와 깊이가 표시됩니다. **이전** / **다음**(Previous / Next)으로 문제 사이를
   이동합니다. **HTML 보고서 열기**(Open HTML Report)는 원본 영상과 캐릭터를 나란히 보여 주는 보고서를 웹
-  브라우저에서 엽니다(처음에는 만드는 데 약 15초 걸립니다).
+  브라우저에서 엽니다(처음에는 만드는 데 약 15초 걸립니다). 캐릭터는 0.5 m마다 놓인 고정된 바닥 십자 위에 서 있어서, 미끄러지는지 볼 수 있습니다.
 
 애드온은 19개 언어를 지원합니다. **자동 (Blender / 시스템)** (Auto (Blender / System))은
 Blender의 언어를 따릅니다. **설정** 상자의 **UI 언어** (UI Language)에서 바꿀 수
@@ -144,6 +150,7 @@ Blender의 언어를 따릅니다. **설정** 상자의 **UI 언어** (UI Langua
 | --- | --- |
 | **런타임 설치 실패** (Runtime installation failed) | 인터넷 연결을 확인하고 버튼을 다시 클릭하세요. 로그: `~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X 모델: 없음** (SMPL-X model: missing) | 4단계를 다시 진행하고 `SMPLX_NEUTRAL.npz`를 선택하세요 |
+| **MANO 손 모델: 없음** (MANO hand model: missing) | **손 검출**을 켠 뒤 **MANO 손 모델 선택…**에서 `MANO_RIGHT.pkl`을 고르세요 |
 | **Mixamo FBX가 올바르지 않습니다** (Mixamo FBX invalid) | 캐릭터를 **FBX Binary**, **T-pose**로 다시 다운로드하세요 |
 | **입력에 여러 사람이 있습니다** (Input contains multiple people) | 한 사람만 나오는 클립을 사용하세요 |
 | **입력에서 사람을 찾지 못했습니다** (No person was detected in the input) | 전신이 보이고 조명이 충분한지 확인하세요 |

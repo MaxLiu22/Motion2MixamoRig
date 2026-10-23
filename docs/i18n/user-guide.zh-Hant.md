@@ -83,9 +83,14 @@ SMPL-X 是外掛需要的一個免費人體模型。它的授權不允許我們�
 2. **來源檔案**（Source File）：你的影片片段。畫面中必須**只有一個人，而且從頭到腳
    全程完整入鏡**。
 3. **Mixamo 角色 FBX**（Mixamo Rig FBX）：第 5 步下載的角色
-4. 點選 **產生動作**（Generate Motion）
+4. **偵測手部**（Detect Hands）預設關著。只有想讓手指跟著動時才打開。
+   然後點 **選擇 MANO 手部模型…**（Choose MANO Hand Model…），選中 `MANO_RIGHT.pkl`。
+   這個檔案和 SMPL-X 一樣要自己下載：在
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/) 註冊，下載 **Models & Code**，
+   解壓後找到它。第一次跑手部會再下載約 **2.7 GB**，只下這一次，耗時大約是只跑身體的兩倍。
+5. 點選 **產生動作**（Generate Motion）
 
-完成後，帶有動畫的角色會自動匯入你的場景。
+完成後，帶有動畫的角色會自動匯入你的場景。踩實的那隻腳會停在落點上，腳底板貼在 Blender 的地面上。地面上會多一個 **Floor Markers** 網格（每 0.5 公尺一個十字）。進度 / 結果裡的 **地面標記**（Floor Markers）勾選框用來顯示或隱藏它。
 
 ### 首次執行會比較久，這是正常的
 
@@ -119,11 +124,11 @@ SMPL-X 是外掛需要的一個免費人體模型。它的授權不允許我們�
 - **標題旁的 ⚙** 用來顯示或隱藏 **設定**（Setup）區塊。
 - **設定**：語言、執行環境、SMPL-X、**裝置**（Device，選 CPU 最保險），以及
   **檢查環境**（Check Environment）。
-- **輸入**：要製作成動畫的素材。
+- **輸入**：要製作成動畫的素材、**身體模型**（Body Model，目前是 GVHMR），以及 **偵測手部**（Detect Hands）。
 - **進度 / 結果**（Progress / Result）：進度、最近的記錄；工作完成後還有
-  **匯入產生的角色**（Import Generated Character）、**開啟輸出資料夾**（Open Output Folder）、
+  **匯入產生的角色**（Import Generated Character）、**地面標記**（Floor Markers）勾選框、**開啟輸出資料夾**（Open Output Folder）、
   **檢視完整記錄**（View Full Log）。
-- **診斷**（Diagnostics）：角色身體部位互相穿插的地方（例如手穿進頭裡、雙臂交叉時穿進去）。條上的紅格是有問題的影格，點一下就會跳過去。條下方的三角形跟著目前影格移動，再下方列出這一格有哪些部位穿插、深度多少。**上一個問題** / **下一個問題**（Previous / Next）可在問題之間跳轉。**開啟 HTML 報告**（Open HTML Report）會在瀏覽器中開啟報告，原始影片與角色並排顯示（第一次需要產生，大約 15 秒）。
+- **診斷**（Diagnostics）：角色身體部位互相穿插的地方（例如手穿進頭裡、雙臂交叉時穿進去）。條上的紅格是有問題的影格，點一下就會跳過去。條下方的三角形跟著目前影格移動，再下方列出這一格有哪些部位穿插、深度多少。**上一個問題** / **下一個問題**（Previous / Next）可在問題之間跳轉。**開啟 HTML 報告**（Open HTML Report）會在瀏覽器中開啟報告，原始影片與角色並排顯示（第一次需要產生，大約 15 秒）。角色站在固定的地面十字上，每 0.5 公尺一個，用來看它有沒有在滑。
 
 外掛支援 19 種語言。**自動（跟隨 Blender / 系統）**（Auto (Blender / System)）會跟隨
 Blender 的語言；可以在設定區塊的 **介面語言**（UI Language）中變更。
@@ -134,6 +139,7 @@ Blender 的語言；可以在設定區塊的 **介面語言**（UI Language）�
 | --- | --- |
 | **執行環境安裝失敗**（Runtime installation failed） | 檢查網路連線，然後再點一次按鈕。記錄檔：`~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X 模型：缺少**（SMPL-X model: missing） | 重新執行第 4 步，選擇 `SMPLX_NEUTRAL.npz` |
+| **MANO 手部模型：缺少**（MANO hand model: missing） | 打開 **偵測手部**，再點 **選擇 MANO 手部模型…**，選中 `MANO_RIGHT.pkl` |
 | **Mixamo FBX 無效**（Mixamo FBX invalid） | 重新下載角色，格式選 **FBX Binary**，姿勢選 **T-pose** |
 | **輸入中有多個人**（Input contains multiple people） | 改用只有一個人的片段 |
 | **輸入中沒有偵測到人**（No person was detected in the input） | 確認全身入鏡且光線充足 |

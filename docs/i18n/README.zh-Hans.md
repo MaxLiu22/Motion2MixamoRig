@@ -64,7 +64,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-推理权重（GVHMR 等）不在这一步下载，首次 `m2mr run` 时自动拉到 `weights/`（约 5 GB，只下这一次）。
+推理权重（GVHMR 等）不在这一步下载，首次 `m2mr run` 时自动拉到 `weights/`（约 5 GB，只下这一次）。首次 `m2mr run --detect-hands` 还会把 HaMeR 手部权重量下载到 `weights/hamer/`（约 2.7 GB，只下这一次）。
 
 建议再装上 ffmpeg（macOS：`brew install ffmpeg`，Ubuntu：`apt install ffmpeg`）。
 没有它也能跑，但输出的视频会**没有声音**，编码格式也没法在浏览器里直接播放。
@@ -79,6 +79,7 @@ pip install --upgrade pip setuptools wheel \
 | Mixamo 角色 FBX | `assets/mixamo/Y_Bot.fbx` | 用 Adobe 账号从 [Mixamo](https://www.mixamo.com) 下载 Y Bot（或其他 Mixamo rig 角色） |
 | 动作视频 | `assets/video/<your_clip>.mp4` | **只有一个人**、人清晰可见、**从头到脚全程都在画框内**（可放多个文件，每次跑用最新的那一个） |
 | 姿态照片（可选） | `assets/image/<your_photo>.jpg` | **只有一个人**、人清晰可见、**从头到脚都在画框内**。配合 `--image` 使用 |
+| MANO 右手模型（只有 `--detect-hands` 才需要） | `assets/body_models/mano/MANO_RIGHT.pkl` | 在 [MANO](https://mano.is.tue.mpg.de/) 注册后下载 **Models & Code**。只跑身体时不需要这个文件 |
 
 注意：Mixamo 下载下来的文件叫 `Y Bot.fbx`（中间是**空格**），和上表的 `Y_Bot.fbx`（**下划线**）差一个字符。
 改成下划线它就是默认 rig，`m2mr run` 不带 `--rig` 时自动用它；不想改名也行——找不到 `Y_Bot.fbx` 时
@@ -99,6 +100,12 @@ pip install --upgrade pip setuptools wheel \
 m2mr doctor
 ```
 
+`m2mr doctor` 检查的是身体这一路，不要求 MANO 手部模型。要连手指检测用的文件和 Python 包一起查：
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. 第一次跑：先拿到一个能看的结果
 
 不带参数时，用**最后放进 `assets/video/` 的视频** + `assets/mixamo/Y_Bot.fbx`。
@@ -110,6 +117,8 @@ m2mr run
 这步最慢。第一次跑会先下载约 5 GB 推理权重（只这一次），然后从视频里提取人体动作。
 一段约 30 秒的视频，CPU 上提取大约 8–15 分钟；权重下完之后再跑同类长度，大约 3–5 分钟。
 后面的重定向和渲染通常一两分钟。用下一节的 `--skeleton` 复用骨架时，提取整段跳过，几十秒就能出结果。
+
+踩实的脚默认会钉住：脚掌着地时锁脚掌，只有脚尖抬起来才锁脚跟。腿伸直还够不到时，髋部会跟着挪。然后脚底板会被放到地面上（y = 0）。`--no-foot-lock` 保留原始重定向，脚可能会滑；脚底板仍然会放到地面上。
 
 ### 3. 同一段动作，换个角色
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # 另外生成 diagnostics.html：�
 m2mr diagnose outputs/<run> --threshold-cm 2 # 只报告深于 2 cm 的穿插（默认 1）
 ```
 
-`diagnostics.json` 里每个问题是一对身体部位，附带它们穿插的帧范围、最严重的一帧和深度。帧号从 0 开始，和 glTF 导入 Blender 后的时间轴一致。由关节连着的部位（上臂和前臂、躯干和大腿……）不互相比较：无论什么姿势，关节附近的皮肤都会重叠。`diagnostics.html` 会嵌入原视频（需要 `ffmpeg`），three.js 从 CDN 加载，所以 3D 视图需要联网。
+`diagnostics.json` 里每个问题是一对身体部位，附带它们穿插的帧范围、最严重的一帧和深度。帧号从 0 开始，和 glTF 导入 Blender 后的时间轴一致。由关节连着的部位（上臂和前臂、躯干和大腿……）不互相比较：无论什么姿势，关节附近的皮肤都会重叠。`diagnostics.html` 会嵌入原视频（需要 `ffmpeg`），three.js 从 CDN 加载，所以 3D 视图需要联网。这个 3D 视图在 y = 0 上画着固定的地面标记：每 0.5 米一个十字，整米的更大，原点是绿色，用来判断角色有没有在动。
+
+### 7. 手指（`--detect-hands`）
+
+普通的 `m2mr run` 只动身体，Mixamo 的手指骨停在静息姿势。`--detect-hands` 打开和身体提取器配套的手部模型。默认提取器 GVHMR 用的是 [HaMeR](https://github.com/geopavlakos/hamer)。HaMeR 用 GVHMR 已经选定的人和帧去裁手腕，不会再在片子里另找一个人。
+
+**耗时大约翻倍。** 不加这个开关几分钟能跑完的片段，加上之后大约要两倍时间，因为手部是在身体提取之上再跑一遍。长视频开跑之前先把这段时间算进去。
+
+按上面的表放好 `MANO_RIGHT.pkl`，然后：
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+第一次带 `--detect-hands` 会把 HaMeR 权重下载到 `weights/hamer/`（约 2.7 GB，只这一次）。手指旋转写进 `skeleton_motion.npz`，并驱动带皮角色上的 30 根 Mixamo 手指骨。身体那一步没看清的那只手腕，这只手就保持静息。
+
+`--hand-smooth` 是这些旋转要平滑多少秒。默认 `0.08`。`0` 保留原始估计。只要骨架文件里已经有手部动作，平滑就会做，包括后来只复用这个文件的那次运行。
+
+复用以前的骨架时：
+
+- 文件里已经有手部动作：`--skeleton` 自己就会驱动手指，不必再加 `--detect-hands`。
+- 没有，但这边还留着那次的身体缓存（`cache/<片段>/0_input_video.mp4`，以及 `preprocess/vitpose.pt` 和 `preprocess/bbx.pt`）：`--skeleton ... --detect-hands` 可以补上手指，不用重新提取身体。
+- 缓存已经没了：用 `--detect-hands` 把视频或照片再跑一遍。
 
 ## 输出
 
@@ -192,6 +225,8 @@ images/
                                         # 右：10° 俯视绕角色转一圈
 ```
 
+带上 `--detect-hands` 时，`skeleton_motion.npz` 里还有手指旋转，`mixamo_rotations.npz` 和 `mixamo_character.glb` 会包含那 30 根手指骨。没有这个开关、复用的骨架里也没有手部动作时，这些骨头停在静息姿势。
+
 `mixamo_character.glb` 用 Blender 打开：File → Import → glTF 2.0 (.glb/.gltf)。导入后若镜头对不准，选中角色网格，再 View → Frame Selected。头和手上那堆球是骨头的显示形状，不是模型：在 Outliner 里隐藏 **Icosphere** 和骨架（armature），留下带皮网格。场景 FPS 按 `run.json` 里的 `fps` 设置，时间轴设为第 0 帧到第 `n_frames` − 1 帧，这样播放才会和原片一样长，帧号也和 `diagnostics.json` 对得上。视频 run 对照 `videos/mixamo_character.mp4`，照片 run 对照 `images/mixamo_character.png` 或那条绕转视频。
 
 ## 许可证
@@ -199,8 +234,10 @@ images/
 本仓库代码为 Apache-2.0。你自取的资产各有条款，不能随本仓库再分发：
 
 - **SMPL-X**：MPI 门禁，默认非商业科研 / 教育 / 艺术；商用需另谈
+- **MANO**（只有用 `--detect-hands` 时）：同样是 MPI 门禁，下载方式和 SMPL-X 一样；把 `MANO_RIGHT.pkl` 放在本地，不要再分发
 - **Mixamo FBX**：可用在成品里，不能把原始 FBX 当资源包发出去
 - **GVHMR 等推理权重**：首次 `m2mr run` 自动下载到 `weights/`，遵循各自上游许可
+- **HaMeR**：本仓库里的推理代码是 MIT；权重在首次 `m2mr run --detect-hands` 时下载到 `weights/hamer/`，遵循上游发布条款
 
 ## 联系
 

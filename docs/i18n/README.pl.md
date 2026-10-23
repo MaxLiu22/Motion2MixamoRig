@@ -65,7 +65,7 @@ pip install --upgrade pip setuptools wheel \
   && pip install -e .
 ```
 
-Wagi modeli (GVHMR itd.) nie są pobierane na tym etapie. Pierwsze `m2mr run` pobierze je do `weights/` (~5 GB, tylko raz).
+Wagi modeli (GVHMR itd.) nie są pobierane na tym etapie. Pierwsze `m2mr run` pobierze je do `weights/` (~5 GB, tylko raz). Pierwsze `m2mr run --detect-hands` pobiera też wagi dłoni HaMeR do `weights/hamer/` (~2,7 GB, tylko raz).
 
 Zalecane jest zainstalowanie ffmpeg (macOS: `brew install ffmpeg`, Ubuntu: `apt install ffmpeg`).
 Pipeline działa bez niego, ale wynikowe filmy będą **bez dźwięku** i nie odtworzą się w przeglądarce.
@@ -80,6 +80,7 @@ To repozytorium nie zawiera tych plików; musisz je pobrać samodzielnie. Nazwa 
 | FBX postaci z Mixamo | `assets/mixamo/Y_Bot.fbx` | Za pomocą konta Adobe pobierz Y Bot (lub dowolną inną postać zriggowaną w Mixamo) z [Mixamo](https://www.mixamo.com) |
 | Nagranie akcji | `assets/video/<your_clip>.mp4` | Klip z **dokładnie jedną** wyraźnie widoczną osobą, **od stóp do głów przez cały czas w kadrze** (możesz trzymać kilka plików; każde uruchomienie używa ostatnio dodanego) |
 | Zdjęcie pozy (opcjonalnie) | `assets/image/<your_photo>.jpg` | Zdjęcie z **dokładnie jedną** wyraźnie widoczną osobą, **od stóp do głów w kadrze**. Używane z `--image` |
+| Prawa dłoń MANO (tylko dla `--detect-hands`) | `assets/body_models/mano/MANO_RIGHT.pkl` | Zarejestruj się na [MANO](https://mano.is.tue.mpg.de/) i pobierz **Models & Code**. Przebieg samego ciała nie potrzebuje tego pliku |
 
 Uwaga: plik pobrany z Mixamo nazywa się `Y Bot.fbx` (**ze spacją**), czyli różni się jednym znakiem od `Y_Bot.fbx` (**z podkreślnikiem**) w tabeli.
 Zmień nazwę na wersję z podkreślnikiem, a stanie się domyślnym rigiem (`m2mr run` bez `--rig`). Pozostawienie spacji też działa — jeśli brakuje `Y_Bot.fbx`, użyty zostanie pierwszy plik `.fbx` z `assets/mixamo/`.
@@ -99,6 +100,12 @@ Wszystko, czego brakuje, zostanie wypisane razem z informacją, skąd to pobrać
 m2mr doctor
 ```
 
+`m2mr doctor` sprawdza przebieg ciała. Nie wymaga modelu dłoni MANO. Żeby sprawdzić też dodatkowy plik i pakiety Pythona używane do wykrywania palców:
+
+```bash
+m2mr doctor --detect-hands
+```
+
 ### 2. Pierwsze uruchomienie: zobacz wynik na ekranie
 
 Bez żadnych opcji polecenie używa **najnowszego pliku z `assets/video/`** oraz `assets/mixamo/Y_Bot.fbx`.
@@ -110,6 +117,8 @@ m2mr run
 To najwolniejszy krok. Pierwsze uruchomienie pobiera ~5 GB wag modeli (tylko raz), a potem wyodrębnia ruch człowieka z nagrania.
 Na CPU ekstrakcja klipu o długości ~30 sekund trwa około 8–15 minut; kolejne uruchomienia o podobnej długości, gdy wagi są już pobrane, trwają około 3–5 minut.
 Retargeting i renderowanie zajmują zwykle minutę lub dwie. Ponowne użycie szkieletu przez `--skeleton` w następnej sekcji całkowicie pomija ekstrakcję i kończy się w kilkadziesiąt sekund.
+
+Postawiona stopa jest domyślnie przypinana: śródstopie, gdy śródstopie jest na dole, pięta tylko gdy palce są uniesione. Jeśli wyprostowana noga nie sięga tego punktu, biodra się przesuwają. Potem podeszwa jest stawiana na podłodze (y = 0). `--no-foot-lock` zostawia surowy retarget, więc stopy mogą się ślizgać; podeszwa i tak ląduje na podłodze.
 
 ### 3. Ten sam ruch, inna postać
 
@@ -151,7 +160,31 @@ m2mr diagnose outputs/<run> --visualize      # także diagnostics.html: wideo ź
 m2mr diagnose outputs/<run> --threshold-cm 2 # zgłaszaj tylko przenikania głębsze niż 2 cm (domyślnie 1)
 ```
 
-Każdy problem w `diagnostics.json` to para części ciała z zakresami klatek, w których się przenikają, najgorszą klatką i jej głębokością. Numery klatek liczone są od 0, tak jak na osi czasu Blendera po imporcie glTF. Części połączone stawem (ramię i przedramię, tułów i udo, …) nie są porównywane: ich skóra nachodzi na siebie przy stawie w każdej pozie. `diagnostics.html` osadza wideo źródłowe (wymaga `ffmpeg`) i wczytuje three.js z CDN, więc widok 3D wymaga połączenia z internetem.
+Każdy problem w `diagnostics.json` to para części ciała z zakresami klatek, w których się przenikają, najgorszą klatką i jej głębokością. Numery klatek liczone są od 0, tak jak na osi czasu Blendera po imporcie glTF. Części połączone stawem (ramię i przedramię, tułów i udo, …) nie są porównywane: ich skóra nachodzi na siebie przy stawie w każdej pozie. `diagnostics.html` osadza wideo źródłowe (wymaga `ffmpeg`) i wczytuje three.js z CDN, więc widok 3D wymaga połączenia z internetem. Ten widok rysuje stałe znaczniki podłogi na y = 0: krzyż co 0,5 m, większy co metr i zielony krzyż w początku układu, żeby dało się ocenić, czy postać się rusza.
+
+### 7. Palce (`--detect-hands`)
+
+Zwykłe `m2mr run` rusza ciałem i zostawia kości palców Mixamo w spoczynku. `--detect-hands` włącza model dłoni, który jedzie z ekstraktorem ciała. Przy domyślnym ekstraktorze, GVHMR, tym modelem jest [HaMeR](https://github.com/geopavlakos/hamer). HaMeR wycina nadgarstki z osoby i klatek, które GVHMR już wybrał. Nie szuka drugiej osoby w klipie.
+
+**Czas rośnie mniej więcej dwukrotnie.** Klip, który bez flagi kończy się w kilka minut, z `--detect-hands` trwa około dwa razy dłużej, bo przejście dłoni idzie na wierzch ekstrakcji ciała. Przy długim wideo uwzględnij ten czas, zanim zaczniesz.
+
+Umieść `MANO_RIGHT.pkl` jak w tabeli powyżej, a potem:
+
+```bash
+m2mr doctor --detect-hands
+m2mr run --detect-hands
+m2mr run --video assets/video/dance.mp4 --detect-hands --hand-smooth 0.08
+```
+
+Pierwsze uruchomienie z `--detect-hands` pobiera wagi HaMeR do `weights/hamer/` (~2,7 GB, raz). Obroty palców trafiają do `skeleton_motion.npz` i napędzają 30 kości palców Mixamo na postaci ze skinningiem. Nadgarstek, którego przejście ciała nie widziało wyraźnie, zostaje w spoczynku dla tej dłoni.
+
+`--hand-smooth` mówi, ile sekund wygładzania nałożyć na te obroty. Domyślnie `0.08`. `0` zostawia surową estymację. Wygładzanie działa, gdy plik szkieletu już zawiera ruch dłoni, także przy późniejszym uruchomieniu, które tylko używa tego pliku ponownie.
+
+Ponowne użycie wcześniejszego szkieletu:
+
+- Plik już zawiera ruch dłoni: `--skeleton` sam napędza palce. `--detect-hands` nie jest już potrzebne.
+- Nie zawiera, ale cache ciała tego przebiegu wciąż leży obok (`cache/<clip>/0_input_video.mp4` oraz `preprocess/vitpose.pt` i `preprocess/bbx.pt`): `--skeleton ... --detect-hands` dokłada palce bez ponownej ekstrakcji ciała.
+- Tego cache już nie ma: uruchom wideo albo zdjęcie jeszcze raz z `--detect-hands`.
 
 ## Wyniki
 
@@ -192,6 +225,8 @@ images/
                                         # prawo: obrót wokół riga co 10° (pełny obrót)
 ```
 
+Z `--detect-hands` plik `skeleton_motion.npz` przechowuje też obroty palców, a `mixamo_rotations.npz` i `mixamo_character.glb` zawierają 30 kości palców. Bez tej flagi i bez ruchu dłoni już zapisanego w ponownie używanym szkielecie te kości zostają w spoczynku.
+
 Otwórz `mixamo_character.glb` w Blenderze: File → Import → glTF 2.0 (.glb/.gltf). Jeśli kamera patrzy w pustą przestrzeń, zaznacz mesh postaci i użyj View → Frame Selected. Skupisko kul na głowie i dłoniach to wyświetlanie kości, a nie mesh: w Outlinerze ukryj **Icosphere** i **armature**; pozostaw widoczny mesh ze skinningiem. Ustaw FPS sceny zgodnie z `run.json` (`fps`), a oś czasu na klatki od 0 do `n_frames` − 1, aby odtwarzanie odpowiadało źródłu, a numery klatek — plikowi `diagnostics.json`. Porównaj uruchomienie z wideo z `videos/mixamo_character.mp4`, a uruchomienie ze zdjęcia z `images/mixamo_character.png` lub klipem z obrotem.
 
 ## Licencja
@@ -199,8 +234,10 @@ Otwórz `mixamo_character.glb` w Blenderze: File → Import → glTF 2.0 (.glb/.
 Kod tego repozytorium jest objęty licencją Apache-2.0. Zasoby, które pobierasz samodzielnie, mają własne warunki i nie mogą być rozpowszechniane razem z tym repozytorium:
 
 - **SMPL-X**: dostęp kontrolowany przez MPI; domyślnie niekomercyjne badania / edukacja / sztuka; użycie komercyjne wymaga osobnej umowy
+- **MANO** (tylko przy `--detect-hands`): dostęp kontrolowany przez MPI, ten sam rodzaj pobrania co SMPL-X; trzymaj `MANO_RIGHT.pkl` lokalnie i nie rozpowszechniaj go
 - **Mixamo FBX**: można używać w wydanym produkcie; nie rozpowszechniaj surowego FBX jako paczki zasobów
 - **GVHMR i inne wagi modeli**: pobierane automatycznie do `weights/` przy pierwszym `m2mr run`, na licencjach poszczególnych projektów źródłowych
+- **HaMeR**: kod inferencji w tym repozytorium jest na licencji MIT; wagi trafiają do `weights/hamer/` przy pierwszym `m2mr run --detect-hands`, na warunkach publikacji projektu źródłowego
 
 ## Kontakt
 

@@ -87,9 +87,16 @@ Sa **Input** box:
 2. **Source File**: ang clip mo. Dapat **eksaktong isang tao lang ang nasa
    clip, kita mula ulo hanggang paa sa frame sa buong oras**.
 3. **Mixamo Rig FBX**: ang character mula sa step 5
-4. I-click ang **Gumawa ng Galaw** (Generate Motion)
+4. Naka-off ang **I-detect ang mga kamay** (Detect Hands). I-on lang ito kapag
+   dapat gumalaw ang mga daliri. Pagkatapos, i-click ang **Piliin ang MANO Hand Model…**
+   (Choose MANO Hand Model…) at piliin ang `MANO_RIGHT.pkl`. Kunin ang file na iyon
+   gaya ng SMPL-X: magrehistro sa
+   [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), i-download ang **Models & Code**,
+   at i-unzip. Ang unang hand run ay magda-download pa ng mga **2.7 GB**, isang beses,
+   at aabot nang halos doble ng body-only na run.
+5. I-click ang **Gumawa ng Galaw** (Generate Motion)
 
-Pagkatapos nito, awtomatikong ii-import sa scene mo ang animated na character.
+Pagkatapos nito, awtomatikong ii-import sa scene mo ang animated na character. Nanatili ang nakalapag na paa kung saan ito dumapo, at inilalagay ang talampakan sa sahig ng Blender. May idinaragdag na mesh na **Mga marka sa sahig** (Floor Markers) sa sahig na iyon (isang krus kada 0.5 m). Ipinapakita o itinatago ito ng checkbox na **Mga marka sa sahig** (Floor Markers) sa ilalim ng Progreso / Resulta.
 
 ### Mas matagal ang unang run — normal lang ito
 
@@ -125,9 +132,9 @@ Makikita ang naka-install mong bersyon sa tabi ng add-on sa **Get Extensions**.
 - Ang **⚙ sa tabi ng title** ay nagpapakita o nagtatago ng **Setup** box.
 - **Setup**: wika, runtime, SMPL-X, **Device** (CPU ang ligtas na piliin), at
   **Suriin ang Environment** (Check Environment).
-- **Input**: kung ano ang ia-animate.
+- **Input**: kung ano ang ia-animate, ang **Model ng katawan** (Body Model, GVHMR), at **I-detect ang mga kamay** (Detect Hands).
 - **Progreso / Resulta** (Progress / Result): progress, recent log, at pagkatapos ng job,
-  **I-import ang Nagawang Character** (Import Generated Character), **Buksan ang
+  **I-import ang Nagawang Character** (Import Generated Character), **Mga marka sa sahig** (Floor Markers), **Buksan ang
   Output Folder** (Open Output Folder), **Tingnan ang Buong Log** (View Full Log).
 - **Diagnostics**: kung saan pumapasok sa isa't isa ang mga bahagi ng katawan
   ng character (kamay sa loob ng ulo, nakakrus na braso). Ang mga pulang cell
@@ -137,7 +144,7 @@ Makikita ang naka-install mong bersyon sa tabi ng add-on sa **Get Extensions**.
   pagitan ng mga problema ang **Nauna** / **Susunod** (Previous / Next).
   Binubuksan ng **Buksan ang HTML Report** (Open HTML Report) ang isang report
   sa web browser na katabi ng character ang source video (sa unang beses, mga
-  15 segundo bago ito mabuo).
+  15 segundo bago ito mabuo). Nakatayo ang character sa mga nakapirming krus sa sahig, isa kada 0.5 m, para makita kung dumudulas ito.
 
 Available ang add-on sa 19 wika. Sinusunod ng **Auto (sundan ang Blender / system)**
 ang wika ng Blender; palitan ito sa Setup box sa **Wika ng UI** (UI Language).
@@ -148,6 +155,7 @@ ang wika ng Blender; palitan ito sa Setup box sa **Wika ng UI** (UI Language).
 | --- | --- |
 | **Pumalya ang pag-install ng runtime** (Runtime installation failed) | I-check ang internet connection mo at i-click ulit ang button. Log: `~/Motion2MixamoRig/logs/setup.log` |
 | **SMPL-X model: wala** (SMPL-X model: missing) | Ulitin ang step 4 at piliin ang `SMPLX_NEUTRAL.npz` |
+| **MANO hand model: wala** (MANO hand model: missing) | I-on ang **I-detect ang mga kamay**, tapos **Piliin ang MANO Hand Model…** at piliin ang `MANO_RIGHT.pkl` |
 | **Hindi valid ang Mixamo FBX** (Mixamo FBX invalid) | I-download ulit ang character bilang **FBX Binary**, **T-pose** |
 | **Higit sa isang tao ang nasa input** (Input contains multiple people) | Gumamit ng clip na iisang tao lang ang nasa loob |
 | **Walang taong na-detect sa input** (No person was detected in the input) | Siguraduhing kita ang buong katawan at maliwanag ang ilaw |

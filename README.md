@@ -118,6 +118,8 @@ This is the slow step. The first run downloads ~5 GB of inference weights (once 
 On CPU, a ~30 second clip takes about 8–15 minutes to extract; later runs of similar length, with weights already there, take about 3–5 minutes.
 Retargeting and rendering are usually a minute or two. Reusing a skeleton with `--skeleton` in the next section skips extraction entirely and finishes in tens of seconds.
 
+A planted foot is pinned by default: the ball when the ball is down, the heel only when the toes are up. If a straight leg cannot reach that point, the hips move. The sole is then set on the floor (y = 0). `--no-foot-lock` keeps the raw retarget, so the feet may slide; the sole is still set on the floor.
+
 ### 3. Same motion, different character
 
 Download another character from Mixamo into `assets/mixamo/`. **Do not rerun with only `--rig`** — that repeats the slow extraction.
@@ -158,7 +160,7 @@ m2mr diagnose outputs/<run> --visualize      # also diagnostics.html: source vid
 m2mr diagnose outputs/<run> --threshold-cm 2 # report only penetrations deeper than 2 cm (default 1)
 ```
 
-Each issue in `diagnostics.json` is a pair of body parts with the frame ranges where they intersect, the worst frame, and its depth. Frame numbers count from 0, as the Blender timeline does after a glTF import. Parts joined at a joint (upper arm and forearm, torso and thigh, …) are not compared: their skins overlap around the joint in any pose. `diagnostics.html` embeds the source video (needs `ffmpeg`) and loads three.js from a CDN, so its 3D view needs an internet connection.
+Each issue in `diagnostics.json` is a pair of body parts with the frame ranges where they intersect, the worst frame, and its depth. Frame numbers count from 0, as the Blender timeline does after a glTF import. Parts joined at a joint (upper arm and forearm, torso and thigh, …) are not compared: their skins overlap around the joint in any pose. `diagnostics.html` embeds the source video (needs `ffmpeg`) and loads three.js from a CDN, so its 3D view needs an internet connection. That view keeps fixed floor markers on y = 0 — a cross every 0.5 m, a larger one each metre, and a green cross at the origin — so you can judge whether the character is moving.
 
 ### 7. Fingers (`--detect-hands`)
 
