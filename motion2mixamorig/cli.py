@@ -4,6 +4,8 @@
     m2mr run                    latest video in assets/video/ + default Y Bot
     m2mr run --video V --rig R  pick the inputs explicitly (flags combine freely)
     m2mr run --image I --rig R  still photo -> 3D pose on the same Mixamo path
+    m2mr run --set-extractor NAME   choose how the skeleton is recovered (default: gvhmr)
+    m2mr run --detect-hands         also run that extractor's hand model (GVHMR: HaMeR)
 
 `m2mr run` performs the same asset checks as `m2mr doctor` before doing any
 work, and reports everything that is missing in one pass.
@@ -16,6 +18,7 @@ import sys
 from pathlib import Path
 
 from . import checks, paths
+from .extractors import DEFAULT_EXTRACTOR, extractor_names, get_extractor
 from .progress import ProgressWriter
 from .run_report import write_failed_report
 
@@ -23,10 +26,6 @@ OK = "[ok]     "
 MISS = "[missing]"
 BAD = "[invalid]"
 
-SMPLX_HINT = (
-    "register at https://smpl-x.is.tue.mpg.de/ , download SMPLX_NEUTRAL.npz, "
-    "place it at assets/body_models/smplx/SMPLX_NEUTRAL.npz"
-)
 RIG_HINT = (
     "download a character from https://www.mixamo.com/ (FBX Binary, T-pose) "
     "into assets/mixamo/ , e.g. Y_Bot.fbx"
@@ -58,6 +57,32 @@ def _check_content(label: str, path: Path, checker) -> bool:
     return problem is None
 
 
+def _report_requirement(item) -> bool:
+    if item.ok:
+        print(f"{OK} {item.label}")
+        return True
+    print(f"{BAD if item.invalid else MISS} {item.label}")
+    if item.hint:
+        print(f"          -> {item.hint}")
+    return False
+
+
+def _report_hand_model(extractor, name: str, requirements) -> bool:
+    """The hand model paired with `extractor`. False when it cannot run."""
+    hand_model = getattr(extractor, "hand_model", None)
+    if not hand_model:
+        return _check(
+            "hand detection      --detect-hands",
+            False,
+            f"{name} has no paired hand model",
+        )
+    ok = _check(f"hand detection      {hand_model}", True, "")
+    for item in requirements:
+        if item.section == "hand":
+            ok &= _report_requirement(item)
+    return ok
+
+
 def _module_available(name: str) -> bool:
     import importlib.util
 
@@ -68,16 +93,22 @@ def _available_rigs() -> list[Path]:
     return sorted(paths.MIXAMO_DIR.glob("*.fbx")) if paths.MIXAMO_DIR.is_dir() else []
 
 
-def doctor() -> int:
+def doctor(extractor_name: str | None = None, *, detect_hands: bool = False) -> int:
     """Check every user-supplied asset and dependency; say where to get what's missing."""
     print(f"project root: {paths.PROJECT_ROOT}\n")
 
-    ok = True
-    smplx_label = f"SMPL-X body model  {paths.SMPLX_NEUTRAL.relative_to(paths.PROJECT_ROOT)}"
-    if paths.SMPLX_NEUTRAL.exists():
-        ok &= _check_content(smplx_label, paths.SMPLX_NEUTRAL, checks.check_smplx)
-    else:
-        ok &= _check(smplx_label, False, SMPLX_HINT)
+    name = extractor_name or DEFAULT_EXTRACTOR
+    try:
+        extractor = get_extractor(name)
+    except ValueError as exc:
+        print(f"{BAD} motion extractor   {name}")
+        print(f"          -> {exc}")
+        return 1
+    requirements = extractor.check(detect_hands=detect_hands)
+    ok = _check(f"motion extractor   {name}", True, "")
+    for item in requirements:
+        if item.section == "asset" and item.audience in ("doctor", "both"):
+            ok &= _report_requirement(item)
     rigs = _available_rigs()
     ok &= _check(
         f"Mixamo rig .fbx    assets/mixamo/  ({len(rigs)} found"
@@ -104,15 +135,20 @@ def doctor() -> int:
     for image in images:
         ok &= _check_content(f"  - {image.name}", image, checks.check_image)
 
+    if detect_hands:
+        print()
+        ok &= _report_hand_model(extractor, name, requirements)
+
     print()
     deps_ok = True
     for module, hint in (
         ("numpy", "pip install -e ."),
         ("cv2", "pip install -e ."),
-        ("torch", "pip install -e ."),
-        ("gvhmr", "pip install -e ."),
     ):
         deps_ok &= _check(f"python module      {module}", _module_available(module), hint)
+    for item in requirements:
+        if item.section == "module" and item.audience in ("doctor", "both"):
+            deps_ok &= _report_requirement(item)
     import shutil as _shutil
 
     _check(
@@ -121,13 +157,16 @@ def doctor() -> int:
         "brew install ffmpeg / apt install ffmpeg — runs fine without, but videos are silent mp4v",
     )
 
-    weights_note = (
-        "downloaded automatically into weights/ on the first `m2mr run` (~5 GB)"
-    )
-    print(f"\ninference weights: {weights_note}")
+    if extractor.weights_note:
+        print(f"\ninference weights: {extractor.weights_note}")
+    if detect_hands:
+        note = getattr(extractor, "hand_weights_note", "")
+        if note:
+            print(f"hand weights: {note}")
 
     if ok and deps_ok:
-        print("\neverything in place — try: m2mr run")
+        suggestion = "m2mr run --detect-hands" if detect_hands else "m2mr run"
+        print(f"\neverything in place — try: {suggestion}")
         return 0
     print("\nfix the [missing] items above, then re-run: m2mr doctor")
     return 1
@@ -232,7 +271,17 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
         )
     check_content(f"rig is Mixamo      {rig.name if rig else ''}", rig, checks.check_rig)
 
-    # Skeleton reuse skips extraction; only then is SMPL-X not needed.
+    # Skeleton reuse skips the body-model check. Hand detection still needs
+    # either fingers already stored in that file, or the body cache beside it.
+    detect_hands = bool(getattr(args, "detect_hands", False))
+    chosen_name = getattr(args, "set_extractor", None) or DEFAULT_EXTRACTOR
+    try:
+        chosen = get_extractor(chosen_name)
+        extractor_error = ""
+    except ValueError as exc:
+        chosen = None
+        extractor_error = str(exc)
+
     skeleton = Path(args.skeleton) if args.skeleton else None
     if skeleton is not None:
         check(
@@ -241,20 +290,55 @@ def preflight(args: argparse.Namespace) -> tuple[Path | None, Path, Path | None,
             "check the --skeleton path (a previous run's skeleton_motion.npz)",
         )
         check_content(f"skeleton loads     {skeleton.name}", skeleton, checks.check_skeleton_npz)
+        if detect_hands and skeleton.exists():
+            from .extractors.hamer import find_body_cache, skeleton_has_hands
+
+            if skeleton_has_hands(skeleton):
+                check("hand motion         already in the skeleton file", True, "")
+            else:
+                if chosen is None:
+                    check("motion extractor   --set-extractor", False, extractor_error)
+                else:
+                    problems += _hand_problem_count(chosen, chosen_name)
+                cache = find_body_cache(skeleton.parent)
+                check(
+                    "body cache         next to the reused skeleton",
+                    cache is not None,
+                    "re-run without --skeleton; this skeleton has no saved wrist cache",
+                )
+    elif chosen is None:
+        check("motion extractor   --set-extractor", False, extractor_error)
     else:
-        check(
-            f"SMPL-X body model  {paths.SMPLX_NEUTRAL.relative_to(paths.PROJECT_ROOT)}",
-            paths.SMPLX_NEUTRAL.exists(),
-            SMPLX_HINT,
-        )
-        check_content(
-            "SMPL-X loads       SMPLX_NEUTRAL.npz", paths.SMPLX_NEUTRAL, checks.check_smplx
-        )
+        check(f"motion extractor   {chosen_name}", True, "")
+        for item in chosen.check():
+            if item.section == "asset" and item.audience in ("preflight", "both"):
+                if not _report_requirement(item):
+                    problems += 1
+        if detect_hands:
+            problems += _hand_problem_count(chosen, chosen_name)
 
     if problems:
         print(f"\n{problems} problem(s) — nothing was run. `m2mr doctor` checks everything.")
         sys.exit(1)
     return video, rig, skeleton, image
+
+
+def _hand_problem_count(extractor, name: str) -> int:
+    """Print the paired hand model's requirements and return how many failed."""
+    hand_model = getattr(extractor, "hand_model", None)
+    if not hand_model:
+        if not _check(
+            "hand detection      --detect-hands",
+            False,
+            f"{name} has no paired hand model",
+        ):
+            return 1
+        return 0
+    failed = 0 if _check(f"hand detection      {hand_model}", True, "") else 1
+    for item in extractor.check(detect_hands=True):
+        if item.section == "hand" and not _report_requirement(item):
+            failed += 1
+    return failed
 
 
 def run(args: argparse.Namespace) -> int:
@@ -288,6 +372,9 @@ def run(args: argparse.Namespace) -> int:
             rig,
             image=image,
             device=args.device,
+            extractor=getattr(args, "set_extractor", None) or DEFAULT_EXTRACTOR,
+            detect_hands=bool(getattr(args, "detect_hands", False)),
+            hand_smooth_s=float(getattr(args, "hand_smooth", 0.08)),
             skeleton_npz=skeleton,
             output_dir=output_dir,
             progress=progress,
@@ -314,7 +401,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("doctor", help="check assets, weights and dependencies")
+    p_doctor = sub.add_parser("doctor", help="check assets, weights and dependencies")
+    _add_extractor_arg(p_doctor)
+    _add_detect_hands_arg(p_doctor)
 
     p_run = sub.add_parser("run", help="video or still -> Mixamo rig, results in outputs/")
     p_run.add_argument(
@@ -338,6 +427,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.add_argument(
         "--skeleton",
         help="reuse a previous run's skeleton_motion.npz and skip extraction",
+    )
+    _add_extractor_arg(p_run)
+    _add_detect_hands_arg(p_run)
+    p_run.add_argument(
+        "--hand-smooth",
+        type=float,
+        default=0.08,
+        metavar="SECONDS",
+        help=(
+            "smooth detected finger rotations over this many seconds "
+            "(0 keeps the raw estimate; default: 0.08)"
+        ),
     )
     p_run.add_argument(
         "--device",
@@ -400,11 +501,39 @@ def diagnose(args: argparse.Namespace) -> int:
     return 0
 
 
+def _add_detect_hands_arg(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--detect-hands",
+        action="store_true",
+        help=(
+            "turn on the hand detection bundled with the selected body extractor "
+            "(GVHMR uses HaMeR). Needs assets/body_models/mano/MANO_RIGHT.pkl. Off by default"
+        ),
+    )
+
+
+def _add_extractor_arg(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--set-extractor",
+        default=DEFAULT_EXTRACTOR,
+        choices=list(extractor_names()),
+        help=(
+            "how to turn the video or still into skeleton_motion.npz "
+            f"(default: {DEFAULT_EXTRACTOR})"
+        ),
+    )
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     if args.command == "doctor":
-        sys.exit(doctor())
+        sys.exit(
+            doctor(
+                getattr(args, "set_extractor", None),
+                detect_hands=bool(getattr(args, "detect_hands", False)),
+            )
+        )
     if args.command == "diagnose":
         sys.exit(diagnose(args))
     sys.exit(run(args))

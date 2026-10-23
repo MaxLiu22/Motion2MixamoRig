@@ -112,12 +112,27 @@ class M2MR_PT_main(Panel):
         row.operator("m2mr.set_smplx", text=t("choose_smplx"), icon="CHECKMARK" if found else "FILE_BLANK")
         sub.label(text=t("smplx_found") if found else t("smplx_missing"))
 
+    def _draw_mano(self, box, prefs, busy: bool) -> None:
+        from ..services.backend import mano_model_present
+
+        found = bool(prefs.project_dir) and mano_model_present(prefs.project_dir)
+        row = box.row()
+        row.enabled = not busy
+        row.operator("m2mr.set_mano", text=t("choose_mano"), icon="CHECKMARK" if found else "FILE_BLANK")
+        box.label(text=t("mano_found") if found else t("mano_missing"))
+
     def _draw_input(self, layout, prefs, props, busy: bool) -> None:
         box = layout.box()
         box.label(text=t("section_input"))
         box.prop(props, "source_type", text=t("source_type"))
         box.prop(props, "source_path", text=t("source_file"))
         box.prop(props, "rig_path", text=t("mixamo_rig"))
+        box.prop(props, "extractor", text=t("extractor"))
+        box.prop(props, "detect_hands", text=t("detect_hands"))
+        if props.detect_hands:
+            box.label(text=t("detect_hands_slow"))
+            box.prop(props, "hand_smooth", text=t("hand_smooth"))
+            self._draw_mano(box, prefs, busy)
         box.prop(props, "generate_preview", text=t("generate_preview"))
         if not busy and _first_run(prefs):
             _draw_first_run_note(box)

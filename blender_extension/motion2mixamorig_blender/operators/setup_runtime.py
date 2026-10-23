@@ -24,6 +24,7 @@ from ..services.runtime_setup import (
 from .runtime import JobRuntime, attach, is_busy
 
 SMPLX_RELATIVE = Path("assets") / "body_models" / "smplx" / "SMPLX_NEUTRAL.npz"
+MANO_DIR = Path("assets") / "body_models" / "mano"
 
 
 class M2MR_OT_setup_runtime(Operator):
@@ -107,7 +108,34 @@ class M2MR_OT_set_smplx(Operator):
         return {"FINISHED"}
 
 
-CLASSES = (M2MR_OT_setup_runtime, M2MR_OT_set_smplx)
+class M2MR_OT_set_mano(Operator):
+    bl_idname = "m2mr.set_mano"
+    bl_label = "Choose MANO Hand Model"
+    bl_description = "Pick the MANO_RIGHT.pkl you downloaded; it is copied into the runtime"
+
+    filepath: StringProperty(subtype="FILE_PATH")
+    filter_glob: StringProperty(default="*.pkl;*.npz", options={"HIDDEN"})
+
+    def invoke(self, context: Context, event):
+        context.window_manager.fileselect_add(self)
+        return {"RUNNING_MODAL"}
+
+    def execute(self, context: Context):
+        src = Path(bpy.path.abspath(self.filepath))
+        if not src.is_file() or src.suffix.lower() not in {".pkl", ".npz"}:
+            self.report({"ERROR"}, t("err_mano"))
+            return {"CANCELLED"}
+        prefs = get_preferences(context)
+        project = Path(prefs.project_dir) if directory_exists(prefs.project_dir) else app_dir(default_home())
+        name = "MANO_RIGHT.npz" if src.suffix.lower() == ".npz" else "MANO_RIGHT.pkl"
+        dest = project / MANO_DIR / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
+        self.report({"INFO"}, t("mano_copied", path=str(dest)))
+        return {"FINISHED"}
+
+
+CLASSES = (M2MR_OT_setup_runtime, M2MR_OT_set_smplx, M2MR_OT_set_mano)
 
 
 def register() -> None:

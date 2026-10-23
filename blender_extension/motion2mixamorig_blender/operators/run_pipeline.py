@@ -36,6 +36,7 @@ class M2MR_OT_run_pipeline(Operator):
             source=props.source_path,
             rig=props.rig_path,
             busy=is_busy(),
+            detect_hands=bool(props.detect_hands),
         )
         if errors:
             props.job_status = "failed"
@@ -59,6 +60,9 @@ class M2MR_OT_run_pipeline(Operator):
             output_dir=output_dir,
             progress_jsonl=progress_path,
             preview=bool(props.generate_preview),
+            extractor=props.extractor,
+            detect_hands=bool(props.detect_hands),
+            hand_smooth_s=float(props.hand_smooth),
         )
         try:
             process, log_file = launch_process(

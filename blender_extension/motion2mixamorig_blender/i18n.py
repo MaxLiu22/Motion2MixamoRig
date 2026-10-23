@@ -388,6 +388,17 @@ _add("stage_cancelled", en="cancelled", **{"zh-CN": "已取消"}, ko="취소됨"
 _add("err_python", en="External Python not found", **{"zh-CN": "找不到外部 Python"}, ko="외부 Python을 찾을 수 없습니다", ja="外部 Python が見つかりません", de="Externes Python nicht gefunden", ru="Внешний Python не найден", ar="لم يُعثر على Python الخارجي")
 _add("err_package", en="Motion2MixamoRig package not installed", **{"zh-CN": "未安装 Motion2MixamoRig 软件包"}, ko="Motion2MixamoRig 패키지가 설치되지 않았습니다", ja="Motion2MixamoRig パッケージがインストールされていません", de="Motion2MixamoRig-Paket ist nicht installiert", ru="Пакет Motion2MixamoRig не установлен", ar="حزمة Motion2MixamoRig غير مثبتة")
 _add("err_smplx", en="SMPL-X model missing", **{"zh-CN": "缺少 SMPL-X 模型"}, ko="SMPL-X 모델이 없습니다", ja="SMPL-X モデルがありません", de="SMPL-X-Modell fehlt", ru="Модель SMPL-X отсутствует", ar="نموذج SMPL-X مفقود")
+_add("err_mano", en="MANO hand model missing", **{"zh-CN": "缺少 MANO 手部模型"}, ko="MANO 손 모델이 없습니다", ja="MANO ハンドモデルがありません", de="MANO-Handmodell fehlt", ru="Модель кисти MANO отсутствует", ar="نموذج يد MANO مفقود")
+_add(
+    "err_hand_deps",
+    en="Hand detection needs timm, smplx, and scikit-image. Use Update Runtime",
+    **{"zh-CN": "手部检测需要 timm、smplx 和 scikit-image。请点「更新运行环境」"},
+    ko="손 검출에는 timm, smplx, scikit-image가 필요합니다. 런타임을 업데이트하세요",
+    ja="手の検出には timm、smplx、scikit-image が必要です。ランタイムを更新してください",
+    de="Handerkennung braucht timm, smplx und scikit-image. Laufzeit aktualisieren",
+    ru="Для кистей нужны timm, smplx и scikit-image. Обновите среду",
+    ar="كشف اليد يحتاج timm وsmplx وscikit-image. حدّث بيئة التشغيل",
+)
 _add("err_invalid_rig", en="Mixamo FBX invalid", **{"zh-CN": "Mixamo FBX 无效"}, ko="Mixamo FBX가 올바르지 않습니다", ja="Mixamo FBX が無効です", de="Mixamo-FBX ungültig", ru="Некорректный Mixamo FBX", ar="ملف Mixamo FBX غير صالح")
 _add("err_multiple_people", en="Input contains multiple people", **{"zh-CN": "输入里有多个人"}, ko="입력에 여러 사람이 있습니다", ja="入力に複数人が写っています", de="Die Quelle enthält mehrere Personen", ru="Во входе несколько людей", ar="المصدر يحتوي على أكثر من شخص")
 _add("err_no_person", en="No person was detected in the input", **{"zh-CN": "输入里没有检测到人"}, ko="입력에서 사람을 찾지 못했습니다", ja="入力から人物を検出できませんでした", de="Keine Person in der Quelle erkannt", ru="Человек во входе не обнаружен", ar="لم يُكتشف أي شخص في المصدر")
@@ -431,6 +442,8 @@ _CODE_TO_KEY = {
     "PYTHON_NOT_FOUND": "err_python",
     "PACKAGE_MISSING": "err_package",
     "SMPLX_MISSING": "err_smplx",
+    "MANO_MISSING": "err_mano",
+    "HAND_DEPS_MISSING": "err_hand_deps",
     "INVALID_RIG": "err_invalid_rig",
     "MULTIPLE_PEOPLE": "err_multiple_people",
     "NO_PERSON": "err_no_person",
@@ -463,6 +476,27 @@ _add("setup_running", en="Installing runtime…", **{"zh-CN": "正在安装运�
 _add("setup_done", en="Runtime installed", **{"zh-CN": "运行环境已安装"})
 _add("setup_failed", en="Runtime installation failed", **{"zh-CN": "运行环境安装失败"})
 _add("err_backend_missing", en="This add-on build does not include the Motion2MixamoRig code", **{"zh-CN": "这个插件包里缺少 Motion2MixamoRig 程序代码"})
+_add("extractor", en="Body Model", **{"zh-CN": "身体模型"})
+_add("extractor_gvhmr_desc", en="Recover the 3D skeleton with GVHMR", **{"zh-CN": "用 GVHMR 恢复 3D 骨架"})
+_add(
+    "detect_hands",
+    en="Detect Hands",
+    **{"zh-CN": "检测手部"},
+)
+_add(
+    "detect_hands_slow",
+    en="About twice as long. The first time also downloads ~2.7 GB of hand weights",
+    **{"zh-CN": "整次运行大约要两倍时间。第一次还会再下载约 2.7 GB 手部权重"},
+)
+_add("hand_smooth", en="Finger Smoothing (seconds)", **{"zh-CN": "手指平滑（秒）"})
+_add("choose_mano", en="Choose MANO Hand Model…", **{"zh-CN": "选择 MANO 手部模型…"})
+_add("mano_found", en="MANO hand model: found", **{"zh-CN": "MANO 手部模型：已就绪"})
+_add(
+    "mano_missing",
+    en="MANO hand model: missing — download MANO_RIGHT.pkl from mano.is.tue.mpg.de",
+    **{"zh-CN": "MANO 手部模型：缺失 — 请从 mano.is.tue.mpg.de 下载 MANO_RIGHT.pkl"},
+)
+_add("mano_copied", en="MANO hand model copied to {path}", **{"zh-CN": "MANO 手部模型已复制到 {path}"})
 _add("choose_smplx", en="Choose SMPL-X Model…", **{"zh-CN": "选择 SMPL-X 模型文件…"})
 _add("smplx_found", en="SMPL-X model: found", **{"zh-CN": "SMPL-X 模型：已就绪"})
 _add("smplx_missing", en="SMPL-X model: missing — download SMPLX_NEUTRAL.npz from smpl-x.is.tue.mpg.de", **{"zh-CN": "SMPL-X 模型：缺失 — 请从 smpl-x.is.tue.mpg.de 下载 SMPLX_NEUTRAL.npz"})

@@ -37,6 +37,8 @@ m2mr run --image assets/image/pose.jpg --rig assets/mixamo/Y_Bot.fbx
 m2mr run --skeleton outputs/<run>/skeleton_motion.npz --rig ...   # reuse extraction, swap rig
 m2mr run --output-dir DIR --progress-jsonl FILE --no-preview      # Blender Extension / automation
 m2mr run --no-foot-lock ...                                        # keep the raw retarget (planted feet are pinned by default)
+m2mr run --set-extractor gvhmr --detect-hands --hand-smooth 0.08  # HaMeR fingers; needs assets/body_models/mano/MANO_RIGHT.pkl
+m2mr doctor --detect-hands                                         # also check the MANO file and HaMeR packages
 m2mr diagnose outputs/<run> [--visualize] [--threshold-cm N]      # re-check self-intersection -> diagnostics.json (+ .html)
 ```
 
@@ -78,7 +80,8 @@ When helping a user:
    Extensions. The **⚙** after the title shows / hides Setup. Setup: UI
    Language, Install / Update Runtime, Choose SMPL-X Model, Device,
    **Check Environment**; External Python and Project Directory are under
-   **Advanced**.
+   **Advanced**. Input: **Body Model**, and **Detect Hands** (off by default;
+   on shows finger smoothing and **Choose MANO Hand Model…**).
 5. After add-on **code** changes they must rebuild the zip and reinstall.
    The installed copy is not live from this repo. With the one-click runtime,
    changes to `motion2mixamorig/` also need **Update Runtime** (weights are
@@ -113,7 +116,9 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 ## Code map
 
 - `motion2mixamorig/paths.py` — all filesystem locations
-- `motion2mixamorig/extract.py` — video or still -> 3D human skeleton (GVHMR)
+- `motion2mixamorig/extract.py` — clip timing helpers, plus `foot_contact_from_raw`
+- `motion2mixamorig/extractors/` — body extractors (`gvhmr`) and the HaMeR finger pass (`hamer.py`, `--detect-hands`)
+- `motion2mixamorig/mixamo/hand_retarget.py` — MANO finger rotations onto the 30 Mixamo finger bones
 - `motion2mixamorig/mixamo/` — FBX parsing, FK, retargeting, skinning, rendering
 - `motion2mixamorig/mixamo/foot_lock.py` — pins planted feet (ball first, else heel) with two-bone leg IK, shifting the hips when a straight leg cannot reach; summary in `run.json` → `foot_lock`
 - `motion2mixamorig/mixamo/ground.py` — shifts the hips so the planted sole sits on y = 0; summary in `run.json` → `ground`
