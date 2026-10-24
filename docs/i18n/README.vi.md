@@ -16,7 +16,7 @@ Chuyển chuyển động của một người trong video — hoặc tư thế 
 
 Dành cho nhà phát triển game: đưa vào một video hành động có **một người duy nhất** (hoặc một ảnh tĩnh) cùng một nhân vật Mixamo; công cụ sẽ xuất các video xem trước và một tệp nhân vật đã skin (`.glb`) để bạn kéo thẳng vào Blender hoặc Unity.
 
-> Motion2MixamoRig hiện vẫn đang ở giai đoạn thử nghiệm. Phiên bản 0.1.7 là pipeline dòng lệnh. Kho mã này cũng có một Blender 4.2+ Extension chạy chính pipeline đó trong một môi trường Python bên ngoài. Tự build add-on từ mã nguồn: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig hiện vẫn đang ở giai đoạn thử nghiệm. Phiên bản 0.1.8 là pipeline dòng lệnh. Kho mã này cũng có một Blender 4.2+ Extension chạy chính pipeline đó trong một môi trường Python bên ngoài. Tự build add-on từ mã nguồn: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Hai cách sử dụng
 

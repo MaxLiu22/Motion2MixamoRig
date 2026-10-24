@@ -16,7 +16,7 @@ För över rörelsen hos en person i en video — eller posen i ett stillbildsfo
 
 För spelutvecklare: ge den en actionvideo med **en enda person** (eller ett foto) och en Mixamo-karaktär. Den skriver förhandsvisningsvideor och en karaktärsfil med skinning (`.glb`) som du kan släppa in i Blender eller Unity.
 
-> Motion2MixamoRig är tills vidare experimentellt. Version 0.1.7 är kommandoradspipelinen. Det här arkivet innehåller också ett tillägg för Blender 4.2+ som kör samma pipeline i en extern Python-miljö. Bygg tillägget från källkoden: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig är tills vidare experimentellt. Version 0.1.8 är kommandoradspipelinen. Det här arkivet innehåller också ett tillägg för Blender 4.2+ som kör samma pipeline i en extern Python-miljö. Bygg tillägget från källkoden: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Två sätt att använda det
 

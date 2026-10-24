@@ -16,7 +16,7 @@
 
 게임 개발자를 위한 도구입니다. **한 사람만** 나오는 동작 영상(또는 사진)과 Mixamo 캐릭터를 넣으면 미리보기와, Blender / Unity에 바로 넣을 수 있는 스키닝된 캐릭터 파일(`.glb`)을 생성합니다.
 
-> Motion2MixamoRig는 아직 실험 단계입니다. v0.1.7은 명령줄 파이프라인입니다. 이 저장소의 Blender 4.2+ Extension은 같은 파이프라인을 외부 Python에서 실행합니다. 소스에서 애드온 빌드하기: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig는 아직 실험 단계입니다. v0.1.8은 명령줄 파이프라인입니다. 이 저장소의 Blender 4.2+ Extension은 같은 파이프라인을 외부 Python에서 실행합니다. 소스에서 애드온 빌드하기: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## 두 가지 사용 방법
 

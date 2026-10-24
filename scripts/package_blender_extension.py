@@ -61,7 +61,7 @@ def read_manifest(path: Path) -> dict[str, str]:
 
 def extension_version(src: Path = SRC) -> str:
     manifest = read_manifest(src / "blender_manifest.toml")
-    return manifest.get("version", "0.1.7")
+    return manifest.get("version", "0.1.8")
 
 
 def should_include(path: Path) -> bool:

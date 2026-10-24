@@ -75,7 +75,7 @@ When helping a user:
    it, click **Install Runtime (one click)**, then **Choose SMPL-X Model…**.
    Own-venv path: the same venv + SMPL-X + Mixamo FBX as the CLI (see Setup
    above).
-2. Build `dist/motion2mixamorig-0.1.7-<platform>.zip` with
+2. Build `dist/motion2mixamorig-0.1.8-<platform>.zip` with
    `python scripts/package_blender_extension.py --platform macos-arm64` (one
    zip per platform; the platform is declared in the zip's manifest, the
    version is shared; the zip bundles `motion2mixamorig/` under `backend/`
@@ -180,4 +180,4 @@ Handing this file back with the GLB or the skeleton is the revision pass in Afte
 - `docs/user-guide.md` — add-on guide for non-programmers
 - `docs/blender-extension.md` — maintainer smoke-test checklist
 - `docs/c4d-fbx-support.md` — how Cinema 4D-exported FBX rigs are read (bind-matrix rest pose, one GLB skin per mesh)
-- `scripts/package_blender_extension.py` — build `dist/motion2mixamorig-0.1.7-<platform>.zip`
+- `scripts/package_blender_extension.py` — build `dist/motion2mixamorig-0.1.8-<platform>.zip`

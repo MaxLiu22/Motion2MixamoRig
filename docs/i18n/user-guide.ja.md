@@ -28,7 +28,7 @@
 | Apple Silicon 搭載の Mac（M1/M2/M3/M4） | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **近日公開** |
 
-たとえば `motion2mixamorig-0.1.7-macos-arm64.zip` の場合、`0.1.7` がアドオンの
+たとえば `motion2mixamorig-0.1.8-macos-arm64.zip` の場合、`0.1.8` がアドオンの
 バージョン、`macos-arm64` がプラットフォームです。違うものを選ぶと Blender は
 インストールを拒否し、想定しているプラットフォームを表示します。
 

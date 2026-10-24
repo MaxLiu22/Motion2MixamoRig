@@ -16,7 +16,7 @@ Přeneste pohyb člověka ve videu — nebo pózu na fotografii — na 3D postav
 
 Pro vývojáře her: dejte mu akční video s **jednou osobou** (nebo fotografii) a postavu Mixamo; zapíše náhledová videa a soubor postavy se skinningem (`.glb`), který můžete přetáhnout do Blenderu nebo Unity.
 
-> Motion2MixamoRig je zatím experimentální. Verze 0.1.7 je pipeline pro příkazový řádek. Tento repozitář obsahuje také rozšíření pro Blender 4.2+, které spouští stejný pipeline v externím prostředí Pythonu. Sestavení doplňku ze zdrojů: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig je zatím experimentální. Verze 0.1.8 je pipeline pro příkazový řádek. Tento repozitář obsahuje také rozšíření pro Blender 4.2+, které spouští stejný pipeline v externím prostředí Pythonu. Sestavení doplňku ze zdrojů: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Dva způsoby použití
 

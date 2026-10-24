@@ -16,7 +16,7 @@ Zet de beweging van een persoon in een video — of de pose op een foto — over
 
 Voor gameontwikkelaars: geef een actievideo met **één persoon** (of een foto) en een Mixamo-personage op; het levert previewvideo's en een geskind personagebestand (`.glb`) dat je direct in Blender of Unity kunt laden.
 
-> Motion2MixamoRig is momenteel experimenteel. Versie 0.1.7 is de command-line-pipeline. Deze repository bevat ook een Blender 4.2+ Extension die dezelfde pipeline in een externe Python-omgeving uitvoert. De add-on vanuit de broncode bouwen: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig is momenteel experimenteel. Versie 0.1.8 is de command-line-pipeline. Deze repository bevat ook een Blender 4.2+ Extension die dezelfde pipeline in een externe Python-omgeving uitvoert. De add-on vanuit de broncode bouwen: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Twee manieren om het te gebruiken
 

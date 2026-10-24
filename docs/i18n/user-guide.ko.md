@@ -28,7 +28,7 @@
 | Apple Silicon Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **곧 나옵니다** |
 
-예를 들어 `motion2mixamorig-0.1.7-macos-arm64.zip`에서 `0.1.7`은 애드온
+예를 들어 `motion2mixamorig-0.1.8-macos-arm64.zip`에서 `0.1.8`은 애드온
 버전, `macos-arm64`는 플랫폼입니다. 잘못된 파일을 고르면 Blender가 설치를
 거부하고 필요한 플랫폼을 알려 줍니다.
 

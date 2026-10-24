@@ -28,7 +28,7 @@ at i-download ang zip para sa computer mo:
 | Mac na may Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Malapit na** |
 
-Halimbawa, `motion2mixamorig-0.1.7-macos-arm64.zip`: ang `0.1.7` ay ang
+Halimbawa, `motion2mixamorig-0.1.8-macos-arm64.zip`: ang `0.1.8` ay ang
 bersyon ng add-on, at ang `macos-arm64` ay ang platform. Kapag mali ang napili
 mo, tatanggihan ito ng Blender at sasabihin kung anong platform ang inaasahan.
 

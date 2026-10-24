@@ -16,7 +16,7 @@
 
 ゲーム開発者向け：入力は**一人**の動作動画（または写真）と Mixamo キャラクター。プレビューと、Blender / Unity にそのまま入れられるスキン付きキャラクターファイル（`.glb`）を書き出します。
 
-> Motion2MixamoRig はまだ実験段階です。v0.1.7 はコマンドラインのパイプラインです。このリポジトリの Blender 4.2+ Extension は、同じパイプラインを外部 Python で実行します。アドオンをソースからビルドする方法：[`blender_extension/README.md`](../../blender_extension/README.md)。
+> Motion2MixamoRig はまだ実験段階です。v0.1.8 はコマンドラインのパイプラインです。このリポジトリの Blender 4.2+ Extension は、同じパイプラインを外部 Python で実行します。アドオンをソースからビルドする方法：[`blender_extension/README.md`](../../blender_extension/README.md)。
 
 ## 2 つの使い方
 

@@ -16,7 +16,7 @@ Pindahkan gerakan seseorang dalam video — atau pose dalam sebuah foto — ke k
 
 Untuk developer game: berikan video aksi dengan **satu orang saja** (atau sebuah foto) dan satu karakter Mixamo; alat ini akan menghasilkan video pratinjau serta file karakter yang sudah di-skin (`.glb`) yang bisa langsung kamu masukkan ke Blender atau Unity.
 
-> Motion2MixamoRig saat ini masih eksperimental. Versi 0.1.7 adalah pipeline baris perintah. Repositori ini juga menyertakan Blender 4.2+ Extension yang menjalankan pipeline yang sama di lingkungan Python eksternal. Membangun add-on dari source: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig saat ini masih eksperimental. Versi 0.1.8 adalah pipeline baris perintah. Repositori ini juga menyertakan Blender 4.2+ Extension yang menjalankan pipeline yang sama di lingkungan Python eksternal. Membangun add-on dari source: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Dua cara memakainya
 

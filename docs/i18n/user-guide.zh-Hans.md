@@ -28,7 +28,7 @@
 | Apple Silicon 芯片的 Mac（M1/M2/M3/M4） | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **即将推出** |
 
-例如 `motion2mixamorig-0.1.7-macos-arm64.zip`：`0.1.7` 是插件版本，
+例如 `motion2mixamorig-0.1.8-macos-arm64.zip`：`0.1.8` 是插件版本，
 `macos-arm64` 是平台。选错了的话，Blender 会拒绝安装，并提示它需要的平台。
 
 **不要**解压。Blender 会直接安装这个 zip。

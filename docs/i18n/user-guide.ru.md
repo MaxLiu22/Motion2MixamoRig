@@ -28,7 +28,7 @@
 | Mac с Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Скоро** |
 
-Например, `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` — версия аддона,
+Например, `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` — версия аддона,
 `macos-arm64` — платформа. Если выбрать не тот файл, Blender откажется его
 устанавливать и назовёт ожидаемую платформу.
 

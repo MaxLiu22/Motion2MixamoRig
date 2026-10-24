@@ -28,7 +28,7 @@
 | Apple Silicon वाला Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **जल्द आ रहा है** |
 
-उदाहरण `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` ऐड-ऑन का संस्करण है,
+उदाहरण `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` ऐड-ऑन का संस्करण है,
 `macos-arm64` प्लैटफ़ॉर्म। गलत वाला चुनने पर Blender इंस्टॉल करने से मना कर
 देता है और बताता है कि उसे कौन सा प्लैटफ़ॉर्म चाहिए था।
 

@@ -16,7 +16,7 @@
 
 面向游戏开发者：输入一段**单人**动作视频（或一张人物照片）和一个 Mixamo 角色，输出预览视频，以及可直接丢进 Blender / Unity 的带皮角色文件（`.glb`）。
 
-> Motion2MixamoRig 目前仍处于实验阶段。v0.1.7 是命令行工作流。本仓库另有一个 Blender 4.2+ Extension，在外部 Python 里跑同一条 pipeline。从源码构建插件：[`blender_extension/README.md`](../../blender_extension/README.md)。
+> Motion2MixamoRig 目前仍处于实验阶段。v0.1.8 是命令行工作流。本仓库另有一个 Blender 4.2+ Extension，在外部 Python 里跑同一条 pipeline。从源码构建插件：[`blender_extension/README.md`](../../blender_extension/README.md)。
 
 ## 两种用法
 

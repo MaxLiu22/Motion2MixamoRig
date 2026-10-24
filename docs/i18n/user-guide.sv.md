@@ -28,7 +28,7 @@ och ladda ner zip-filen för din dator:
 | Mac med Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Kommer snart** |
 
-Till exempel `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` är tilläggets
+Till exempel `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` är tilläggets
 version, `macos-arm64` plattformen. Om du väljer fel vägrar Blender att
 installera den och talar om vilken plattform den väntade sig.
 

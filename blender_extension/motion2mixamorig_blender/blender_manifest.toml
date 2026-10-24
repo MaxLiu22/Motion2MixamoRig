@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "motion2mixamorig"
-version = "0.1.7"
+version = "0.1.8"
 name = "Motion2MixamoRig"
 tagline = "Transfer human motion from video to Mixamo characters"
 maintainer = "Max Liu"

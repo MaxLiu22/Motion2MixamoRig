@@ -28,7 +28,7 @@ a stáhněte zip pro svůj počítač:
 | Mac s Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Již brzy** |
 
-Třeba `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` je verze doplňku,
+Třeba `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` je verze doplňku,
 `macos-arm64` platforma. Když vyberete špatný, Blender instalaci odmítne
 a napíše, jakou platformu čekal.
 

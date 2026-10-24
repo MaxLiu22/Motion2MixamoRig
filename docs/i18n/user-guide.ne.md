@@ -28,7 +28,7 @@
 | Apple Silicon (M1/M2/M3/M4) भएको Mac | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **चाँडै आउँदैछ** |
 
-उदाहरणका लागि `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` एड-अनको संस्करण
+उदाहरणका लागि `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` एड-अनको संस्करण
 हो, `macos-arm64` प्लेटफर्म हो। गलत फाइल छान्नुभयो भने Blender ले इन्स्टल गर्न
 मान्दैन र कुन प्लेटफर्म चाहिएको थियो भनेर देखाउँछ।
 

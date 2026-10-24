@@ -16,7 +16,7 @@ Przenieś ruch osoby z nagrania wideo — albo pozę ze zdjęcia — na postać 
 
 Dla twórców gier: podaj nagranie akcji z **jedną osobą** (albo zdjęcie) i postać z Mixamo; narzędzie wygeneruje filmy podglądowe oraz plik postaci ze skinningiem (`.glb`), który możesz od razu wczytać do Blendera lub Unity.
 
-> Motion2MixamoRig jest na razie eksperymentalny. Wersja 0.1.7 to pipeline wiersza poleceń. To repozytorium zawiera też rozszerzenie Blender 4.2+ Extension, które uruchamia ten sam pipeline w zewnętrznym środowisku Pythona. Budowanie dodatku ze źródeł: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig jest na razie eksperymentalny. Wersja 0.1.8 to pipeline wiersza poleceń. To repozytorium zawiera też rozszerzenie Blender 4.2+ Extension, które uruchamia ten sam pipeline w zewnętrznym środowisku Pythona. Budowanie dodatku ze źródeł: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Dwa sposoby użycia
 

@@ -16,7 +16,7 @@ Bir videodaki kişinin hareketini — ya da bir fotoğraftaki pozu — Adobe Mix
 
 Oyun geliştiricileri için: **tek kişilik** bir aksiyon videosu (ya da bir fotoğraf) ve bir Mixamo karakteri verin; araç önizleme videoları ile Blender veya Unity'ye doğrudan aktarabileceğiniz skin'lenmiş bir karakter dosyası (`.glb`) üretir.
 
-> Motion2MixamoRig şu anda deneysel aşamadadır. 0.1.7 sürümü komut satırı pipeline'ıdır. Bu depo ayrıca aynı pipeline'ı harici bir Python ortamında çalıştıran bir Blender 4.2+ Extension da içerir. Eklentiyi kaynak koddan derlemek için: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig şu anda deneysel aşamadadır. 0.1.8 sürümü komut satırı pipeline'ıdır. Bu depo ayrıca aynı pipeline'ı harici bir Python ortamında çalıştıran bir Blender 4.2+ Extension da içerir. Eklentiyi kaynak koddan derlemek için: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## İki kullanım yolu
 

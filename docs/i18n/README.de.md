@@ -16,7 +16,7 @@
 
 Für Spieleentwickler: ein Video mit **genau einer Person** (oder ein Still) und ein Mixamo-Charakter; Ausgabe sind Vorschauen plus eine Charakterdatei mit Skinning (`.glb`) für Blender oder Unity.
 
-> Motion2MixamoRig ist noch experimentell. Version 0.1.7 ist die Kommandozeilen-Pipeline. In diesem Repository liegt außerdem eine Blender-4.2+-Extension, die dieselbe Pipeline in einem externen Python ausführt. Add-on aus dem Quellcode bauen: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Motion2MixamoRig ist noch experimentell. Version 0.1.8 ist die Kommandozeilen-Pipeline. In diesem Repository liegt außerdem eine Blender-4.2+-Extension, die dieselbe Pipeline in einem externen Python ausführt. Add-on aus dem Quellcode bauen: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Zwei Wege zur Nutzung
 

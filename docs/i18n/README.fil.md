@@ -16,7 +16,7 @@ Ilipat ang galaw ng isang tao sa video — o ang pose sa isang still na larawan 
 
 Para sa mga game developer: bigyan ito ng action video na may **iisang tao** (o isang still) at isang Mixamo character; gagawa ito ng mga preview video at isang skinned na character file (`.glb`) na puwede mong ilagay agad sa Blender o Unity.
 
-> Eksperimental pa ang Motion2MixamoRig sa ngayon. Ang bersyon 0.1.7 ay ang command-line pipeline. May kasama ring Blender 4.2+ Extension ang repository na ito na nagpapatakbo ng parehong pipeline sa isang hiwalay na Python environment. Pag-build ng add-on mula sa source: [`blender_extension/README.md`](../../blender_extension/README.md).
+> Eksperimental pa ang Motion2MixamoRig sa ngayon. Ang bersyon 0.1.8 ay ang command-line pipeline. May kasama ring Blender 4.2+ Extension ang repository na ito na nagpapatakbo ng parehong pipeline sa isang hiwalay na Python environment. Pag-build ng add-on mula sa source: [`blender_extension/README.md`](../../blender_extension/README.md).
 
 ## Dalawang paraan para gamitin ito
 

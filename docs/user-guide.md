@@ -28,7 +28,7 @@ and download the zip for your computer:
 | Mac with Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Coming soon** |
 
-For example `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` is the add-on
+For example `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` is the add-on
 version, `macos-arm64` the platform. If you pick the wrong one, Blender refuses
 to install it and names the platform it expected.
 

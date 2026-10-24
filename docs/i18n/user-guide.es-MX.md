@@ -28,7 +28,7 @@ y descarga el zip para tu computadora:
 | Mac con Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Próximamente** |
 
-Por ejemplo, en `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` es la versión
+Por ejemplo, en `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` es la versión
 del complemento y `macos-arm64` la plataforma. Si eliges el equivocado, Blender
 se niega a instalarlo y te dice qué plataforma esperaba.
 

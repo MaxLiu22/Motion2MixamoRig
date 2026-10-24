@@ -29,7 +29,7 @@ sayfasına gidin ve bilgisayarınıza uygun zip dosyasını indirin:
 | Apple Silicon'lu Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Çok yakında** |
 
-Örneğin `motion2mixamorig-0.1.7-macos-arm64.zip` dosyasında `0.1.7` eklenti
+Örneğin `motion2mixamorig-0.1.8-macos-arm64.zip` dosyasında `0.1.8` eklenti
 sürümü, `macos-arm64` ise platformdur. Yanlış dosyayı seçerseniz Blender
 kurulumu reddeder ve beklediği platformu belirtir.
 

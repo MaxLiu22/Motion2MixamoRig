@@ -28,7 +28,7 @@ và tải tệp zip phù hợp với máy của bạn:
 | Mac dùng Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
 | Windows | **Sắp có** |
 
-Ví dụ `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` là phiên bản add-on,
+Ví dụ `motion2mixamorig-0.1.8-macos-arm64.zip`: `0.1.8` là phiên bản add-on,
 `macos-arm64` là nền tảng. Nếu chọn nhầm tệp, Blender sẽ từ chối cài đặt và cho
 biết nền tảng mà nó cần.
 
