@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> ตอนนี้ทดสอบแล้วบน **macOS (Apple Silicon)** เท่านั้น ยังไม่ได้ทดสอบบน Windows
-> และ Linux
+> ตอนนี้ทดสอบแล้วบน **macOS (Apple Silicon)** เท่านั้น Windows กำลังจะมา
 
 ## สิ่งที่ต้องมี
 
@@ -27,7 +26,7 @@
 | คอมพิวเตอร์ของคุณ | ไฟล์ |
 | --- | --- |
 | Mac ที่ใช้ Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac Intel | ยังไม่มีให้ดาวน์โหลด |
+| Windows | **เร็วๆ นี้** |
 
 ตัวอย่างเช่น `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` คือเวอร์ชันของ
 add-on และ `macos-arm64` คือแพลตฟอร์ม ถ้าเลือกผิดไฟล์ Blender จะไม่ยอมติดตั้ง

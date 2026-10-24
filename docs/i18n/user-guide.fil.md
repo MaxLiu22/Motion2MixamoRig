@@ -9,8 +9,7 @@ Walang coding o terminal na kailangan.
 
 <!-- video: link the tutorial video here -->
 
-> Sa ngayon, sa **macOS (Apple Silicon)** pa lang ito na-test. Hindi pa
-> na-test ang Windows at Linux.
+> Sa ngayon, sa **macOS (Apple Silicon)** pa lang ito na-test. Paparating na ang build para sa Windows.
 
 ## Mga kailangan mo
 
@@ -27,7 +26,7 @@ at i-download ang zip para sa computer mo:
 | Computer mo | File |
 | --- | --- |
 | Mac na may Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | Hindi pa available |
+| Windows | **Malapit na** |
 
 Halimbawa, `motion2mixamorig-0.1.7-macos-arm64.zip`: ang `0.1.7` ay ang
 bersyon ng add-on, at ang `macos-arm64` ay ang platform. Kapag mali ang napili

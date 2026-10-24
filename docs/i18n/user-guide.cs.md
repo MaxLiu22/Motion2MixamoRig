@@ -9,8 +9,7 @@ Programování ani terminál nepotřebujete.
 
 <!-- video: link the tutorial video here -->
 
-> Zatím vyzkoušeno jen na **macOS (Apple Silicon)**. Windows a Linux ještě
-> vyzkoušené nejsou.
+> Zatím vyzkoušeno jen na **macOS (Apple Silicon)**. Verze pro Windows brzy přijde.
 
 ## Co budete potřebovat
 
@@ -27,7 +26,7 @@ a stáhněte zip pro svůj počítač:
 | Váš počítač | Soubor |
 | --- | --- |
 | Mac s Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | Zatím není |
+| Windows | **Již brzy** |
 
 Třeba `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` je verze doplňku,
 `macos-arm64` platforma. Když vyberete špatný, Blender instalaci odmítne

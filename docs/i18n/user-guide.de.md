@@ -9,8 +9,7 @@ Ohne Programmieren und ohne Terminal.
 
 <!-- video: link the tutorial video here -->
 
-> Bisher nur unter **macOS (Apple Silicon)** getestet. Windows und Linux sind
-> noch nicht getestet.
+> Bisher nur unter **macOS (Apple Silicon)** getestet. Eine Windows-Version kommt bald.
 
 ## Was du brauchst
 
@@ -27,7 +26,7 @@ und lade die Zip-Datei für deinen Computer herunter:
 | Dein Computer | Datei |
 | --- | --- |
 | Mac mit Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel-Mac | Noch nicht verfügbar |
+| Windows | **Kommt bald** |
 
 Zum Beispiel `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` ist die
 Add-on-Version, `macos-arm64` die Plattform. Erwischst du die falsche Datei,

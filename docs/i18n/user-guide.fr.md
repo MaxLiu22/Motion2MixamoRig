@@ -9,8 +9,7 @@ Aucune programmation ni aucun terminal nécessaires.
 
 <!-- video: link the tutorial video here -->
 
-> Testé pour l’instant uniquement sur **macOS (Apple Silicon)**. Windows et Linux
-> n’ont pas encore été testés.
+> Testé pour l’instant uniquement sur **macOS (Apple Silicon)**. Une version Windows arrive bientôt.
 
 ## Ce qu’il vous faut
 
@@ -27,7 +26,7 @@ et téléchargez le zip correspondant à votre ordinateur :
 | Votre ordinateur | Fichier |
 | --- | --- |
 | Mac avec Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac Intel | Pas encore disponible |
+| Windows | **Bientôt disponible** |
 
 Par exemple `motion2mixamorig-0.1.7-macos-arm64.zip` : `0.1.7` est la version du
 module, `macos-arm64` la plateforme. Si vous choisissez le mauvais fichier,

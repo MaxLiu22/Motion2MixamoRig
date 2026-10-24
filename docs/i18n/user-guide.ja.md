@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> 現時点でテスト済みなのは **macOS（Apple Silicon）** のみです。Windows と Linux は
-> まだテストしていません。
+> 現時点でテスト済みなのは **macOS（Apple Silicon）** のみです。Windows 版は近日公開です。
 
 ## 必要なもの
 
@@ -27,7 +26,7 @@
 | お使いのコンピューター | ファイル |
 | --- | --- |
 | Apple Silicon 搭載の Mac（M1/M2/M3/M4） | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows、Linux、Intel Mac | 未対応 |
+| Windows | **近日公開** |
 
 たとえば `motion2mixamorig-0.1.7-macos-arm64.zip` の場合、`0.1.7` がアドオンの
 バージョン、`macos-arm64` がプラットフォームです。違うものを選ぶと Blender は

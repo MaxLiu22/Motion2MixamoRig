@@ -9,8 +9,7 @@ Tanpa coding dan tanpa terminal.
 
 <!-- video: link the tutorial video here -->
 
-> Sejauh ini baru diuji di **macOS (Apple Silicon)**. Windows dan Linux belum
-> diuji.
+> Sejauh ini baru diuji di **macOS (Apple Silicon)**. Versi Windows segera hadir.
 
 ## Yang kamu butuhkan
 
@@ -27,7 +26,7 @@ dan unduh zip untuk komputermu:
 | Komputermu | File |
 | --- | --- |
 | Mac dengan Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac Intel | Belum tersedia |
+| Windows | **Segera hadir** |
 
 Contohnya `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` adalah versi
 add-on, `macos-arm64` adalah platformnya. Kalau kamu salah pilih, Blender akan

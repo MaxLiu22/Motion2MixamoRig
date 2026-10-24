@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> अहिलेसम्म **macOS (Apple Silicon)** मा मात्र परीक्षण गरिएको छ। Windows र Linux
-> मा अझै परीक्षण गरिएको छैन।
+> अहिलेसम्म **macOS (Apple Silicon)** मा मात्र परीक्षण गरिएको छ। Windows बिल्ड चाँडै आउँदैछ।
 
 ## तपाईंलाई के चाहिन्छ
 
@@ -27,7 +26,7 @@
 | तपाईंको कम्प्युटर | फाइल |
 | --- | --- |
 | Apple Silicon (M1/M2/M3/M4) भएको Mac | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | अझै उपलब्ध छैन |
+| Windows | **चाँडै आउँदैछ** |
 
 उदाहरणका लागि `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` एड-अनको संस्करण
 हो, `macos-arm64` प्लेटफर्म हो। गलत फाइल छान्नुभयो भने Blender ले इन्स्टल गर्न

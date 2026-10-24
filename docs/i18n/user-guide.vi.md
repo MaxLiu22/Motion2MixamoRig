@@ -9,8 +9,7 @@ Không cần lập trình hay dùng terminal.
 
 <!-- video: link the tutorial video here -->
 
-> Hiện mới được kiểm thử trên **macOS (Apple Silicon)**. Windows và Linux chưa
-> được kiểm thử.
+> Hiện mới được kiểm thử trên **macOS (Apple Silicon)**. Bản Windows sắp ra mắt.
 
 ## Bạn cần có
 
@@ -27,7 +26,7 @@ và tải tệp zip phù hợp với máy của bạn:
 | Máy của bạn | Tệp |
 | --- | --- |
 | Mac dùng Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac Intel | Chưa có |
+| Windows | **Sắp có** |
 
 Ví dụ `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` là phiên bản add-on,
 `macos-arm64` là nền tảng. Nếu chọn nhầm tệp, Blender sẽ từ chối cài đặt và cho

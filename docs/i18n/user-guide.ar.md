@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> جُرّب حتى الآن على **macOS (Apple Silicon)** فقط. لم يُختبر بعد على Windows
-> وLinux.
+> جُرّب حتى الآن على **macOS (Apple Silicon)** فقط. إصدار Windows قريب.
 
 ## ما تحتاج إليه
 
@@ -27,7 +26,7 @@
 | جهازك | الملف |
 | --- | --- |
 | Mac بمعالج Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows وLinux وMac بمعالج Intel | غير متاح بعد |
+| Windows | **قريبًا** |
 
 مثلًا `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` هو إصدار الإضافة،
 و`macos-arm64` هو المنصة. إن اخترت الملف الخطأ، يرفض Blender تثبيته ويذكر

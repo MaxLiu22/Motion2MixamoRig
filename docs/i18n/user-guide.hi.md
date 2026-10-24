@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> अभी तक सिर्फ़ **macOS (Apple Silicon)** पर जाँचा गया है। Windows और Linux की
-> जाँच अभी नहीं हुई।
+> अभी तक सिर्फ़ **macOS (Apple Silicon)** पर जाँचा गया है। Windows बिल्ड जल्द आ रहा है।
 
 ## क्या चाहिए
 
@@ -27,7 +26,7 @@
 | आपका कंप्यूटर | फ़ाइल |
 | --- | --- |
 | Apple Silicon वाला Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | अभी उपलब्ध नहीं |
+| Windows | **जल्द आ रहा है** |
 
 उदाहरण `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` ऐड-ऑन का संस्करण है,
 `macos-arm64` प्लैटफ़ॉर्म। गलत वाला चुनने पर Blender इंस्टॉल करने से मना कर

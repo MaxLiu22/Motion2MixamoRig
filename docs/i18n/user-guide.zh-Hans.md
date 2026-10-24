@@ -9,7 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> 目前只在 **macOS（Apple Silicon）** 上测试过。Windows 和 Linux 还没有测试。
+> 目前只在 **macOS（Apple Silicon）** 上测试过。Windows 版即将推出。
 
 ## 准备工作
 
@@ -26,7 +26,7 @@
 | 你的电脑 | 文件 |
 | --- | --- |
 | Apple Silicon 芯片的 Mac（M1/M2/M3/M4） | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows、Linux、Intel Mac | 暂未提供 |
+| Windows | **即将推出** |
 
 例如 `motion2mixamorig-0.1.7-macos-arm64.zip`：`0.1.7` 是插件版本，
 `macos-arm64` 是平台。选错了的话，Blender 会拒绝安装，并提示它需要的平台。

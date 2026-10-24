@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> 지금까지 **macOS (Apple Silicon)** 에서만 테스트했습니다. Windows와 Linux는
-> 아직 테스트하지 않았습니다.
+> 지금까지 **macOS (Apple Silicon)** 에서만 테스트했습니다. Windows 버전은 곧 나옵니다.
 
 ## 준비물
 
@@ -27,7 +26,7 @@
 | 내 컴퓨터 | 파일 |
 | --- | --- |
 | Apple Silicon Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | 아직 제공되지 않음 |
+| Windows | **곧 나옵니다** |
 
 예를 들어 `motion2mixamorig-0.1.7-macos-arm64.zip`에서 `0.1.7`은 애드온
 버전, `macos-arm64`는 플랫폼입니다. 잘못된 파일을 고르면 Blender가 설치를

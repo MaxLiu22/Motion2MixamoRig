@@ -9,8 +9,7 @@ Nie musisz programować ani korzystać z terminala.
 
 <!-- video: link the tutorial video here -->
 
-> Na razie przetestowano tylko na **macOS (Apple Silicon)**. Windows i Linux
-> nie zostały jeszcze przetestowane.
+> Na razie przetestowano tylko na **macOS (Apple Silicon)**. Wersja dla Windows jest już w drodze.
 
 ## Czego potrzebujesz
 
@@ -27,7 +26,7 @@ i pobierz zip dla swojego komputera:
 | Twój komputer | Plik |
 | --- | --- |
 | Mac z Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac z procesorem Intel | Jeszcze niedostępne |
+| Windows | **Wkrótce** |
 
 Na przykład w `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` to wersja
 dodatku, a `macos-arm64` to platforma. Jeśli wybierzesz zły plik, Blender

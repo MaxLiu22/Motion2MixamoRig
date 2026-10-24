@@ -10,7 +10,7 @@ Kod yazmanız veya terminal kullanmanız gerekmez.
 <!-- video: link the tutorial video here -->
 
 > Şimdiye kadar yalnızca **macOS (Apple Silicon)** üzerinde test edilmiştir.
-> Windows ve Linux henüz test edilmedi.
+> Windows sürümü yakında geliyor.
 
 ## Gerekenler
 
@@ -27,7 +27,7 @@ sayfasına gidin ve bilgisayarınıza uygun zip dosyasını indirin:
 | Bilgisayarınız | Dosya |
 | --- | --- |
 | Apple Silicon'lu Mac (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Intel Mac | Henüz mevcut değil |
+| Windows | **Çok yakında** |
 
 Örneğin `motion2mixamorig-0.1.7-macos-arm64.zip` dosyasında `0.1.7` eklenti
 sürümü, `macos-arm64` ise platformdur. Yanlış dosyayı seçerseniz Blender

@@ -9,8 +9,7 @@
 
 <!-- video: link the tutorial video here -->
 
-> Пока проверено только на **macOS (Apple Silicon)**. Windows и Linux ещё не
-> тестировались.
+> Пока проверено только на **macOS (Apple Silicon)**. Сборка для Windows скоро появится.
 
 ## Что понадобится
 
@@ -27,7 +26,7 @@
 | Ваш компьютер | Файл |
 | --- | --- |
 | Mac с Apple Silicon (M1/M2/M3/M4) | `motion2mixamorig-<version>-macos-arm64.zip` |
-| Windows, Linux, Mac с Intel | Пока недоступно |
+| Windows | **Скоро** |
 
 Например, `motion2mixamorig-0.1.7-macos-arm64.zip`: `0.1.7` — версия аддона,
 `macos-arm64` — платформа. Если выбрать не тот файл, Blender откажется его
