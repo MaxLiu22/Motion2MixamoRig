@@ -48,11 +48,7 @@ https://github.com/user-attachments/assets/073f20c8-7283-4209-98e8-f247228bfd56
 
 Diagnostics report (`diagnostics.html`):
 
-![diagnostics.html](docs/assets/diagnostics_demo.gif)
-
-<p align="center">
-  <sub>Open <a href="docs/assets/diagnostics_demo.mp4">diagnostics_demo.mp4</a> in this repository.</sub>
-</p>
+https://github.com/user-attachments/assets/0474ba58-dea7-4538-82a9-cbe35e437c44
 
 ## Prerequisites
 
