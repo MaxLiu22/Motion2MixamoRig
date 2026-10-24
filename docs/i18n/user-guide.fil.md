@@ -93,7 +93,7 @@ Sa **Input** box:
    gaya ng SMPL-X: magrehistro sa
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), i-download ang **Models & Code**,
    at i-unzip. Ang unang hand run ay magda-download pa ng mga **2.7 GB**, isang beses,
-   at aabot nang halos doble ng body-only na run.
+   at aabot nang halos doble ng body-only na run. Kapag naka-on, lumalabas ang **Finger Smoothing (seconds)**. Pinapalambot nito ang galaw ng mga daliri. Ang default ay 0.08 segundo; ang 0 ay iniiwan ang nadetect.
 5. I-click ang **Gumawa ng Galaw** (Generate Motion)
 
 Pagkatapos nito, awtomatikong ii-import sa scene mo ang animated na character. Nanatili ang nakalapag na paa kung saan ito dumapo, at inilalagay ang talampakan sa sahig ng Blender. May idinaragdag na mesh na **Mga marka sa sahig** (Floor Markers) sa sahig na iyon (isang krus kada 0.5 m). Ipinapakita o itinatago ito ng checkbox na **Mga marka sa sahig** (Floor Markers) sa ilalim ng Progreso / Resulta.
@@ -144,7 +144,7 @@ Makikita ang naka-install mong bersyon sa tabi ng add-on sa **Get Extensions**.
   pagitan ng mga problema ang **Nauna** / **Susunod** (Previous / Next).
   Binubuksan ng **Buksan ang HTML Report** (Open HTML Report) ang isang report
   sa web browser na katabi ng character ang source video (sa unang beses, mga
-  15 segundo bago ito mabuo). Nakatayo ang character sa mga nakapirming krus sa sahig, isa kada 0.5 m, para makita kung dumudulas ito. Ang amber na lane sa ibabaw ng mga pulang track ay para sa mga talang nakikita ng mata. Nasa listahang **Notes** sa kanan ang mga ito; i-click ang isang row para lumipat doon. Sine-save ng **Download notes** ang mga talang ito kasama ang oras ng intersection. Ipinangalan ang file sa source video.
+  15 segundo bago ito mabuo). Kailangan ng orihinal na video ang ffmpeg sa computer (sa Mac: `brew install ffmpeg`). Kung wala, nandoon ang character at blangko ang video sa tabi nito. Nakatayo ang character sa mga nakapirming krus sa sahig, isa kada 0.5 m, para makita kung dumudulas ito. Ang amber na lane sa ibabaw ng mga pulang track ay para sa mga talang nakikita ng mata. Nasa listahang **Notes** sa kanan ang mga ito; i-click ang isang row para lumipat doon. Sine-save ng **Download notes** ang mga talang ito kasama ang oras ng intersection. Ipinangalan ang file sa source video.
 
 Available ang add-on sa 19 wika. Sinusunod ng **Auto (sundan ang Blender / system)**
 ang wika ng Blender; palitan ito sa Setup box sa **Wika ng UI** (UI Language).

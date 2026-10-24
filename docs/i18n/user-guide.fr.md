@@ -92,7 +92,7 @@ Dans la zone **Entrée** (Input) :
    comme SMPL-X : inscrivez-vous sur
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), téléchargez **Models & Code**
    et décompressez-le. Le premier passage des mains télécharge environ **2,7 Go** de
-   plus, une seule fois, et dure environ deux fois plus longtemps qu’un passage du corps seul.
+   plus, une seule fois, et dure environ deux fois plus longtemps qu’un passage du corps seul. Lorsqu’il est activé, **Finger Smoothing (seconds)** apparaît. Il adoucit le mouvement des doigts. La valeur par défaut est 0,08 seconde ; 0 garde ce qui a été détecté.
 5. Cliquez sur **Générer le mouvement** (Generate Motion)
 
 Une fois le traitement terminé, le personnage animé est automatiquement importé
@@ -144,7 +144,7 @@ version installée est indiquée à côté du module dans **Get Extensions**.
   et leur profondeur. **Précédent** / **Suivant** (Previous / Next) passent
   d’un problème à l’autre. **Ouvrir le rapport HTML** (Open HTML Report) ouvre
   dans le navigateur un rapport avec la vidéo source à côté du personnage (la
-  première fois, sa création prend environ 15 secondes). Le personnage se tient sur des croix de sol fixes, une tous les 0,5 m, pour voir s’il glisse. La bande ambre au-dessus des pistes rouges sert aux remarques que vous faites à l’œil. Elles sont listées à droite sous **Notes** ; un clic sur une ligne y saute. **Download notes** enregistre ces remarques avec les instants d’intersection. Le fichier porte le nom de la vidéo source.
+  première fois, sa création prend environ 15 secondes). La vidéo d’origine a besoin de ffmpeg sur l’ordinateur (sur Mac : `brew install ffmpeg`). Sans lui, le personnage est là et la vidéo à côté reste vide. Le personnage se tient sur des croix de sol fixes, une tous les 0,5 m, pour voir s’il glisse. La bande ambre au-dessus des pistes rouges sert aux remarques que vous faites à l’œil. Elles sont listées à droite sous **Notes** ; un clic sur une ligne y saute. **Download notes** enregistre ces remarques avec les instants d’intersection. Le fichier porte le nom de la vidéo source.
 
 Le module parle 19 langues. **Automatique (Blender / Système)** (Auto) suit la langue de Blender ;
 vous pouvez la changer dans la zone Configuration, sous **Langue de l’interface** (UI Language).

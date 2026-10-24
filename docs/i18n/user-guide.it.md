@@ -92,7 +92,7 @@ Nel riquadro **Input**:
    Hand Model…) e scegli `MANO_RIGHT.pkl`. Quel file si ottiene come SMPL-X:
    registrati su [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), scarica
    **Models & Code** e decomprimilo. Il primo passaggio delle mani scarica circa
-   **2,7 GB** in più, una sola volta, e dura circa il doppio di un passaggio del solo corpo.
+   **2,7 GB** in più, una sola volta, e dura circa il doppio di un passaggio del solo corpo. Quando è attivo compare **Finger Smoothing (seconds)**. Ammorbidisce il movimento delle dita. Il valore predefinito è 0,08 secondi; 0 lascia ciò che è stato rilevato.
 5. Fai clic su **Genera movimento** (Generate Motion)
 
 Al termine, il personaggio animato viene importato automaticamente nella scena. Un piede appoggiato resta dove è atterrato, e la pianta è posata sul pavimento di Blender. Su quel pavimento viene aggiunto un mesh **Segni sul pavimento** (Floor Markers) (una croce ogni 0,5 m). La casella **Segni sul pavimento** (Floor Markers) sotto Avanzamento / Risultato lo mostra o lo nasconde.
@@ -144,7 +144,7 @@ installata è indicata accanto al componente aggiuntivo in **Get Extensions**.
   **Precedente** / **Successivo** (Previous / Next) passano da un problema
   all’altro. **Apri il report HTML** (Open HTML Report) apre nel browser un
   report con il video sorgente accanto al personaggio (la prima volta la
-  creazione richiede circa 15 secondi). Il personaggio sta su croci fisse del pavimento, una ogni 0,5 m, così si vede se sta scivolando. La corsia ambra sopra le tracce rosse serve per le note che fai a occhio. Sono elencate a destra in **Notes**; un clic su una riga ci salta. **Download notes** salva queste note insieme agli istanti di intersezione. Il file prende il nome del video sorgente.
+  creazione richiede circa 15 secondi). Il video originale richiede ffmpeg sul computer (su Mac: `brew install ffmpeg`). Senza, il personaggio c’è e il video accanto resta vuoto. Il personaggio sta su croci fisse del pavimento, una ogni 0,5 m, così si vede se sta scivolando. La corsia ambra sopra le tracce rosse serve per le note che fai a occhio. Sono elencate a destra in **Notes**; un clic su una riga ci salta. **Download notes** salva queste note insieme agli istanti di intersezione. Il file prende il nome del video sorgente.
 
 Il componente aggiuntivo parla 19 lingue. **Automatica (Blender / Sistema)**
 (Auto) segue la lingua di Blender; puoi cambiarla nel riquadro Configurazione in

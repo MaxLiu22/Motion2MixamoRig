@@ -93,7 +93,7 @@ indirmeniz gerekir:
    düğmesine tıklayıp `MANO_RIGHT.pkl` dosyasını seçin. Bu dosyayı SMPL-X gibi alırsınız:
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/) adresine kaydolun, **Models & Code**
    indirin ve açın. İlk el geçişi bir kez yaklaşık **2,7 GB** daha indirir ve yalnızca
-   gövde çalıştırmasının yaklaşık iki katı sürer.
+   gövde çalıştırmasının yaklaşık iki katı sürer. Açıkken **Finger Smoothing (seconds)** da görünür. Parmak hareketini yumuşatır. Varsayılan 0,08 saniyedir; 0, algılananı olduğu gibi bırakır.
 5. **Hareket Üret** (Generate Motion) düğmesine tıklayın
 
 İşlem bittiğinde animasyonlu karakter sahnenize otomatik olarak içe
@@ -143,7 +143,7 @@ Güncelleme, indirilmiş modelleri korur; bu yüzden hızlıdır. Kurulu sürüm
   geçtiği ve ne kadar derin olduğu görünür. **Önceki** / **Sonraki** (Previous
   / Next) sorunlar arasında geçiş yapar. **HTML Raporunu Aç** (Open HTML
   Report), kaynak videonun karakterin yanında gösterildiği bir raporu web
-  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer). Karakter, kayıp kaymadığı görülsün diye her 0,5 m'de bir sabit zemin çarpısının üzerinde durur. Kırmızı izlerin üstündeki amber şerit, gözünüzle gördüğünüz notlar içindir. Sağdaki **Notes** listesinde dururlar; bir satıra tıklamak oraya gider. **Download notes** bu notları kesişim zamanlarıyla birlikte kaydeder. Dosya kaynak videonun adını taşır.
+  tarayıcısında açar (ilk seferde oluşturulması yaklaşık 15 saniye sürer). Özgün videonun görünmesi için bilgisayarda ffmpeg olmalıdır (Mac’te `brew install ffmpeg`). Yoksa karakter durur, yanındaki video boş kalır. Karakter, kayıp kaymadığı görülsün diye her 0,5 m'de bir sabit zemin çarpısının üzerinde durur. Kırmızı izlerin üstündeki amber şerit, gözünüzle gördüğünüz notlar içindir. Sağdaki **Notes** listesinde dururlar; bir satıra tıklamak oraya gider. **Download notes** bu notları kesişim zamanlarıyla birlikte kaydeder. Dosya kaynak videonun adını taşır.
 
 Eklenti 19 dili destekler. **Otomatik (Blender / Sistem)** (Auto (Blender / System))
 Blender'ın dilini izler; bunu Kurulum kutusundaki **Arayüz Dili** (UI Language)

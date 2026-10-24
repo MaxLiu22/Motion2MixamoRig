@@ -91,7 +91,7 @@ Im Bereich **Eingabe** (Input):
    Hand Model…) und wähle `MANO_RIGHT.pkl`. Die Datei holst du wie SMPL-X: registriere
    dich auf [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), lade **Models & Code**
    und entpacke es. Der erste Handlauf lädt einmalig etwa **2,7 GB** zusätzlich und
-   dauert ungefähr doppelt so lang wie ein reiner Körperlauf.
+   dauert ungefähr doppelt so lang wie ein reiner Körperlauf. Ist es an, erscheint **Finger Smoothing (seconds)**. Es glättet die Fingerbewegung. Der Standard ist 0,08 Sekunden; 0 lässt die erkannte Bewegung unverändert.
 5. Klicke auf **Motion erzeugen** (Generate Motion)
 
 Wenn der Vorgang fertig ist, wird der animierte Charakter automatisch in deine
@@ -142,7 +142,7 @@ es schnell. Deine installierte Version steht neben dem Add-on in **Get Extension
   Teile und wie tief sie ineinander stecken. **Zurück** / **Weiter** (Previous
   / Next) springen zwischen den Problemen. **HTML-Bericht öffnen** (Open HTML
   Report) öffnet im Webbrowser einen Bericht mit dem Quellvideo neben dem
-  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden). Der Charakter steht auf festen Bodenkreuzen, alle 0,5 m eines, damit zu sehen ist, ob er rutscht. Die bernsteinfarbene Spur über den roten Spuren ist für Notizen, die du mit dem Auge machst. Sie stehen rechts unter **Notes**; ein Klick auf eine Zeile springt dorthin. **Download notes** speichert diese Notizen zusammen mit den Schnittzeiten. Die Datei heißt wie das Quellvideo.
+  Charakter (beim ersten Mal dauert das Erstellen etwa 15 Sekunden). Das Originalvideo braucht ffmpeg auf dem Computer (auf dem Mac: `brew install ffmpeg`). Ohne ffmpeg ist der Charakter da, und das Video daneben bleibt leer. Der Charakter steht auf festen Bodenkreuzen, alle 0,5 m eines, damit zu sehen ist, ob er rutscht. Die bernsteinfarbene Spur über den roten Spuren ist für Notizen, die du mit dem Auge machst. Sie stehen rechts unter **Notes**; ein Klick auf eine Zeile springt dorthin. **Download notes** speichert diese Notizen zusammen mit den Schnittzeiten. Die Datei heißt wie das Quellvideo.
 
 Das Add-on spricht 19 Sprachen. **Automatisch (Blender / System)** (Auto) folgt der Sprache von Blender;
 ändern kannst du das im Bereich Einrichtung unter **UI-Sprache** (UI Language).

@@ -90,7 +90,7 @@ Trong khung **Đầu vào** (Input):
    chọn `MANO_RIGHT.pkl`. Lấy tệp này giống SMPL-X: đăng ký tại
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), tải **Models & Code** và giải nén.
    Lần chạy bàn tay đầu tiên tải thêm khoảng **2.7 GB**, một lần, và mất khoảng gấp đôi
-   thời gian so với lần chỉ chạy thân người.
+   thời gian so với lần chỉ chạy thân người. Khi bật, **Finger Smoothing (seconds)** cũng hiện ra. Nó làm chuyển động ngón tay mượt hơn. Mặc định là 0,08 giây; 0 giữ nguyên kết quả nhận dạng.
 5. Nhấp **Tạo chuyển động** (Generate Motion)
 
 Khi hoàn tất, nhân vật có hoạt ảnh sẽ tự động được nhập vào cảnh của bạn. Bàn chân đã đặt xuống đứng yên tại chỗ đáp, và lòng bàn chân nằm trên sàn của Blender. Trên sàn đó có thêm một mesh **Mốc sàn** (Floor Markers) (một dấu cộng mỗi 0,5 m). Ô **Mốc sàn** (Floor Markers) trong Tiến trình / Kết quả dùng để hiện hoặc ẩn nó.
@@ -138,7 +138,7 @@ hiển thị bên cạnh add-on trong **Get Extensions**.
   hình hiện tại, bên dưới là các bộ phận đang giao cắt và độ sâu. **Trước** /
   **Tiếp** (Previous / Next) nhảy giữa các vấn đề. **Mở báo cáo HTML** (Open
   HTML Report) mở trong trình duyệt một báo cáo có video nguồn bên cạnh nhân
-  vật (lần đầu mất khoảng 15 giây để tạo). Nhân vật đứng trên các dấu cộng sàn cố định, mỗi 0,5 m một dấu, để xem nó có đang trượt hay không. Làn màu hổ phách phía trên các dải đỏ dùng để ghi điều bạn thấy bằng mắt. Chúng nằm trong danh sách **Notes** bên phải; bấm một dòng để nhảy tới đó. **Download notes** lưu các ghi chú này cùng thời điểm giao cắt. Tệp được đặt tên theo video nguồn.
+  vật (lần đầu mất khoảng 15 giây để tạo). Video gốc cần ffmpeg trên máy tính (trên Mac: `brew install ffmpeg`). Không có thì nhân vật vẫn hiện, còn video bên cạnh để trống. Nhân vật đứng trên các dấu cộng sàn cố định, mỗi 0,5 m một dấu, để xem nó có đang trượt hay không. Làn màu hổ phách phía trên các dải đỏ dùng để ghi điều bạn thấy bằng mắt. Chúng nằm trong danh sách **Notes** bên phải; bấm một dòng để nhảy tới đó. **Download notes** lưu các ghi chú này cùng thời điểm giao cắt. Tệp được đặt tên theo video nguồn.
 
 Add-on hỗ trợ 19 ngôn ngữ. **Tự động (theo Blender / hệ thống)** (Auto (Blender / System))
 đi theo ngôn ngữ của Blender; bạn có thể đổi trong khung **Thiết lập**, tại

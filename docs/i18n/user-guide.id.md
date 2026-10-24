@@ -90,7 +90,7 @@ Di kotak **Input**:
    `MANO_RIGHT.pkl`. Berkas itu diambil seperti SMPL-X: daftar di
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), unduh **Models & Code**, lalu
    ekstrak. Proses tangan yang pertama mengunduh sekitar **2,7 GB** lagi, sekali, dan
-   makan waktu kira-kira dua kali proses tubuh saja.
+   makan waktu kira-kira dua kali proses tubuh saja. Saat menyala, **Finger Smoothing (seconds)** muncul. Ia menghaluskan gerakan jari. Nilai bawaannya 0,08 detik; 0 mempertahankan yang terdeteksi.
 5. Klik **Buat Gerakan** (Generate Motion)
 
 Setelah selesai, karakter yang sudah beranimasi otomatis diimpor ke scene-mu. Kaki yang menapak tetap di tempat ia mendarat, dan telapak kaki diletakkan di lantai Blender. Di lantai itu ditambahkan mesh **Penanda lantai** (Floor Markers) (satu silang setiap 0,5 m). Kotak **Penanda lantai** (Floor Markers) di Progres / Hasil menampilkan atau menyembunyikannya.
@@ -139,7 +139,7 @@ terpasang ditampilkan di samping add-on di **Get Extensions**.
   tembus serta seberapa dalam. **Sebelumnya** / **Berikutnya** (Previous /
   Next) melompat antarmasalah. **Buka Laporan HTML** (Open HTML Report)
   membuka laporan di browser dengan video sumber di samping karakter (pertama
-  kali butuh sekitar 15 detik untuk membuatnya). Karakter berdiri di atas silang lantai yang tetap, satu setiap 0,5 m, supaya terlihat apakah ia meluncur. Lajur amber di atas jalur merah untuk catatan yang kamu lihat dengan mata. Daftar **Notes** di kanan menampilkannya; klik satu baris untuk meloncat ke sana. **Download notes** menyimpan catatan itu bersama waktu perpotongan. Berkas dinamai sesuai video sumber.
+  kali butuh sekitar 15 detik untuk membuatnya). Video asli membutuhkan ffmpeg di komputer (di Mac: `brew install ffmpeg`). Tanpa itu karakternya ada, dan video di sebelahnya kosong. Karakter berdiri di atas silang lantai yang tetap, satu setiap 0,5 m, supaya terlihat apakah ia meluncur. Lajur amber di atas jalur merah untuk catatan yang kamu lihat dengan mata. Daftar **Notes** di kanan menampilkannya; klik satu baris untuk meloncat ke sana. **Download notes** menyimpan catatan itu bersama waktu perpotongan. Berkas dinamai sesuai video sumber.
 
 Add-on ini tersedia dalam 19 bahasa. **Otomatis (ikut Blender / sistem)** (Auto)
 mengikuti bahasa Blender; ubah di kotak Penyiapan pada **Bahasa Antarmuka** (UI Language).

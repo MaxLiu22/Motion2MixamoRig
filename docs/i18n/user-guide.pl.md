@@ -90,7 +90,7 @@ W sekcji **Dane wejściowe** (Input):
    Hand Model…) i wskaż `MANO_RIGHT.pkl`. Plik bierzesz tak jak SMPL-X: zarejestruj
    się na [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), pobierz **Models & Code**
    i rozpakuj. Pierwsze przejście dłoni dociąga jednorazowo około **2,7 GB** i trwa
-   mniej więcej dwa razy dłużej niż przebieg samego ciała.
+   mniej więcej dwa razy dłużej niż przebieg samego ciała. Po włączeniu pojawia się **Finger Smoothing (seconds)**. Wygładza ruch palców. Domyślnie 0,08 sekundy; 0 zostawia to, co wykryto.
 5. Kliknij **Generuj ruch** (Generate Motion)
 
 Po zakończeniu animowana postać zostanie automatycznie zaimportowana do
@@ -140,7 +140,7 @@ jest widoczna obok dodatku w **Get Extensions**.
   przenikają i jak głęboko. **Poprzedni** / **Następny** (Previous / Next)
   przechodzą między problemami. **Otwórz raport HTML** (Open HTML Report)
   otwiera w przeglądarce raport z wideo źródłowym obok postaci (za pierwszym
-  razem tworzenie trwa około 15 sekund). Postać stoi na stałych krzyżach podłogi, co 0,5 m, żeby było widać, czy się ślizga. Bursztynowy pas nad czerwonymi ścieżkami służy do uwag, które zauważysz na oko. Są na liście **Notes** po prawej; kliknięcie wiersza przenosi do niego. **Download notes** zapisuje te uwagi razem z czasami przenikania. Plik nazywa się jak wideo źródłowe.
+  razem tworzenie trwa około 15 sekund). Oryginalne wideo wymaga ffmpeg na komputerze (na Macu: `brew install ffmpeg`). Bez niego postać jest, a wideo obok pozostaje puste. Postać stoi na stałych krzyżach podłogi, co 0,5 m, żeby było widać, czy się ślizga. Bursztynowy pas nad czerwonymi ścieżkami służy do uwag, które zauważysz na oko. Są na liście **Notes** po prawej; kliknięcie wiersza przenosi do niego. **Download notes** zapisuje te uwagi razem z czasami przenikania. Plik nazywa się jak wideo źródłowe.
 
 Dodatek mówi w 19 językach. **Automatycznie (Blender / system)**
 (Auto (Blender / System)) podąża za językiem Blendera; zmienisz to w sekcji

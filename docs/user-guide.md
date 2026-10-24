@@ -91,7 +91,9 @@ In the **Input** box:
    file the same way as SMPL-X: register at
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), download **Models & Code**,
    and unzip it. The first hand run downloads about **2.7 GB** more, once, and
-   takes about twice as long as a body-only run.
+   takes about twice as long as a body-only run. With hands on, **Finger
+   Smoothing (seconds)** appears. It softens the finger motion. The default is
+   0.08 seconds; 0 keeps what was detected.
 5. Click **Generate Motion**
 
 When it finishes, the animated character is imported into your scene
@@ -143,7 +145,9 @@ shown next to the add-on in **Get Extensions**.
   current frame, and below it are the parts that intersect and how deep.
   **Previous** / **Next** jump between problems. **Open HTML Report** opens a
   report in your web browser with the source video beside the character (the
-  first time it takes about 15 seconds to build). The character stands on
+  first time it takes about 15 seconds to build). That video needs ffmpeg
+  installed on the computer (on a Mac, `brew install ffmpeg`); without it the
+  pane stays blank. The character stands on
   fixed floor crosses, one every 0.5 m, so you can see whether it is sliding.
   The amber lane above the red tracks is for notes you make by eye. Those notes
   are listed under **Notes** on the right; click one to jump to it.   **Download

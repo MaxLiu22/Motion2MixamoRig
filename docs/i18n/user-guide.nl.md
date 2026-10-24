@@ -90,7 +90,7 @@ In het vak **Invoer** (Input):
    en kies `MANO_RIGHT.pkl`. Dat bestand haal je op zoals SMPL-X: registreer op
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), download **Models & Code** en pak
    het uit. De eerste handgang downloadt eenmalig ongeveer **2,7 GB** extra en duurt
-   ongeveer twee keer zo lang als een run met alleen het lichaam.
+   ongeveer twee keer zo lang als een run met alleen het lichaam. Staat het aan, dan verschijnt **Finger Smoothing (seconds)**. Het maakt de vingerbeweging zachter. De standaard is 0,08 seconden; 0 houdt wat er is gedetecteerd.
 5. Klik op **Beweging genereren** (Generate Motion)
 
 Als het klaar is, wordt het geanimeerde personage automatisch in je scène
@@ -141,7 +141,7 @@ Je geïnstalleerde versie staat naast de add-on in **Get Extensions**.
   delen elkaar doorsnijden en hoe diep. **Vorige** / **Volgende** (Previous /
   Next) springen tussen problemen. **HTML-rapport openen** (Open HTML Report)
   opent in de webbrowser een rapport met de bronvideo naast het personage (de
-  eerste keer duurt het maken ongeveer 15 seconden). Het personage staat op vaste vloerkruisen, elke 0,5 m één, zodat te zien is of het schuift. De amberkleurige baan boven de rode sporen is voor notities die je met het oog maakt. Ze staan rechts onder **Notes**; een klik op een rij springt ernaartoe. **Download notes** bewaart die notities samen met de snijtijden. Het bestand heet naar de bronvideo.
+  eerste keer duurt het maken ongeveer 15 seconden). De originele video heeft ffmpeg op de computer nodig (op een Mac: `brew install ffmpeg`). Zonder blijft het personage zichtbaar en is de video ernaast leeg. Het personage staat op vaste vloerkruisen, elke 0,5 m één, zodat te zien is of het schuift. De amberkleurige baan boven de rode sporen is voor notities die je met het oog maakt. Ze staan rechts onder **Notes**; een klik op een rij springt ernaartoe. **Download notes** bewaart die notities samen met de snijtijden. Het bestand heet naar de bronvideo.
 
 De add-on spreekt 19 talen. **Automatisch (Blender / Systeem)** (Auto) volgt de taal van Blender;
 je wijzigt dit in het vak Instellen onder **Interfacetaal** (UI Language).

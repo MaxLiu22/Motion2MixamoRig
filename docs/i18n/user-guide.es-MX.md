@@ -93,7 +93,7 @@ En la sección **Entrada** (Input):
    que SMPL-X: regístrate en
    [mano.is.tue.mpg.de](https://mano.is.tue.mpg.de/), descarga **Models & Code**
    y descomprímelo. La primera pasada de las manos descarga unos **2.7 GB** más,
-   una sola vez, y tarda aproximadamente el doble que una pasada solo del cuerpo.
+   una sola vez, y tarda aproximadamente el doble que una pasada solo del cuerpo. Al activarlo aparece **Finger Smoothing (seconds)**. Suaviza el movimiento de los dedos. El valor predeterminado es 0.08 segundos; 0 deja lo detectado tal cual.
 5. Haz clic en **Generar movimiento** (Generate Motion)
 
 Cuando termina, el personaje animado se importa a tu escena
@@ -144,7 +144,7 @@ instalada aparece junto al complemento en **Get Extensions**.
   partes que se intersectan y qué tan profundo. **Anterior** / **Siguiente**
   (Previous / Next) saltan entre problemas. **Abrir reporte HTML** (Open HTML
   Report) abre en el navegador un reporte con el video fuente junto al
-  personaje (la primera vez tarda unos 15 segundos en generarse). El personaje está sobre cruces de piso fijas, una cada 0.5 m, para ver si se está deslizando. El carril ámbar arriba de las pistas rojas es para notas que haces a simple vista. Aparecen a la derecha en **Notes**; haz clic en una para ir a ella. **Download notes** guarda esas notas junto con los tiempos de intersección. El archivo se llama como el video fuente.
+  personaje (la primera vez tarda unos 15 segundos en generarse). El video original necesita ffmpeg en la computadora (en Mac: `brew install ffmpeg`). Sin él, el personaje está ahí y el video de al lado queda en blanco. El personaje está sobre cruces de piso fijas, una cada 0.5 m, para ver si se está deslizando. El carril ámbar arriba de las pistas rojas es para notas que haces a simple vista. Aparecen a la derecha en **Notes**; haz clic en una para ir a ella. **Download notes** guarda esas notas junto con los tiempos de intersección. El archivo se llama como el video fuente.
 
 El complemento está disponible en 19 idiomas. **Automático (Blender / Sistema)**
 (Auto (Blender / System)) sigue el idioma de Blender; cámbialo en la sección
