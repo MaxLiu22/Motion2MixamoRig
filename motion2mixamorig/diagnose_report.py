@@ -441,7 +441,13 @@ document.querySelectorAll('#filters button').forEach(b => b.onclick = () => {
 // Timeline: a sticky review lane (notes a person makes) above one track per issue.
 const TL = { label: 180, ruler: 22, lane: 32, row: 20, pad: 12 };
 const AMBER = '#e6a23c';
-const storeKey = `m2mr-review-v1:${R.source}:${N}:${FPS}`;
+// The GLB is named mixamo_character.glb in every run, so the browser must not
+// key notes by that name: a new report would open with the previous clip's notes.
+// The run folder and the source video (or still) are written into this file.
+const ident = D.source || {};
+const storeKey = 'm2mr-review-v1:' + JSON.stringify([
+  ident.run || '', ident.video || ident.image || '', N, FPS,
+]);
 let notes = [], selectedNote = -1, pendingIn = null, drag = null, noteSeq = 1;
 function newNoteId() { return 'n' + (noteSeq++); }
 function clampFrame(f) { return Math.max(0, Math.min(N - 1, f | 0)); }

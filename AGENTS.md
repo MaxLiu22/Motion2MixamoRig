@@ -123,7 +123,7 @@ Each run writes `outputs/<YYYYMMDD_HHMMSS>_<source>/`:
 
 Problems only the eye can see (a sliding foot, a popped knee, a hand that misses the body) are not in `diagnostics.json`. They go in a review file, schema `m2mr-review-v1`, so a later pass can revise that run's `mixamo_rotations.npz`, `skeleton_motion.npz`, or the animation in `mixamo_character.glb`. The file does not contain the mesh or the npz bytes.
 
-In `diagnostics.html` the amber lane above the intersection tracks is that pass. Drag a range, or set **In** and **Out**, and write what is wrong. The **Notes** list on the right shows the same notes; click a row to jump to its first frame. **Download notes** saves `<video stem>_review.json`. The browser keeps the notes in `localStorage` under `m2mr-review-v1:<source glb>:<frame count>:<fps>`, so regenerating the HTML does not drop them.
+In `diagnostics.html` the amber lane above the intersection tracks is that pass. Drag a range, or set **In** and **Out**, and write what is wrong. The **Notes** list on the right shows the same notes; click a row to jump to its first frame. **Download notes** saves `<video stem>_review.json`. The browser keeps the notes in `localStorage` under the run folder and the source video or still, so a different report does not show them. Regenerating this report's HTML does not drop them.
 
 An agent automating the pass does not need the browser. Write `<run>/<video stem>_review.json` directly. Read `run.json` for the clip and the rig, and `diagnostics.json` for the intersections. Frame 0 is the first frame, the same index as Blender and `diagnostics.json`. Ranges are inclusive. `start_s` and `end_s` are `frame / fps`, rounded to 3 decimals.
 
