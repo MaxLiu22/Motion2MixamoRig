@@ -54,6 +54,7 @@ def build_animation(
     *,
     verbose: bool = True,
     foot_lock: bool = True,
+    foot_lock_ik_smooth_s: float = 0.05,
     asset: YBotAsset | None = None,
     hands: HandMotion | None = None,
     hand_mapping: HandMapping | None = None,
@@ -105,10 +106,12 @@ def build_animation(
     contact_frames = None if contact is None else np.asarray(contact)[list(frames)]
     if foot_lock and contact_frames is not None and len(frames) > 1:
         anim.r_anim_skeleton, _ = lock_feet(
-            skel, anim.r_anim_skeleton, anim.hips_cm_skeleton, contact_frames, anim.fps
+            skel, anim.r_anim_skeleton, anim.hips_cm_skeleton, contact_frames, anim.fps,
+            ik_smooth_s=foot_lock_ik_smooth_s,
         )
         anim.r_anim_rig, stats = lock_feet(
-            mapping.ybot_rig, anim.r_anim_rig, anim.hips_cm_rig, contact_frames, anim.fps
+            mapping.ybot_rig, anim.r_anim_rig, anim.hips_cm_rig, contact_frames, anim.fps,
+            ik_smooth_s=foot_lock_ik_smooth_s,
         )
         anim.mixamo_pos = [
             world_positions_m(skel, forward_kinematics(skel, r, hips_translation_cm=h))

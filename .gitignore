@@ -9,6 +9,8 @@ assets/**
 
 # ── Auto-downloaded inference weights (GVHMR / 2D pose, etc.) ─
 weights/**
+# A host may point weights at its own tree (this machine: AIGenAnimPrj/assets/weights)
+assets/weights/
 !weights/.gitkeep
 
 # ── Run outputs ──────────────────────────────────────────────

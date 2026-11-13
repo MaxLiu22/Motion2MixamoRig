@@ -101,6 +101,7 @@ def run_pipeline(
     progress_jsonl: Path | None = None,
     no_preview: bool = False,
     foot_lock: bool = True,
+    foot_lock_ik_smooth_s: float = 0.05,
 ) -> Path:
     """Full pipeline for one video or still + one rig. Returns the run directory.
 
@@ -112,6 +113,8 @@ def run_pipeline(
     Blender extension). When omitted, a timestamped directory is created.
     `no_preview` still writes the NPZ/GLB products but skips rendered previews.
     `foot_lock` pins planted feet using GVHMR's foot contact (when available).
+    `foot_lock_ik_smooth_s` low-passes the IK inputs (hip/knee/ankle/ball) so the
+    knee does not chase extractor noise; the pinned target itself is untouched.
     """
     if image is None and video is None:
         raise ValueError("run_pipeline needs a video or an image")
@@ -200,6 +203,7 @@ def run_pipeline(
             frames,
             verbose=verbose,
             foot_lock=foot_lock,
+            foot_lock_ik_smooth_s=foot_lock_ik_smooth_s,
             asset=asset,
             hands=hands,
             hand_mapping=hand_mapping,

@@ -49,6 +49,14 @@ EXIT_CONF = 0.5
 MIN_CONTACT_S = 0.1
 BLEND_S = 0.15
 
+# Two-bone IK reads the hip/knee/ankle positions straight from FK, which carries
+# the extractor's per-frame noise. Solving against noisy geometry makes the knee
+# swing jitter even when the contact target is pinned (measured: 0.53 deg/frame^2
+# on the legs versus 0.07 on the torso, and only 0.30 with foot lock disabled).
+# Low-passing those *inputs* removes the jitter without touching the pinned
+# target, so the foot stays locked. 0 disables it.
+IK_SMOOTH_S = 0.05
+
 
 @dataclass
 class FootLockStats:
@@ -94,6 +102,25 @@ def segments(mask: np.ndarray) -> list[tuple[int, int]]:
     padded = np.concatenate([[False], np.asarray(mask, dtype=bool), [False]])
     edges = np.flatnonzero(padded[1:] != padded[:-1])
     return [(int(s), int(e)) for s, e in zip(edges[::2], edges[1::2])]
+
+
+def smooth_track(values: np.ndarray, sigma_frames: float) -> np.ndarray:
+    """Zero-phase Gaussian low-pass along time; edges repeat instead of decaying.
+
+    Used on the IK inputs (hip / knee / ankle / ball), never on the pinned target.
+    """
+    values = np.asarray(values, dtype=np.float64)
+    if sigma_frames <= 0.0 or len(values) < 3:
+        return values
+    radius = max(1, int(round(3.0 * sigma_frames)))
+    offsets = np.arange(-radius, radius + 1, dtype=np.float64)
+    kernel = np.exp(-0.5 * (offsets / sigma_frames) ** 2)
+    kernel /= kernel.sum()
+    padded = np.pad(values, ((radius, radius), (0, 0)), mode="edge")
+    out = np.zeros_like(values)
+    for index, weight in enumerate(kernel):
+        out += weight * padded[index:index + len(values)]
+    return out
 
 
 def _fade(distance: int, blend: int) -> float:
@@ -223,6 +250,7 @@ def lock_feet(
     hips_cm: list[np.ndarray],
     contact: np.ndarray,
     fps: float,
+    ik_smooth_s: float = IK_SMOOTH_S,
 ) -> tuple[list[dict[str, np.ndarray]], FootLockStats]:
     """Return new per-frame R_anim dicts with the planted feet pinned.
 
@@ -237,14 +265,27 @@ def lock_feet(
     blend = max(2, int(round(BLEND_S * fps)))
 
     worlds = [forward_kinematics(rig, r_anims[i], hips_translation_cm=hips_cm[i]) for i in range(n)]
+    sigma = max(0.0, float(ik_smooth_s)) * fps
+
+    # Per-side IK geometry, low-passed once so the knee does not chase frame noise.
+    geometry: dict[str, dict[str, np.ndarray]] = {}
+    for side, _, _ in SIDES:
+        up, leg, foot, toe = (f"mixamorig:{side}{b}" for b in ("UpLeg", "Leg", "Foot", "ToeBase"))
+        geometry[side] = {
+            "hip": smooth_track(np.stack([w[up][:3, 3] for w in worlds]), sigma),
+            "knee": smooth_track(np.stack([w[leg][:3, 3] for w in worlds]), sigma),
+            "ankle": smooth_track(np.stack([w[foot][:3, 3] for w in worlds]), sigma),
+            "ball": smooth_track(np.stack([w[toe][:3, 3] for w in worlds]), sigma),
+        }
 
     tracks = {}
     planted: dict[str, float] = {}
     seg_count: dict[str, int] = {}
     for side, heel_ch, ball_ch in SIDES:
         foot, toe = f"mixamorig:{side}Foot", f"mixamorig:{side}ToeBase"
-        ankle_raw = np.stack([w[foot][:3, 3] for w in worlds])
-        ball_raw = np.stack([w[toe][:3, 3] for w in worlds])
+        # Smooth inputs: the pinned value is the segment mean of these, so it stays constant.
+        ankle_raw = geometry[side]["ankle"]
+        ball_raw = geometry[side]["ball"]
         heel_mask = contact_mask(contact[:, heel_ch], fps)
         ball_mask = contact_mask(contact[:, ball_ch], fps)
         tracks[side] = (
@@ -269,10 +310,10 @@ def lock_feet(
             if w_h[i] == 0.0 and w_b[i] == 0.0:
                 continue
             up, leg, foot, toe = (f"mixamorig:{side}{b}" for b in ("UpLeg", "Leg", "Foot", "ToeBase"))
-            hip_p = world[up][:3, 3]
-            knee_p = world[leg][:3, 3]
-            ankle_p = world[foot][:3, 3]
-            ball_p = world[toe][:3, 3]
+            hip_p = geometry[side]["hip"][i]
+            knee_p = geometry[side]["knee"][i]
+            ankle_p = geometry[side]["ankle"][i]
+            ball_p = geometry[side]["ball"][i]
             ankle_off = w_b[i] * off_b[i] + (1.0 - w_b[i]) * off_h[i]
             reach = (float(np.linalg.norm(knee_p - hip_p)) + float(np.linalg.norm(ankle_p - knee_p))) * reach_scale
             planted_legs.append(

@@ -380,6 +380,7 @@ def run(args: argparse.Namespace) -> int:
             progress=progress,
             no_preview=bool(getattr(args, "no_preview", False)),
             foot_lock=not bool(getattr(args, "no_foot_lock", False)),
+            foot_lock_ik_smooth_s=float(getattr(args, "foot_lock_smooth", 0.05)),
         )
     except Exception:
         import traceback
@@ -463,6 +464,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-foot-lock",
         action="store_true",
         help="do not pin planted feet (keeps the raw retarget, feet may slide)",
+    )
+    p_run.add_argument(
+        "--foot-lock-smooth",
+        type=float,
+        default=0.05,
+        metavar="SECONDS",
+        help=(
+            "low-pass the foot-lock IK inputs (hip/knee/ankle/ball) by this much "
+            "before solving, which damps knee jitter without unlocking the foot; "
+            "0 disables it (default: 0.05)"
+        ),
     )
 
     p_diag = sub.add_parser(
